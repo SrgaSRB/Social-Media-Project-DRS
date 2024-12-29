@@ -8,7 +8,10 @@ socketio = SocketIO(cors_allowed_origins="*")  # Kreirajte instancu na nivou mod
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'your-secret-key'
-    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_TYPE'] = 'filesystem'  # ili 'redis' za skalabilnost
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
 
     socketio.init_app(app)  # Inicijalizujte SocketIO sa Flask aplikacijom
 
