@@ -1,0 +1,39 @@
+services:
+  - name: backend
+    type: web
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python -m app"
+    startCommand: "python run.py"
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        value: "postgres://postgres:ftn@postgres:5432/DRS"
+    dockerfilePath: ./Backend/Dockerfile
+    httpPort: 5000
+
+  - name: frontend
+    type: web
+    env: node
+    plan: free
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
+    autoDeploy: true
+    envVars:
+      - key: REACT_APP_BACKEND_URL
+        value: "http://backend:5000"
+    dockerfilePath: ./Frontend/Dockerfile
+    httpPort: 3000
+
+  - name: postgres
+    type: database
+    plan: free
+    postgresVersion: 13
+    autoDeploy: true
+    envVars:
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        value: ftn
+      - key: POSTGRES_DB
+        value: DRS
