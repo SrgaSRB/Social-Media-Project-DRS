@@ -53,7 +53,7 @@ const Register: React.FC = () => {
 
   const handleUsernameBlur = async (): Promise<void> => {
     try {
-      const response = await fetch('${backendUrl}/api/auth/check-username', {
+      const response = await fetch(`${backendUrl}/api/auth/check-username`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ const Register: React.FC = () => {
     console.log("Sending data to backend:", formData);
 
     try {
-      const response = await fetch('${backendUrl}/api/auth/register', {
+      const response = await fetch(`${backendUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

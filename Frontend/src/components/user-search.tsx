@@ -45,7 +45,7 @@ const UserSearch: React.FC = () => {
   
     const fetchUsers = async () => {
       try {
-        const response = await fetch('${backendUrl}/api/users/', {
+        const response = await fetch(`${backendUrl}/api/users/`, {
           method: 'GET',
           credentials: 'include', // Neophodno za sesiju
         });
@@ -96,7 +96,7 @@ const UserSearch: React.FC = () => {
 
   const handleSendFriendRequest = async (receiverId: number) => {
     try {
-      const response = await fetch('${backendUrl}/api/users/send-friend-request', {
+      const response = await fetch(`${backendUrl}/api/users/send-friend-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

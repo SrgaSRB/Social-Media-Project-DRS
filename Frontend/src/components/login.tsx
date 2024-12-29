@@ -34,7 +34,7 @@ const Login: React.FC = () => {
     if (hasCheckedSession.current) return; // Skip if already checked
     hasCheckedSession.current = true;
 
-    fetch('${backendUrl}/api/auth/session', { method: 'GET', credentials: 'include' })
+    fetch(`${backendUrl}/api/auth/session`, { method: 'GET', credentials: 'include' })
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -56,7 +56,7 @@ const Login: React.FC = () => {
   }, []);
 
   const handleLogout = async () => {
-    await fetch('${backendUrl}/api/auth/logout', {
+    await fetch(`${backendUrl}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -66,7 +66,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('${backendUrl}/api/auth/login', {
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

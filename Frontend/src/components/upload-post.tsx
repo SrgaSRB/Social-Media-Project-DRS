@@ -37,7 +37,7 @@ const UploadPost: React.FC = () => {
 
     const checkSession = async () => {
       try {
-        const response = await fetch('${backendUrl}/api/auth/session', {
+        const response = await fetch(`${backendUrl}/api/auth/session`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -134,7 +134,7 @@ const UploadPost: React.FC = () => {
     }
 
     try {
-      const response = await fetch('${backendUrl}/api/posts/upload-post', {
+      const response = await fetch(`${backendUrl}/api/posts/upload-post`, {
         method: 'POST',
         credentials: 'include', // Za uključivanje kolačića
         body: formData, // FormData objekat se direktno koristi

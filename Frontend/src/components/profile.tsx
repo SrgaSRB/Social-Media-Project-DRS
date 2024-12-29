@@ -71,7 +71,7 @@ const UserProfile: React.FC = () => {
 
 
   const navigate = useNavigate();
-  const socket = io('http://localhost:5000');
+  const socket = io(`${backendUrl}`);
 
 /*
   useEffect(() => {
@@ -145,7 +145,7 @@ const UserProfile: React.FC = () => {
     //Blocked users list
     const fetchBlockedUsers = async () => {
       try {
-        const response = await fetch('${backendUrl}/api/users/blocked', {
+        const response = await fetch(`${backendUrl}/api/users/blocked`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -164,7 +164,7 @@ const UserProfile: React.FC = () => {
     //check is session empty
     const checkSession = async () => {
       try {
-        const response = await fetch('${backendUrl}/api/auth/session', {
+        const response = await fetch(`${backendUrl}/api/auth/session`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -182,7 +182,7 @@ const UserProfile: React.FC = () => {
     //User posts list
     const fetchUserPosts = async () => {
       try {
-        const response = await fetch('${backendUrl}/api/posts/user-posts', {
+        const response = await fetch(`${backendUrl}/api/posts/user-posts`, {
           method: 'GET',
           credentials: 'include', // Neophodno za sesiju
         });
@@ -198,7 +198,7 @@ const UserProfile: React.FC = () => {
       }
     };
 
-    fetch('${backendUrl}/api/auth/session', {
+    fetch(`${backendUrl}/api/auth/session`, {
       credentials: 'include',
     })
       .then((response) => response.json())
@@ -247,7 +247,7 @@ const UserProfile: React.FC = () => {
 
 
   const fetchPendingPosts = async () => {
-    fetch('${backendUrl}/api/posts/pending-posts', {
+    fetch(`${backendUrl}/api/posts/pending-posts`, {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -331,7 +331,7 @@ const UserProfile: React.FC = () => {
 
     try {
       // Sačuvaj izmenjene podatke (bez provere korisničkog imena)
-      const response = await fetch('${backendUrl}/api/auth/update-profile', {
+      const response = await fetch(`${backendUrl}/api/auth/update-profile`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
@@ -389,7 +389,7 @@ const UserProfile: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('${backendUrl}/api/auth/logout', {
+      const response = await fetch(`${backendUrl}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include', // Include cookies for session
       });

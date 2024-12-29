@@ -43,7 +43,7 @@ const FriendsRequest: React.FC = () => {
 
     const checkSession = async () => {
       try {
-        const response = await fetch('${backendUrl}/api/auth/session', {
+        const response = await fetch(`${backendUrl}/api/auth/session`, {
           method: 'GET',
           credentials: 'include', // Include cookies for authentication
           headers: {
@@ -63,7 +63,7 @@ const FriendsRequest: React.FC = () => {
 
     checkSession();
 
-    fetch('${backendUrl}/api/users/friend-requests', {
+    fetch(`${backendUrl}/api/users/friend-requests`, {
       method: 'GET',
       credentials: 'include',
     })
@@ -77,7 +77,7 @@ const FriendsRequest: React.FC = () => {
 
   const handleAccept = async (requestId: number) => {
     try {
-      const response = await fetch('${backendUrl}/api/users/accept-friend-request', {
+      const response = await fetch(`${backendUrl}/api/users/accept-friend-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ const FriendsRequest: React.FC = () => {
 
   const handleReject = async (requestId: number) => {
     try {
-      const response = await fetch('${backendUrl}/api/users/reject-friend-request', {
+      const response = await fetch(`${backendUrl}/api/users/reject-friend-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -41,7 +41,7 @@ const Index: React.FC = () => {
 
     const checkSession = async () => {
       try {
-        const response = await fetch('${backendUrl}/api/auth/session', {
+        const response = await fetch(`${backendUrl}/api/auth/session`, {
           method: 'GET',
           credentials: 'include', // Include cookies for authentication
           headers: {
@@ -66,7 +66,7 @@ const Index: React.FC = () => {
   
     const fetchPosts = async () => {
       try {
-        const response = await fetch('${backendUrl}/api/posts/friends-posts', {
+        const response = await fetch(`${backendUrl}/api/posts/friends-posts`, {
           method: 'GET',
           credentials: 'include',
           headers: {
