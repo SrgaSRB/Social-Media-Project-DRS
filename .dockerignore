@@ -1,0 +1,22 @@
+# Ignorisanje Git fajlova
+.git
+.gitignore
+
+# Ignorisanje privremenih fajlova
+*.tmp
+*.swp
+*.bak
+
+# Ignorisanje sistema specifičnih fajlova
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Ignorisanje foldera za sinhronizaciju
+.vscode
+.idea
+.DS_Store
+
+# Ignorisanje logova i artefakata
+*.log
+node_modules

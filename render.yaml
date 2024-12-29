@@ -1,0 +1,42 @@
+services:
+  - name: postgres
+    type: pserv
+    plan: free
+    envVars:
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        value: ftn
+      - key: POSTGRES_DB
+        value: DRS
+    disk:
+      name: postgres-data
+      sizeGB: 10
+    autoDeploy: true
+
+  # Backend servis (Python + Docker)
+  - type: web
+    name: backend
+    dockerfilePath: ./Backend/Dockerfile  # Putanja do Dockerfile-a za backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python run.py"  # Startujte aplikaciju
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        value: "postgres://postgres:ftn@postgres:5432/DRS"
+    plan: free  # Prilagodite plan, ako je potrebno
+    region: oregon  # Opcionalno, odaberite region
+
+
+  # Frontend servis (React + Docker)
+  - type: web
+    name: frontend
+    dockerfilePath: ./Frontend/Dockerfile  # Putanja do Dockerfile-a za frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"  # Pokreće React aplikaciju
+    autoDeploy: true
+    envVars:
+      - key: REACT_APP_BACKEND_URL
+        value: "http://backend:5000"  # URL ka backendu
+    plan: free  # Prilagodite plan, ako je potrebno
+    region: oregon  # Opcionalno, odaberite region
