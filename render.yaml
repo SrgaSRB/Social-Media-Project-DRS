@@ -20,7 +20,6 @@ services:
     plan: free
     buildCommand: "pip install -r requirements.txt && python run.py"
     startCommand: "python run.py"  # Možete koristiti ovde dodatne parametre za port ako je potrebno
-    httpPort: 5000  # Ovaj port bi trebao odgovarati portu koji koristi vaša aplikacija
     dockerfilePath: ./Backend/Dockerfile
     envVars:
       - key: DATABASE_URL
@@ -35,7 +34,6 @@ services:
     buildCommand: "npm install && npm run build"
     startCommand: "npm start"
     dockerfilePath: ./Frontend/Dockerfile
-    httpPort: 3000  # Postavite port za frontend aplikaciju
     envVars:
       - key: REACT_APP_BACKEND_URL
         value: "http://backend:5000"  # URL ka backendu
