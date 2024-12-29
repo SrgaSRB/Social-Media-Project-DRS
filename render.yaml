@@ -18,7 +18,6 @@ services:
   - type: web
     name: backend
     dockerfilePath: ./Backend/Dockerfile  # Putanja do Dockerfile-a za backend
-    httpPort: 5000
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python run.py"  # Startujte aplikaciju
     autoDeploy: true
@@ -33,7 +32,6 @@ services:
   - type: web
     name: frontend
     dockerfilePath: ./Frontend/Dockerfile  # Putanja do Dockerfile-a za frontend
-    httpPort: 3000
     buildCommand: "npm install && npm run build"
     startCommand: "npm start"  # Pokreće React aplikaciju
     autoDeploy: true
