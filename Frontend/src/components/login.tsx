@@ -21,9 +21,9 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const hasCheckedSession = useRef(false); // Prevent double execution
+  const hasCheckedSession = useRef(false); 
   const navigate = useNavigate();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;// || 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
   useEffect(() => {
