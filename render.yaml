@@ -14,7 +14,6 @@ services:
       sizeGB: 10
     autoDeploy: true
 
-services:
   # Backend servis (Python + Docker)
   - type: web
     name: backend
@@ -30,7 +29,6 @@ services:
     region: oregon  # Opcionalno, odaberite region
 
 
-services:
   # Frontend servis (React + Docker)
   - type: web
     name: frontend
