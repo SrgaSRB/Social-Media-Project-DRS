@@ -8,7 +8,7 @@ services:
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        value: "postgres://postgres:ftn@postgres:5432/DRS"
+        value: "postgres://postgres:ftn@postgres:5432/DRS"  # URL baze podataka
     dockerfilePath: ./Backend/Dockerfile
     httpPort: 5000
 
@@ -21,19 +21,6 @@ services:
     autoDeploy: true
     envVars:
       - key: REACT_APP_BACKEND_URL
-        value: "http://backend:5000"
+        value: "http://backend:5000"  # URL ka backendu
     dockerfilePath: ./Frontend/Dockerfile
     httpPort: 3000
-
-  - name: postgres
-    type: database
-    plan: free
-    postgresVersion: 13
-    autoDeploy: true
-    envVars:
-      - key: POSTGRES_USER
-        value: postgres
-      - key: POSTGRES_PASSWORD
-        value: ftn
-      - key: POSTGRES_DB
-        value: DRS
