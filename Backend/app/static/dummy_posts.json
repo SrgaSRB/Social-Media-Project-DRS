@@ -1,0 +1,4 @@
+[
+    {"id": 1, "username": "deliics", "text": "Prvi test post", "status": "pending"},
+    {"id": 2, "username": "admin", "text": "Drugi test post", "status": "pending"}
+]

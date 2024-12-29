@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ftn
+      POSTGRES_DB: DRS
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Trajno čuvanje podataka baze
+      - ./DataBase:/docker-entrypoint-initdb.d # Mapiranje lokalnog foldera sa init.sql
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: ./Backend # Folder gde se nalazi Dockerfile za backend
+      dockerfile: Dockerfile # Naziv Dockerfile-a
+    container_name: backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./Backend:/app # Sinhronizacija lokalnog foldera sa kontejnerom
+      - ./Backend/uploads:/app/uploads
+    networks:
+      - app_network
+    depends_on:
+      - postgres # Backend čeka da PostgreSQL servis bude spreman
+
+  frontend:
+    build:
+      context: ./Frontend # Folder gde se nalazi Dockerfile za frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://backend:5000 # URL ka backendu
+    networks:
+      - app_network
+    depends_on:
+      - backend # Frontend čeka da backend bude spreman
+
+volumes:
+  pgdata: # Definicija volumena za čuvanje baze
+
+networks:
+  app_network:
+    driver: bridge # Kreira mrežu za komunikaciju između servisa
