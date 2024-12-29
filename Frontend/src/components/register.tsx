@@ -34,7 +34,7 @@ const Register: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL iz environment varijable
 
   const navigate = useNavigate();
 

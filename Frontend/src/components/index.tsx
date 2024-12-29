@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 
 const loadCSS = (href: string) => {
@@ -32,7 +32,7 @@ const Index: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;// || 'http://localhost:5000'; // URL iz environment varijable
 
 
   useEffect(() => {
@@ -48,9 +48,9 @@ const Index: React.FC = () => {
             'Content-Type': 'application/json',
           },
         });
-  
+
         const data = await response.json();
-  
+
         if (!data.user) {
           // Preusmeri korisnika na login ako nije ulogovan
           navigate('/login');
@@ -63,7 +63,7 @@ const Index: React.FC = () => {
         navigate('/login'); // Ako se desi greška, preusmeri na login
       }
     };
-  
+
     const fetchPosts = async () => {
       try {
         const response = await fetch(`${backendUrl}/api/posts/friends-posts`, {
@@ -73,11 +73,11 @@ const Index: React.FC = () => {
             'Content-Type': 'application/json',
           },
         });
-  
+
         if (!response.ok) {
           throw new Error('Failed to fetch posts. Please try again.');
         }
-  
+
         const data: Post[] = await response.json();
         setPosts(data);
         console.log(data);
@@ -92,7 +92,7 @@ const Index: React.FC = () => {
 
     checkSession();
   }, [navigate]);
-  
+
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,9 +103,11 @@ const Index: React.FC = () => {
   if (isLoading) {
     return (
       <>
-        <Helmet>
-          <style>
-            {`
+        <HelmetProvider>
+
+          <Helmet>
+            <style>
+              {`
               .preloader {
                 display: flex;
                 align-items: center;
@@ -115,32 +117,33 @@ const Index: React.FC = () => {
                 background-color: #f5f5f5;
                 color: #333;
                 font-family: Arial, sans-serif;
-              }
-
-              .spinner {
-                border: 8px solid #f3f3f3;
-                border-top: 8px solid #3498db;
-                border-radius: 50%;
-                width: 50px;
-                height: 50px;
-                animation: spin 1s linear infinite;
-              }
-
-              @keyframes spin {
-                0% {
-                  transform: rotate(0deg);
                 }
-                100% {
-                  transform: rotate(360deg);
-                }
-              }
-            `}
-          </style>
-        </Helmet>
-        <div className="preloader">
-          <div className="spinner"></div>
-          <span>Loading...</span>
-        </div>
+                
+                .spinner {
+                  border: 8px solid #f3f3f3;
+                  border-top: 8px solid #3498db;
+                  border-radius: 50%;
+                  width: 50px;
+                  height: 50px;
+                  animation: spin 1s linear infinite;
+                  }
+                  
+                  @keyframes spin {
+                    0% {
+                      transform: rotate(0deg);
+                      }
+                      100% {
+                        transform: rotate(360deg);
+                        }
+                        }
+                        `}
+            </style>
+          </Helmet>
+          <div className="preloader">
+            <div className="spinner"></div>
+            <span>Loading...</span>
+          </div>
+        </HelmetProvider>
       </>
     );
   }

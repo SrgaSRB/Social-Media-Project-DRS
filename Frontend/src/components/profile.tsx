@@ -3,8 +3,6 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000'); // Backend WebSocket URL
-
 interface BlockedUser {
   id: number;
   username: string;
@@ -65,7 +63,7 @@ const UserProfile: React.FC = () => {
   const [currentPost, setCurrentPost] = useState<any>(null);
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
   const [pendingPosts, setPendingPosts] = useState<any[]>([]);
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL iz environment varijable
 
   //const [activeSection, setActiveSection] = useState<string>('profile');
 

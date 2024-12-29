@@ -36,7 +36,7 @@ const UserSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState(searchTermFromLocation);  
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL; //|| 'http://localhost:5000'; // URL iz environment varijable
 
 
   useEffect(() => {

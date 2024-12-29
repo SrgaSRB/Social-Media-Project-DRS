@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -24,7 +23,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const hasCheckedSession = useRef(false); // Prevent double execution
   const navigate = useNavigate();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;// || 'http://localhost:5000'; // URL iz environment varijable
 
 
   useEffect(() => {
@@ -33,6 +32,10 @@ const Login: React.FC = () => {
 
     if (hasCheckedSession.current) return; // Skip if already checked
     hasCheckedSession.current = true;
+
+    console.log(backendUrl);
+    console.log(process.env);
+
 
     fetch(`${backendUrl}/api/auth/session`, { method: 'GET', credentials: 'include' })
       .then((response) => {

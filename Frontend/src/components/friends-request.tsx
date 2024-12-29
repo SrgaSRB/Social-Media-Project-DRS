@@ -33,7 +33,7 @@ const FriendsRequest: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const navigate = useNavigate();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;//|| 'http://localhost:5000'; // URL iz environment varijable
 
 
   useEffect(() => {
