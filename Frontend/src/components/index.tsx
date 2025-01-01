@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useNotification } from '../notification/NotificationContext';
+
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -16,6 +18,10 @@ const loadCSS = (href: string) => {
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 interface Post {
@@ -33,11 +39,19 @@ const Index: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const backendUrl = process.env.REACT_APP_BACKEND_URL;// || 'http://localhost:5000'; // URL iz environment varijable
-
+  const { showNotification } = useNotification();
+  const location = useLocation();
+  const [hasNotification, setHasNotification] = useState(false);
 
   useEffect(() => {
     loadCSS('/styles/index.css');
     setIsLoading(true);
+
+    if (!hasNotification && location.state?.message) {
+      const { message, type } = location.state;
+      showNotification('success', message);
+      setHasNotification(true);
+    }
 
     const checkSession = async () => {
       try {
@@ -55,7 +69,6 @@ const Index: React.FC = () => {
           // Preusmeri korisnika na login ako nije ulogovan
           navigate('/login');
         } else {
-          // Ako je korisnik ulogovan, preuzmi objave
           fetchPosts();
         }
       } catch (error) {
@@ -80,19 +93,16 @@ const Index: React.FC = () => {
 
         const data: Post[] = await response.json();
         setPosts(data);
-        console.log(data);
+
       } catch (err: any) {
         setError(err.message || 'An unexpected error occurred.');
       } finally {
-        const timer = setTimeout(() => {
-        }, 5000);
         setIsLoading(false);
       }
     };
 
     checkSession();
-  }, [navigate]);
-
+  }, [navigate, hasNotification, location.state, showNotification]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,7 +175,7 @@ const Index: React.FC = () => {
           <div className="form-block w-form">
             <form id="users-search" className="form" onSubmit={handleSearchSubmit}>
               <img
-                src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/673354bfba759d4139976ccc_search.png"
+                src="\assets\Icons\search.svg"
                 loading="lazy"
                 alt="Search"
                 className="image"

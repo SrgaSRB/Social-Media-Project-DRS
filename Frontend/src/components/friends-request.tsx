@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../notification/NotificationContext';
+
 
 
 const loadCSS = (href: string) => {
@@ -34,6 +36,7 @@ const FriendsRequest: React.FC = () => {
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const navigate = useNavigate();
   const backendUrl = process.env.REACT_APP_BACKEND_URL;//|| 'http://localhost:5000'; // URL iz environment varijable
+  const { showNotification } = useNotification();
 
 
   useEffect(() => {
@@ -88,14 +91,14 @@ const FriendsRequest: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        alert(data.message);
+        showNotification('success', data.message);
         setRequests(prevRequests => prevRequests.filter(request => request.id !== requestId));
       } else {
-        alert(data.error);
+        showNotification('error', data.error);
       }
     } catch (error) {
       console.error('Error accepting friend request:', error);
-      alert('Došlo je do greške prilikom prihvatanja zahteva.');
+      showNotification('warning', 'Došlo je do greške prilikom prihvatanja zahteva.');
     }
   };
 
@@ -112,14 +115,14 @@ const FriendsRequest: React.FC = () => {
   
       const data = await response.json();
       if (response.ok) {
-        alert(data.message); 
+        showNotification('success', data.message); 
         setRequests(prevRequests => prevRequests.filter(request => request.id !== requestId));
       } else {
-        alert(data.error); 
+        showNotification('error',data.error); 
       }
     } catch (error) {
       console.error('Error rejecting friend request:', error);
-      alert('Došlo je do greške prilikom odbijanja zahteva.');
+      showNotification('warning', 'Došlo je do greške prilikom odbijanja zahteva.');
     }
   };
 
@@ -175,7 +178,7 @@ const FriendsRequest: React.FC = () => {
           <div className="div-block">
             <div className="text-block-13">Vaši zahtevi za prijateljstvo</div>
             <img
-              src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/673d1b02e3744824fe7ef3f4_users-profiles-01.svg"
+              src="\assets\Icons\friends-requests-2people.svg"
               alt="Friends Requests"
               className="image-10"
             />
@@ -199,7 +202,7 @@ const FriendsRequest: React.FC = () => {
                     <div className="fr-user-location-block">
                       <div className="location-icon">
                         <img
-                          src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/67390a69e460f410ac3fc2b2_marker-02.svg"
+                          src="/assets/Icons/locationPin.svg"
                           alt="Location Icon"
                           className="image-7"
                         />
@@ -221,7 +224,7 @@ const FriendsRequest: React.FC = () => {
                       >
                         <div className="text-block-11">Prihvati</div>
                         <img
-                          src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/673d179fc30c1b34d7a651ea_user-profile-check%20(1).svg"
+                          src="\assets\Icons\accept-request-BLUE.svg"
                           alt="Accept"
                           className="image-8"
                         />
@@ -237,7 +240,7 @@ const FriendsRequest: React.FC = () => {
                       >
                         <div className="text-block-12">Odbij</div>
                         <img
-                          src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/673d1889ccda4abd35683f20_user-profile-x%20(1).svg"
+                          src="\assets\Icons\reject-request-RED.svg"
                           alt="Reject"
                           className="image-9"
                         />

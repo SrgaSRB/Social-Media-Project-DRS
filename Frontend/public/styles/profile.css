@@ -3025,8 +3025,9 @@ textarea.w-input, textarea.w-select {
 
   .container {
     flex-flow: column;
-    width: 320px;
-    max-width: 320px;
+    width: 95%;
+    max-width: 420px;
+    min-width: 320px;
     padding-left: 0;
     padding-right: 0;
   }
@@ -3037,7 +3038,6 @@ textarea.w-input, textarea.w-select {
   }
 
   .container.hero-container {
-    width: 320px;
     padding-left: 0;
     padding-right: 0;
   }
@@ -3167,8 +3167,9 @@ textarea.w-input, textarea.w-select {
   .navbar-icons-div {
     grid-column-gap: 1rem;
     grid-row-gap: 1rem;
-    width: 320px;
+    width: 100%;
     max-width: 320px;
+    max-width: 420px;
   }
 }
 

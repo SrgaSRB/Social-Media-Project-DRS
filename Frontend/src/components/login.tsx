@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../notification/NotificationContext';
+
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -21,9 +23,10 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const hasCheckedSession = useRef(false); 
+  const hasCheckedSession = useRef(false); // Prevent double execution
   const navigate = useNavigate();
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const { showNotification } = useNotification();
 
 
   useEffect(() => {
@@ -63,7 +66,7 @@ const Login: React.FC = () => {
       method: 'POST',
       credentials: 'include',
     });
-    alert('You have been logged out.');
+    //alert('You have been logged out.');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +78,7 @@ const Login: React.FC = () => {
         body: JSON.stringify({ username, password }),
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         let errorMsg = 'Login failed';
         try {
@@ -87,17 +90,17 @@ const Login: React.FC = () => {
         alert(errorMsg);
         return;
       }
-  
+
       const data = await response.json();
-      alert('Login successful!');
-      navigate('/');
+      navigate('/', { state: { message: 'Uspešno ste se prijavili!', type: 'success' } });
+      //navigate('/');
     } catch (error) {
       console.error('Fetch error:', error);
-      alert('Failed to connect to the server. Please try again later.');
+      showNotification('warning','Failed to connect to the server. Please try again later.');
     }
   };
-  
-  
+
+
 
   const handleRegisterRedirect = () => {
     navigate('/register');
@@ -119,7 +122,7 @@ const Login: React.FC = () => {
           <div className="content-wapper">
             <div className="image-div">
               <img
-                src="https://cdn.prod.website-files.com/6733bafcd19b7050f46bc20f/6733bf542da3e7df93259236_Computer%20login-bro%20(1).svg"
+                src="\assets\Icons\login-background.svg"
                 loading="lazy"
                 alt="Login Illustration"
                 className="image-2"
@@ -157,18 +160,18 @@ const Login: React.FC = () => {
                     className="submit-button w-button"
                     value="Prijavi se"
                   />
+                  <a
+                    href="#"
+                    className="link-2"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleRegisterRedirect();
+                    }}
+                  >
+                    Nemate profil?
+                  </a>
                 </form>
               </div>
-              <a
-                href="#"
-                className="link-2"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleRegisterRedirect();
-                }}
-              >
-                Nemate profil?
-              </a>
             </div>
           </div>
         </div>

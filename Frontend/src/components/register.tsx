@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate, redirect } from "react-router-dom";
+import { useNotification } from '../notification/NotificationContext';
+
 
 const loadCSS = (href: string) => {
   // Ukloni sve postojeće CSS linkove osim trenutnog
@@ -35,6 +37,7 @@ const Register: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL iz environment varijable
+  const { showNotification } = useNotification();
 
   const navigate = useNavigate();
 
@@ -337,7 +340,7 @@ const Register: React.FC = () => {
             </div>
             <div className="image-register-div">
               <img
-                src="https://cdn.prod.website-files.com/6733bafcd19b7050f46bc20f/6733c1320dc545b33f52811c_Sign%20up-rafiki%20(1).svg"
+                src="/assets/Icons/register-background.svg"
                 alt="Sign Up"
                 className="image-5"
               />

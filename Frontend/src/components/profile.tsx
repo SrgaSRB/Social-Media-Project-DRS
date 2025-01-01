@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { useNotification } from '../notification/NotificationContext';
+
 
 interface BlockedUser {
   id: number;
@@ -64,6 +66,7 @@ const UserProfile: React.FC = () => {
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
   const [pendingPosts, setPendingPosts] = useState<any[]>([]);
   const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL iz environment varijable
+  const { showNotification } = useNotification();
 
   //const [activeSection, setActiveSection] = useState<string>('profile');
 
@@ -286,10 +289,10 @@ const UserProfile: React.FC = () => {
       // Uklanjanje posta iz lokalnog stanja
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
 
-      alert('Objava je uspešno obrisana.');
+      showNotification('success','Objava je uspešno obrisana.');
     } catch (error) {
       console.error('Greška prilikom brisanja objave:', error);
-      alert('Došlo je do greške prilikom brisanja objave.');
+      showNotification('warning', 'Došlo je do greške prilikom brisanja objave.');
     }
   };
 
@@ -316,7 +319,7 @@ const UserProfile: React.FC = () => {
         prevPosts.map((post) => (post.id === updatedData.id ? updatedData : post))
       );
       handleCloseModal();
-      alert('Objava je uspešno izmenjena i poslana na odobravanje.');
+      showNotification('success','Objava je uspešno izmenjena i poslana na odobravanje.');
     } catch (error) {
       console.error('Error updating post:', error);
     }
@@ -328,7 +331,6 @@ const UserProfile: React.FC = () => {
     setIsSaving(true);
 
     try {
-      // Sačuvaj izmenjene podatke (bez provere korisničkog imena)
       const response = await fetch(`${backendUrl}/api/auth/update-profile`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -337,13 +339,13 @@ const UserProfile: React.FC = () => {
       });
 
       if (response.ok) {
-        alert('Profil je uspešno ažuriran.');
+        showNotification('success','Profil je uspešno ažuriran.');
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'Došlo je do greške prilikom ažuriranja profila.');
+        showNotification('error', errorData.error || 'Došlo je do greške prilikom ažuriranja profila.');
       }
     } catch (error) {
-      setError('Greška pri povezivanju sa serverom.');
+        showNotification('error','Greška pri povezivanju sa serverom.');
     } finally {
       setIsSaving(false);
     }
@@ -358,11 +360,12 @@ const UserProfile: React.FC = () => {
 
       if (response.ok) {
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-        alert('Post je odobren.');
+        showNotification('success','Post je odobren.');
       } else {
-        alert('Došlo je do greške prilikom odobravanja.');
+        showNotification('error','Došlo je do greške prilikom odobravanja.');
       }
     } catch (error) {
+      showNotification('error', 'Greška pri povezivanju sa serverom.');
       console.error('Error approving post:', error);
     }
   };
@@ -376,11 +379,12 @@ const UserProfile: React.FC = () => {
 
       if (response.ok) {
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-        alert('Post je odbijen.');
+        showNotification('success','Post je odbijen.');
       } else {
-        alert('Došlo je do greške prilikom odbijanja.');
+        showNotification('error','Došlo je do greške prilikom odbijanja.');
       }
     } catch (error) {
+      showNotification('error', 'Greška pri povezivanju sa serverom.');
       console.error('Error rejecting post:', error);
     }
   };
@@ -393,17 +397,17 @@ const UserProfile: React.FC = () => {
       });
 
       if (response.ok) {
-        alert('Uspešno ste se izlogovali.');
+        showNotification('success','Uspešno ste se izlogovali.');
         // Resetuj korisničko stanje i redirektuj na login stranicu
         setUserData(null);
         setUserType('user');
         window.location.href = '/login'; // Prilagodite putanju stranici za prijavu
       } else {
-        alert('Došlo je do greške prilikom odjave. Pokušajte ponovo.');
+        showNotification('error','Došlo je do greške prilikom odjave. Pokušajte ponovo.');
       }
     } catch (error) {
       console.error('Greška prilikom odjave:', error);
-      alert('Došlo je do greške prilikom odjave. Pokušajte ponovo.');
+      showNotification('error', 'Greška pri povezivanju sa serverom.');
     }
   };
 
@@ -418,15 +422,14 @@ const UserProfile: React.FC = () => {
         throw new Error('Failed to unblock user');
       }
 
-      // Remove user from the local state
       setBlockedUsers((prevUsers) =>
         prevUsers.filter((user) => user.id !== userId)
       );
 
-      alert('Korisnik je uspešno odblokiran.');
+      showNotification('success','Korisnik je uspešno odblokiran.');
     } catch (error) {
       console.error('Error unblocking user:', error);
-      alert('Došlo je do greške prilikom odblokiranja korisnika.');
+      showNotification('error', 'Greška pri povezivanju sa serverom.');
     }
   };
 
@@ -490,7 +493,7 @@ const UserProfile: React.FC = () => {
                           id="post-photo"
                           src={
                             currentPost?.newImage
-                              ? URL.createObjectURL(currentPost.newImage) // Dinamički kreira URL za izabrani fajl
+                              ? URL.createObjectURL(currentPost.newImage) 
                               : `${backendUrl}/api/posts/uploads/${currentPost.image_url}`
                           }
                           alt="Post"
@@ -570,7 +573,7 @@ const UserProfile: React.FC = () => {
             <form id="email-form" className="form" onSubmit={handleSubmit}>
               {error && <div className="error-message">{error}</div>}
               <div className="user-image">
-                <img src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/67339d51b5955306e08c5a58_user-profile-circle%20(1).svg" alt="" className="image-4" />
+                <img src="\assets\Icons\userProfilePictureRound.svg" alt="" className="image-4" />
                 <div className="text-block-6">@{userData?.username || ''}</div>
                 <div className="div-block-4">
                   <a
@@ -580,7 +583,7 @@ const UserProfile: React.FC = () => {
                   >
                     <div>Izloguj se</div>
                     <img
-                      src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/673dd5b9ce4453e1ab074fc2_logout-02.svg"
+                      src="\assets\Icons\logout.svg"
                       loading="lazy"
                       alt="Logout"
                     />
@@ -673,7 +676,7 @@ const UserProfile: React.FC = () => {
             <div className="div-block">
               <div>Objave</div>
               <img
-                src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/6733a7594027fb1c904c6ab4_grid-04-filled.svg"
+                src="/assets/Icons/9-square.svg"
                 alt="Grid"
                 className="image-5"
               />
@@ -685,7 +688,7 @@ const UserProfile: React.FC = () => {
                     {post.status === 'pending' && (
                       <>
                         <div className="user-post-padding-image-div">
-                          <img src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/674f66bb1662bc2da9d72fc0_alert-triangle%20(1).svg" loading="lazy" alt="" className="image-12" />
+                          <img src="/assets/Icons/alert-triangle.svg" loading="lazy" alt="" className="image-12" />
                           <div className="text-block-10">Post je na čekanju.</div>
                         </div>
 
@@ -696,7 +699,7 @@ const UserProfile: React.FC = () => {
                       <>
                         <div className="user-postreject-div"></div>
                         <div className="user-post-padding-image-div">
-                          <img src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/67516486a101da543c40054d_alert-triangle%20(2).svg" loading="lazy" alt="" className="image-12" />
+                          <img src="\assets\Icons\alert-triangle-RED.svg" loading="lazy" alt="" className="image-12" />
                           <div className="text-block-11">Post je odbijen!</div>
                         </div>
                       </>
@@ -715,7 +718,7 @@ const UserProfile: React.FC = () => {
                     <div className="user-post-info">
                       <div className="user-post-profile-image">
                         <img
-                          src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/67339d5181354d3183da426d_user-profile-02.svg"
+                          src="\assets\Icons\userProfilePictureDefault.svg"
                           alt="Profile"
                           className="image-15"
                         />
@@ -736,14 +739,14 @@ const UserProfile: React.FC = () => {
                     <div className="user-post-remove-and-edit-div">
                       <div className="user-post-edit" onClick={() => handleEditPost(post)}>
                         <img
-                          src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/6733a2c65579c05aed467e62_edit-contained.svg"
+                          src="\assets\Icons\edit.svg"
                           alt="Edit"
                         />
                         <div>Izmeni</div>
                       </div>
                       <div className="user-post-remove" onClick={() => handleDeletePost(post.id)}>
                         <img
-                          src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/6733a2c659b0b6622c877883_trash-01.svg"
+                          src="/assets/Icons/trash.svg"
                           alt="Delete"
                         />
                         <div>Obriši</div>
@@ -792,7 +795,7 @@ const UserProfile: React.FC = () => {
                         <div className="created-post-user-info-block">
                           <div className="div-block-2">
                             <img
-                              src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/67339d5181354d3183da426d_user-profile-02.svg"
+                              src="\assets\Icons\userProfilePictureDefault.svg"
                               alt="User Profile"
                               className="image-6"
                             />
@@ -824,7 +827,7 @@ const UserProfile: React.FC = () => {
                       >
                         <div>Odobri</div>
                         <img
-                          src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/673759394ac417efeb3be678_check-02%20(2).svg"
+                          src="/assets/Icons/success-GREEN.svg"
                           alt="Approve"
                           className="image-8"
                         />
@@ -840,7 +843,7 @@ const UserProfile: React.FC = () => {
                       >
                         <div>Odbij</div>
                         <img
-                          src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/67375842927852ee979b26dc_Icon%20(1).svg"
+                          src="\assets\Icons\reject-request-RED.svg"
                           alt="Reject"
                           className="image-9"
                         />
@@ -866,7 +869,7 @@ const UserProfile: React.FC = () => {
                       <div className="blocked-user-info">
                         <div className="blocked-user-image">
                           <img
-                            src="https://cdn.prod.website-files.com/67339aeaa4bd200a8b028810/67339d515436ea2fcb20bacb_user-profile-circle.svg"
+                            src="\assets\Icons\userProfilePictureRound.svg"
                             alt="Profile"
                             className="image-10"
                           />

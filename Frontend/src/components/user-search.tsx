@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useLocation } from 'react-router-dom';
+import { useNotification } from '../notification/NotificationContext';
+
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -16,6 +18,10 @@ const loadCSS = (href: string) => {
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 interface User {
@@ -38,6 +44,8 @@ const UserSearch: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const backendUrl = process.env.REACT_APP_BACKEND_URL; //|| 'http://localhost:5000'; // URL iz environment varijable
 
+  const { showNotification } = useNotification();
+
 
   useEffect(() => {
     loadCSS('/styles/user-search.css');
@@ -57,6 +65,7 @@ const UserSearch: React.FC = () => {
         const data = await response.json();
         setUsers(data); 
         setFilteredUsers(data); 
+
       } catch (error) {
         console.error('Error fetching users:', error);
       } finally {
@@ -107,13 +116,13 @@ const UserSearch: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        alert(data.message); // Informiši korisnika o uspešnom zahtevu
+            showNotification('success', data.message); 
       } else {
-        alert(data.error); // Informiši korisnika o grešci
+        showNotification('error', data.error); 
       }
     } catch (error) {
       console.error('Error sending friend request:', error);
-      alert('Došlo je do greške prilikom slanja zahteva.');
+      showNotification('error','Došlo je do greške prilikom slanja zahteva.');
     }
   };
 
@@ -170,7 +179,7 @@ const UserSearch: React.FC = () => {
           <div className="form-block w-form">
             <div className="form">
               <img
-                src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/67390545eb4c04a5a906afa5_search.png"
+                src="/assets/Icons/search.svg"
                 alt="Search Icon"
                 className="image"
               />
@@ -207,7 +216,7 @@ const UserSearch: React.FC = () => {
                     </div>
                     <div className="users-location-info">
                       <img
-                        src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/67390a69e460f410ac3fc2b2_marker-02.svg"
+                        src="/assets/Icons/locationPin-RED.svg"
                         alt="Location Icon"
                         className="image-5"
                       />
@@ -219,7 +228,7 @@ const UserSearch: React.FC = () => {
                     <a href="#" className="link-block w-inline-block" onClick={() => handleSendFriendRequest(user.id)}>
                       <div className="text-block-4">Dodaj prijatelja</div>
                       <img
-                        src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/6739088a6ccbf2bcc131e4f2_Icon%20(3).svg"
+                        src="\assets\Icons\sendFriendRequest-BLUE.svg"
                         alt="Add Friend Icon"
                         className="image-4"
                       />

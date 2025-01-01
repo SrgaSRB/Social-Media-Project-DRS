@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { text } from 'stream/consumers';
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../notification/NotificationContext';
 
 
 const loadCSS = (href: string) => {
@@ -28,7 +29,8 @@ const UploadPost: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL; //|| 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const { showNotification } = useNotification();
 
 
   useEffect(() => {
@@ -189,9 +191,11 @@ const UploadPost: React.FC = () => {
                   </>
                 ) : (
                   <>
+                    {/*
                     <div>Drag and Drop to upload file</div>
                     <div>or</div>
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    */}
+                    <input type="file" className='inputFile' accept="image/*" onChange={handleImageChange} />
                   </>
                 )}
               </div>

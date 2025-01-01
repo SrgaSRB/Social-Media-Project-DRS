@@ -1,5 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import logo from '../assets/Icons/navbar-home.svg';
+
 
 const Navbar: React.FC = () => {
     return (
@@ -11,7 +13,7 @@ const Navbar: React.FC = () => {
           >
             <img
               loading="lazy"
-              src="https://cdn.prod.website-files.com/6733c94768b5bfe41ab3b781/6733cc4cb3455a85a1aaf2b9_home-05.svg"
+              src="/assets/Icons/navbar-home.svg"
               alt="Home"
               className="image-3"
             />
@@ -22,7 +24,7 @@ const Navbar: React.FC = () => {
           >
             <img
               loading="lazy"
-              src="https://cdn.prod.website-files.com/6733c94768b5bfe41ab3b781/6733cc4cb3455a85a1aaf2b6_upload-03%20(1).svg"
+              src="./assets/Icons/navbar-upload.svg"
               alt="Upload"
               className="image-3"
             />
@@ -33,7 +35,7 @@ const Navbar: React.FC = () => {
           >
             <img
               loading="lazy"
-              src="https://cdn.prod.website-files.com/6733c94768b5bfe41ab3b781/6733cc4cb3455a85a1aaf2b7_user-profile-right.svg"
+              src="/assets/Icons/navbar-friendsRequests.svg"
               alt="Profile"
               className="image-3"
             />
@@ -44,7 +46,7 @@ const Navbar: React.FC = () => {
           >
             <img
               loading="lazy"
-              src="https://cdn.prod.website-files.com/6733c94768b5bfe41ab3b781/6733cc4cb3455a85a1aaf2b8_user-profile-circle%20(1).svg"
+              src="/assets/Icons/navbar-userProfile.svg"
               alt="Settings"
               className="image-3"
             />
