@@ -202,7 +202,7 @@ const FriendsRequest: React.FC = () => {
                     <div className="fr-user-location-block">
                       <div className="location-icon">
                         <img
-                          src="/assets/Icons/locationPin.svg"
+                          src="\assets\Icons\locationPin-RED.svg"
                           alt="Location Icon"
                           className="image-7"
                         />

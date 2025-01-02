@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_socketio import SocketIO
 import os
 
-socketio = SocketIO(cors_allowed_origins="*")  # Kreirajte instancu na nivou modula
+socketio = SocketIO(cors_allowed_origins="*")  
 
 def create_app():
     app = Flask(__name__)
@@ -13,7 +13,7 @@ def create_app():
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_HTTPONLY'] = True
 
-    socketio.init_app(app)  # Inicijalizujte SocketIO sa Flask aplikacijom
+    socketio.init_app(app) 
 
     # Enable CORS
     CORS(app, supports_credentials=True)

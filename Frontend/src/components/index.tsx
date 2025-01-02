@@ -189,7 +189,10 @@ const Index: React.FC = () => {
                   type="text"
                   id="name"
                 />
-                <div className="text-block">X</div>
+                <div className="text-block">
+                  <img src="\assets\Icons\x-02.svg" 
+                  alt="" />
+                </div>
               </div>
               <input type="submit" className="search-button w-button" value="Pretraži" id="search-user-btn" />
             </form>

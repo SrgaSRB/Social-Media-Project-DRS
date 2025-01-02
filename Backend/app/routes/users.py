@@ -1,5 +1,4 @@
 import os
-import json
 from flask import Blueprint, jsonify, request
 from flask import Blueprint, jsonify, request, session
 from app.models import User, SessionLocal, Friendship
@@ -15,10 +14,8 @@ def get_db():
     finally:
         db.close()
 
-# Kreiraj Blueprint za rute korisnika
 users_bp = Blueprint('users', __name__, url_prefix='/api/users')
 
-#Ruta za dodavanje prijatelja
 @users_bp.route('/accept-friend', methods=['POST'])
 def accept_friend():
     """
@@ -33,7 +30,6 @@ def accept_friend():
 
     db = next(get_db())
 
-    # Check if the friend request exists
     friend_request = db.query(Friendship).filter_by(
         user1_id=sender_id, user2_id=receiver_id, status='pending'
     ).first()
@@ -41,13 +37,10 @@ def accept_friend():
     if not friend_request:
         return jsonify({"error": "Friend request not found"}), 404
 
-    # Update the status to 'accepted'
     friend_request.status = 'accepted'
     db.commit()
     return jsonify({"message": "Friend request accepted"}), 200
 
-
-# Ruta za pretragu korisnika
 @users_bp.route('/search', methods=['GET'])
 def search_users_route():
     """
@@ -75,6 +68,7 @@ def search_users_route():
             "first_name": user.first_name,
             "last_name": user.last_name,
             "city": user.city,
+            'profileImage': user.profile_picture_url,
         } for user in search_results
     ]
 
@@ -82,16 +76,18 @@ def search_users_route():
 
 @users_bp.route('/', methods=['GET'])
 def get_all_users():
+    """
+    GET: Retrieves all users except the currently logged-in user.
+    """
     db = next(get_db())
     user_session = session.get('user')
-    print(f"Session data: {user_session}")  # Debug ispis sesije
 
     if not user_session:
         return jsonify({'error': 'User not logged in'}), 401
 
     current_user_id = user_session['id']
     users = db.query(User).filter(User.id != current_user_id).all()
-    result = [{'id': user.id, 'username': user.username, 'name':user.first_name + " " + user.last_name, 'email':user.email, 'city':user.city, 'country':user.country, 'profileImage':'profileImage.jpg'} for user in users]
+    result = [{'id': user.id, 'username': user.username, 'name':user.first_name + " " + user.last_name, 'email':user.email, 'city':user.city, 'country':user.country, 'profileImage':user.profile_picture_url} for user in users]
     return jsonify(result), 200
 
 @users_bp.route('/send-friend-request', methods=['POST'])
@@ -112,20 +108,19 @@ def send_friend_request():
     if not receiver_id:
         return jsonify({'error': 'Receiver ID is required'}), 400
 
-    # Prevent sending friend request to self
     if sender_id == receiver_id:
         return jsonify({'error': 'Cannot send friend request to yourself'}), 400
 
-    # Check if the friendship already exists
     existing_friendship = db.query(Friendship).filter(
-        (Friendship.user1_id == sender_id) & (Friendship.user2_id == receiver_id) |
-        (Friendship.user1_id == receiver_id) & (Friendship.user2_id == sender_id)
+        (Friendship.user1_id == sender_id) & (Friendship.user2_id == receiver_id)
     ).first()
 
     if existing_friendship:
-        return jsonify({'error': 'Friendship request already exists or is already accepted'}), 400
-
-    # Create a new friend request
+        if existing_friendship.status == 'pending':
+            return jsonify({'error': 'Friendship request already exists'}), 400
+        elif existing_friendship.status == 'accepted':
+            return jsonify({'error': 'You are already friends'}), 400
+        
     new_friend_request = Friendship(
         user1_id=sender_id,
         user2_id=receiver_id,
@@ -140,7 +135,7 @@ def send_friend_request():
 @users_bp.route('/accept-friend-request', methods=['POST'])
 def accept_friend_request():
     """
-    Accepts a friend request.
+    POST: Accepts a friend request by its ID.
     """
     db = next(get_db())
 
@@ -155,13 +150,11 @@ def accept_friend_request():
     if not friend_request_id:
         return jsonify({'error': 'Friend request ID is required'}), 400
 
-    # Find the friendship request by its ID
     friend_request = db.query(Friendship).filter_by(id=friend_request_id, user2_id=user_id, status='pending').first()
 
     if not friend_request:
         return jsonify({'error': 'Friend request not found or already accepted'}), 404
 
-    # Update the friendship status to 'accepted'
     friend_request.status = 'accepted'
     db.commit()
 
@@ -170,7 +163,7 @@ def accept_friend_request():
 @users_bp.route('/reject-friend-request', methods=['POST'])
 def reject_friend_request():
     """
-    Odbija prijateljski zahtev.
+    POST: Rejects a friend request.
     """
     data = request.get_json()
     request_id = data.get('request_id')
@@ -186,7 +179,7 @@ def reject_friend_request():
         return jsonify({'error': 'Friend request not found or already processed'}), 404
 
     if friend_request.user2_id != user_session['id']:
-        return jsonify({'error': 'Unauthorized action'}), 403  # Samo primalac može odbiti zahtev
+        return jsonify({'error': 'Unauthorized action'}), 403  
 
     friend_request.status = 'rejected'
     db.commit()
@@ -196,7 +189,7 @@ def reject_friend_request():
 @users_bp.route('/friend-requests', methods=['GET'])
 def get_friend_requests():
     """
-    GET: Vraća sve zahteve za prijateljstvo trenutnog korisnika (koji čekaju na odobrenje).
+    GET: Retrieves all pending friend requests for the current user.
     """
     db = next(get_db())
     
@@ -207,8 +200,8 @@ def get_friend_requests():
     current_user_id = user_session['id']
 
     requests = db.query(Friendship).filter(
-        (Friendship.user2_id == current_user_id) &  # Zahtevi koji su poslati tebi
-        (Friendship.status == 'pending')  # Status "pending"
+        (Friendship.user2_id == current_user_id) &  
+        (Friendship.status == 'pending')  
     ).all()
 
     if not requests:
@@ -225,47 +218,15 @@ def get_friend_requests():
                 'username': sender.username,
                 'location': sender.city,
                 'country': sender.country,
-                'profileImage': "userimage.jpg"  # Ako koristiš sliku profila
+                'profileImage': sender.profile_picture_url
             })
 
     return jsonify(result), 200
 
-"""
-#Ruta za ažuriranje korisnika prema korisničkom imenu
-@users_bp.route('/<username>', methods=['PUT'])
-def update_user(username):
-    data = request.get_json()
-    users = load_users()
-
-    user = next((u for u in users if u['username'] == username), None)
-    if not user:
-        return jsonify({'error': 'Korisnik nije pronađen'}), 404
-
-    # Ažuriraj podatke osim korisničkog imena
-    for key, value in data.items():
-        if key != 'username':
-            user[key] = value
-
-    save_users(users)
-    return jsonify({'message': 'Korisnik uspešno ažuriran'}), 200
-
-# Ruta za brisanje korisnika prema korisničkom imenu
-@users_bp.route('/<username>', methods=['DELETE'])
-def delete_user(username):
-    users = load_users()
-
-    updated_users = [u for u in users if u['username'] != username]
-    if len(updated_users) == len(users):
-        return jsonify({'error': 'Korisnik nije pronađen'}), 404
-
-    save_users(updated_users)
-    return jsonify({'message': 'Korisnik uspešno obrisan'}), 200
-"""
-
 @users_bp.route('/blocked', methods=['GET'])
 def get_blocked_users():
     """
-    GET: Vraća listu blokiranih korisnika iz tabele users.
+    GET: Retrieves a list of blocked users.
     """
     db = next(get_db())
     blocked_users = db.query(User).filter_by(is_blocked=True).all()
@@ -281,6 +242,7 @@ def get_blocked_users():
             'country': user.country,
             'phone': user.phone_number,
             'email': user.email,
+            'profileImage': user.profile_picture_url
         })
 
     return jsonify(result), 200
@@ -288,7 +250,7 @@ def get_blocked_users():
 @users_bp.route('/unblock/<int:user_id>', methods=['POST'])
 def unblock_user(user_id):
     """
-    POST: Odblokira korisnika po ID-u.
+    POST: Unblocks a user by their ID.
     """
     db = next(get_db())
     user = db.query(User).filter_by(id=user_id, is_blocked=True).first()
@@ -296,7 +258,6 @@ def unblock_user(user_id):
     if not user:
         return jsonify({'error': 'User not found or not blocked'}), 404
 
-    # Postavljanje is_blocked na False
     user.is_blocked = False
     db.commit()
     return jsonify({'message': f'User {user.username} successfully unblocked'}), 200

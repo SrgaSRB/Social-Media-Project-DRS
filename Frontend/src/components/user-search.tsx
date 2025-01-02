@@ -32,7 +32,7 @@ interface User {
   address: string;
   city: string;
   country: string;
-  profileImage: string;
+  profileImage?: string;
 }
 
 const UserSearch: React.FC = () => {
@@ -193,7 +193,8 @@ const UserSearch: React.FC = () => {
                   onChange={handleSearchInputChange}
                 />
                 <div className="text-block" onClick={() => setSearchTerm('')}>
-                  X
+                  <img src="\assets\Icons\x-02.svg" 
+                  alt="" />
                 </div>
               </div>
             </div>

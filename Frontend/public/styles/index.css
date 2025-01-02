@@ -2214,6 +2214,10 @@ textarea.w-input, textarea.w-select {
   inset: 0% 0% 0% auto;
 }
 
+.text-block:hover{
+  background-color: rgb(215, 215, 215);
+}
+
 .upload-div {
   height: 100%;
 }

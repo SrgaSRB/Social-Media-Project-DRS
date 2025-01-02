@@ -1,5 +1,4 @@
-from flask import Flask
-from app import create_app, socketio  # Uverite se da je create_app definisan u app/__init__.py
+from app import create_app, socketio 
 
 app = create_app()
 

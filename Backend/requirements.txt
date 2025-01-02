@@ -4,4 +4,4 @@ sqlalchemy
 psycopg2-binary
 flask-socketio
 eventlet
-gunicorn==20.1.0
+gunicorn

@@ -24,11 +24,7 @@ def send_email(sender_email: str, sender_password: str, recipients: List[str], s
         msg['Subject'] = subject
 
         # Attach the message body
-        
 
-        
-
-        
         msg.attach(MIMEText(message, 'plain'))
         # Establish a connection to the SMTP server
         with smtplib.SMTP(smtp_server, smtp_port) as server:

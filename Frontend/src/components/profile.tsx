@@ -14,6 +14,7 @@ interface BlockedUser {
   country: string;
   phone: string;
   email: string;
+  profileImage?: string; // Optional property
 }
 
 interface User {
@@ -26,13 +27,15 @@ interface User {
   phone: string;
   email: string;
   password: string;
+  profileImage?: string; // Optional property
 }
 
 interface Post {
   id: number;
   username: string;
   content: string;
-  image_url?: string; // Optional ako nije uvek prisutno
+  image_url?: string; // Optional property
+  profileImage?: string; // Optional property
   created_at: string;
 }
 
@@ -74,64 +77,64 @@ const UserProfile: React.FC = () => {
   const navigate = useNavigate();
   const socket = io(`${backendUrl}`);
 
-/*
-  useEffect(() => {
-    // Funkcija koja menja hash u URL-u kad korisnik skroluje
-    const handleScroll = () => {
-      const sections = document.querySelectorAll("section");
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        const id = section.getAttribute("id");
-        if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-          if (id && window.location.hash !== `#${id}`) {
-            window.location.hash = `#${id}`; // Postavi novi hash u URL
+  /*
+    useEffect(() => {
+      // Funkcija koja menja hash u URL-u kad korisnik skroluje
+      const handleScroll = () => {
+        const sections = document.querySelectorAll("section");
+        sections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          const id = section.getAttribute("id");
+          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+            if (id && window.location.hash !== `#${id}`) {
+              window.location.hash = `#${id}`; // Postavi novi hash u URL
+            }
           }
-        }
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll); // Clean up listener
-    };
-  }, []);
-
-  useEffect(() => {
-    // Kada se hash promeni u URL-u, ažuriraj aktivnu sekciju
-    const handleLocationChange = () => {
-      const hash = window.location.hash;
-      if (hash === '#hero-section') {
-        setActiveSection('profile');
-      } else if (hash === '#admin-section') {
-        setActiveSection('posts');
-      } else if (hash === '#admin-section-blocked-users') {
-        setActiveSection('blockedUsers');
-      } else {
-        setActiveSection('profile'); // Defaultna sekcija ako nema odgovarajućeg hash-a
-      }
-
-      // Pomeri sekciju u prikaz sa scrollIntoView
-      const targetSection = document.querySelector(hash);
-      if (targetSection) {
-        targetSection.scrollIntoView({
-          behavior: "smooth", // Pomeri glatko do sekcije
-          block: "start", // Početak sekcije treba biti na vrhu ekrana
         });
-      }
-    };
-
-    // Pozovi funkciju odmah da bi postavio početnu sekciju
-    handleLocationChange();
-
-    // Čitaj promene u hash-u
-    window.addEventListener("hashchange", handleLocationChange);
-
-    return () => {
-      window.removeEventListener("hashchange", handleLocationChange); // Clean up listener
-    };
-  }, []);
-*/
+      };
+  
+      window.addEventListener('scroll', handleScroll);
+  
+      return () => {
+        window.removeEventListener('scroll', handleScroll); // Clean up listener
+      };
+    }, []);
+  
+    useEffect(() => {
+      // Kada se hash promeni u URL-u, ažuriraj aktivnu sekciju
+      const handleLocationChange = () => {
+        const hash = window.location.hash;
+        if (hash === '#hero-section') {
+          setActiveSection('profile');
+        } else if (hash === '#admin-section') {
+          setActiveSection('posts');
+        } else if (hash === '#admin-section-blocked-users') {
+          setActiveSection('blockedUsers');
+        } else {
+          setActiveSection('profile'); // Defaultna sekcija ako nema odgovarajućeg hash-a
+        }
+  
+        // Pomeri sekciju u prikaz sa scrollIntoView
+        const targetSection = document.querySelector(hash);
+        if (targetSection) {
+          targetSection.scrollIntoView({
+            behavior: "smooth", // Pomeri glatko do sekcije
+            block: "start", // Početak sekcije treba biti na vrhu ekrana
+          });
+        }
+      };
+  
+      // Pozovi funkciju odmah da bi postavio početnu sekciju
+      handleLocationChange();
+  
+      // Čitaj promene u hash-u
+      window.addEventListener("hashchange", handleLocationChange);
+  
+      return () => {
+        window.removeEventListener("hashchange", handleLocationChange); // Clean up listener
+      };
+    }, []);
+  */
 
   useEffect(() => {
     loadCSS('/styles/profile.css');
@@ -220,7 +223,7 @@ const UserProfile: React.FC = () => {
       fetchBlockedUsers();
     }
 
-    setIsLoading(false); 
+    setIsLoading(false);
 
     return () => {
       socket.disconnect();
@@ -289,7 +292,7 @@ const UserProfile: React.FC = () => {
       // Uklanjanje posta iz lokalnog stanja
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
 
-      showNotification('success','Objava je uspešno obrisana.');
+      showNotification('success', 'Objava je uspešno obrisana.');
     } catch (error) {
       console.error('Greška prilikom brisanja objave:', error);
       showNotification('warning', 'Došlo je do greške prilikom brisanja objave.');
@@ -319,7 +322,7 @@ const UserProfile: React.FC = () => {
         prevPosts.map((post) => (post.id === updatedData.id ? updatedData : post))
       );
       handleCloseModal();
-      showNotification('success','Objava je uspešno izmenjena i poslana na odobravanje.');
+      showNotification('success', 'Objava je uspešno izmenjena i poslana na odobravanje.');
     } catch (error) {
       console.error('Error updating post:', error);
     }
@@ -339,13 +342,13 @@ const UserProfile: React.FC = () => {
       });
 
       if (response.ok) {
-        showNotification('success','Profil je uspešno ažuriran.');
+        showNotification('success', 'Profil je uspešno ažuriran.');
       } else {
         const errorData = await response.json();
         showNotification('error', errorData.error || 'Došlo je do greške prilikom ažuriranja profila.');
       }
     } catch (error) {
-        showNotification('error','Greška pri povezivanju sa serverom.');
+      showNotification('error', 'Greška pri povezivanju sa serverom.');
     } finally {
       setIsSaving(false);
     }
@@ -360,9 +363,9 @@ const UserProfile: React.FC = () => {
 
       if (response.ok) {
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-        showNotification('success','Post je odobren.');
+        showNotification('success', 'Post je odobren.');
       } else {
-        showNotification('error','Došlo je do greške prilikom odobravanja.');
+        showNotification('error', 'Došlo je do greške prilikom odobravanja.');
       }
     } catch (error) {
       showNotification('error', 'Greška pri povezivanju sa serverom.');
@@ -379,9 +382,9 @@ const UserProfile: React.FC = () => {
 
       if (response.ok) {
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-        showNotification('success','Post je odbijen.');
+        showNotification('success', 'Post je odbijen.');
       } else {
-        showNotification('error','Došlo je do greške prilikom odbijanja.');
+        showNotification('error', 'Došlo je do greške prilikom odbijanja.');
       }
     } catch (error) {
       showNotification('error', 'Greška pri povezivanju sa serverom.');
@@ -397,13 +400,13 @@ const UserProfile: React.FC = () => {
       });
 
       if (response.ok) {
-        showNotification('success','Uspešno ste se izlogovali.');
+        showNotification('success', 'Uspešno ste se izlogovali.');
         // Resetuj korisničko stanje i redirektuj na login stranicu
         setUserData(null);
         setUserType('user');
         window.location.href = '/login'; // Prilagodite putanju stranici za prijavu
       } else {
-        showNotification('error','Došlo je do greške prilikom odjave. Pokušajte ponovo.');
+        showNotification('error', 'Došlo je do greške prilikom odjave. Pokušajte ponovo.');
       }
     } catch (error) {
       console.error('Greška prilikom odjave:', error);
@@ -426,7 +429,7 @@ const UserProfile: React.FC = () => {
         prevUsers.filter((user) => user.id !== userId)
       );
 
-      showNotification('success','Korisnik je uspešno odblokiran.');
+      showNotification('success', 'Korisnik je uspešno odblokiran.');
     } catch (error) {
       console.error('Error unblocking user:', error);
       showNotification('error', 'Greška pri povezivanju sa serverom.');
@@ -493,7 +496,7 @@ const UserProfile: React.FC = () => {
                           id="post-photo"
                           src={
                             currentPost?.newImage
-                              ? URL.createObjectURL(currentPost.newImage) 
+                              ? URL.createObjectURL(currentPost.newImage)
                               : `${backendUrl}/api/posts/uploads/${currentPost.image_url}`
                           }
                           alt="Post"
@@ -573,7 +576,9 @@ const UserProfile: React.FC = () => {
             <form id="email-form" className="form" onSubmit={handleSubmit}>
               {error && <div className="error-message">{error}</div>}
               <div className="user-image">
-                <img src="\assets\Icons\userProfilePictureRound.svg" alt="" className="image-4" />
+                <img
+                  src={`assets/Icons/${userData?.profileImage}`}
+                  alt="" className="image-4" />
                 <div className="text-block-6">@{userData?.username || ''}</div>
                 <div className="div-block-4">
                   <a
@@ -718,7 +723,7 @@ const UserProfile: React.FC = () => {
                     <div className="user-post-info">
                       <div className="user-post-profile-image">
                         <img
-                          src="\assets\Icons\userProfilePictureDefault.svg"
+                          src={`assets/Icons/${post.profileImage}`}
                           alt="Profile"
                           className="image-15"
                         />
@@ -776,82 +781,86 @@ const UserProfile: React.FC = () => {
                 <div className="text-block-5">Kreirane objave</div>
               </div>
               <div className="created-posts">
-                {pendingPosts.map((post) => (
-                  <div className="created-post-block" key={post.id}>
-                    <div className="created-post">
-                      <div className="image-div">
-                        {post.image_url ? (
-                          <img
-                            id="created-post-image"
-                            src={`${backendUrl}/api/posts/uploads/${post.image_url}`}
-                            alt="Post"
-                            className="image-7"
-                          />
-                        ) : (
-                          <div>No Image</div>
-                        )}
-                      </div>
-                      <div className="created-post-user-info">
-                        <div className="created-post-user-info-block">
-                          <div className="div-block-2">
+
+                {pendingPosts.length > 0 ? (
+                  pendingPosts.map((post) => (
+                    <div className="created-post-block" key={post.id}>
+                      <div className="created-post">
+                        <div className="image-div">
+                          {post.image_url ? (
                             <img
-                              src="\assets\Icons\userProfilePictureDefault.svg"
-                              alt="User Profile"
-                              className="image-6"
+                              id="created-post-image"
+                              src={`${backendUrl}/api/posts/uploads/${post.image_url}`}
+                              alt="Post"
+                              className="image-7"
                             />
-                          </div>
-                          <div>
-                            <div className="text-block-4">
-                              @{post.username}
-                            </div>
-                            <div className="text-block-3">{new Date(post.created_at).toLocaleString()}</div>
-                          </div>
+                          ) : (
+                            <div>No Image</div>
+                          )}
                         </div>
-                        <div className="created-post-hr"></div>
-                        <div className="created-post-info-div">
-                          <div id="created-post-desc" className="created-post-info">
-                            {post.content}
+                        <div className="created-post-user-info">
+                          <div className="created-post-user-info-block">
+                            <div className="div-block-2">
+                              <img
+                                src={`assets/Icons/${post.profileImage}`}
+                                alt="User Profile"
+                                className="image-6"
+                              />
+                            </div>
+                            <div>
+                              <div className="text-block-4">
+                                @{post.username}
+                              </div>
+                              <div className="text-block-3">{new Date(post.created_at).toLocaleString()}</div>
+                            </div>
+                          </div>
+                          <div className="created-post-hr"></div>
+                          <div className="created-post-info-div">
+                            <div id="created-post-desc" className="created-post-info">
+                              {post.content}
+                            </div>
                           </div>
                         </div>
                       </div>
+                      <div className="approval-dissapproval-block">
+                        <a
+                          href="#"
+                          id="created-post-accept"
+                          className="link-block approve-linkblock w-inline-block"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleApprovePost(post.id);
+                          }}
+                        >
+                          <div>Odobri</div>
+                          <img
+                            src="/assets/Icons/success-GREEN.svg"
+                            alt="Approve"
+                            className="image-8"
+                          />
+                        </a>
+                        <a
+                          href="#"
+                          id="created-post-reject"
+                          className="link-block dissapproval-linkblock w-inline-block"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleRejectPost(post.id);
+                          }}
+                        >
+                          <div>Odbij</div>
+                          <img
+                            src="\assets\Icons\reject-request-RED.svg"
+                            alt="Reject"
+                            className="image-9"
+                          />
+                        </a>
+                      </div>
                     </div>
-                    <div className="approval-dissapproval-block">
-                      <a
-                        href="#"
-                        id="created-post-accept"
-                        className="link-block approve-linkblock w-inline-block"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleApprovePost(post.id);
-                        }}
-                      >
-                        <div>Odobri</div>
-                        <img
-                          src="/assets/Icons/success-GREEN.svg"
-                          alt="Approve"
-                          className="image-8"
-                        />
-                      </a>
-                      <a
-                        href="#"
-                        id="created-post-reject"
-                        className="link-block dissapproval-linkblock w-inline-block"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleRejectPost(post.id);
-                        }}
-                      >
-                        <div>Odbij</div>
-                        <img
-                          src="\assets\Icons\reject-request-RED.svg"
-                          alt="Reject"
-                          className="image-9"
-                        />
-                      </a>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (<div>No pending posts</div>)}
               </div>
+
             </div>
           </section>
           <div className="body-hr">
@@ -869,7 +878,7 @@ const UserProfile: React.FC = () => {
                       <div className="blocked-user-info">
                         <div className="blocked-user-image">
                           <img
-                            src="\assets\Icons\userProfilePictureRound.svg"
+                            src={`/assets/Icons/${user.profileImage}`}
                             alt="Profile"
                             className="image-10"
                           />
@@ -919,7 +928,7 @@ const UserProfile: React.FC = () => {
               </div>
             </div>
           </section>
-                  {/*
+          {/*
           <div className="admin-navbar">
           <a
           href="#hero-section"

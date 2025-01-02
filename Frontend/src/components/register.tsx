@@ -34,6 +34,7 @@ const Register: React.FC = () => {
     email: "",
     password: "",
   });
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL iz environment varijable
@@ -53,6 +54,28 @@ const Register: React.FC = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  const handleEmailBlur = async (): Promise<void> => {
+    try {
+      const response = await fetch(`${backendUrl}/api/auth/check-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setEmailAvailable(data.available);
+      } else {
+        setEmailAvailable(false);
+      }
+    } catch (error) {
+      console.error('Error checking email:', error);
+      setEmailAvailable(false);
+    }
+  };  
 
   const handleUsernameBlur = async (): Promise<void> => {
     try {
@@ -189,7 +212,7 @@ const Register: React.FC = () => {
                     required
                   />
                   {usernameAvailable === false && (
-                    <span className="error-message">
+                    <span className="error-message" color="red">
                       Korisničko ime nije dostupno.
                     </span>
                   )}
@@ -303,8 +326,14 @@ const Register: React.FC = () => {
                     autoComplete="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    onBlur={handleEmailBlur}
                     required
                   />
+                  {emailAvailable === false && (
+                    <span className="error-message" color="red">
+                      Email adresa nije dostupna.
+                    </span>
+                  )}
 
                   <label htmlFor="password" className="user-info-label">
                     Lozinka
