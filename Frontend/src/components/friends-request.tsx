@@ -190,7 +190,12 @@ const FriendsRequest: React.FC = () => {
                   <div className="fr">
                     <div className="fr-user-image">
                       <img
-                        src={`/assets/Icons/${request.profileImage}`}
+                        src=
+                        {
+                          request.profileImage === "defaultProfilePicture.png"
+                            ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
+                            : `${backendUrl}/api/posts/uploads/${request.profileImage}` // Putanja ka serveru
+                        }
                         alt="User Profile"
                         className="image-6"
                       />

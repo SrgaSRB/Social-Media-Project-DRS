@@ -712,8 +712,8 @@ const UserProfile: React.FC = () => {
                     <div className="user-post-image-div">
                       {post.image_url ? (
                         <img
-                          src={`${backendUrl}/api/posts/uploads/${post.image_url}`} // Korigovan URL za rutu backend-a
-                          alt={post.postImage} // Set the alt tag to the filename
+                          src={`${backendUrl}/api/posts/uploads/${post.image_url}`} 
+                          alt={post.postImage} 
                           className="image"
                         />
                       ) : (
@@ -723,7 +723,12 @@ const UserProfile: React.FC = () => {
                     <div className="user-post-info">
                       <div className="user-post-profile-image">
                         <img
-                          src={`assets/Icons/${post.profileImage}`}
+                          src=
+                          {
+                            post.profileImage === "defaultProfilePicture.png"
+                              ? "/assets/Icons/defaultProfilePicture.svg" 
+                              : `${backendUrl}/api/posts/uploads/${post.profileImage}` 
+                          }
                           alt="Profile"
                           className="image-15"
                         />
@@ -802,7 +807,12 @@ const UserProfile: React.FC = () => {
                           <div className="created-post-user-info-block">
                             <div className="div-block-2">
                               <img
-                                src={`assets/Icons/${post.profileImage}`}
+                                src=
+                                {
+                                  post.profileImage === "defaultProfilePicture.png"
+                                    ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
+                                    : `${backendUrl}/api/posts/uploads/${post.profileImage}` // Putanja ka serveru
+                                }
                                 alt="User Profile"
                                 className="image-6"
                               />
@@ -878,7 +888,12 @@ const UserProfile: React.FC = () => {
                       <div className="blocked-user-info">
                         <div className="blocked-user-image">
                           <img
-                            src={`/assets/Icons/${user.profileImage}`}
+                            src=
+                            {
+                              user.profileImage === "defaultProfilePicture.png"
+                                ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
+                                : `${backendUrl}/api/posts/uploads/${user.profileImage}` // Putanja ka serveru
+                            }
                             alt="Profile"
                             className="image-10"
                           />

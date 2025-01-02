@@ -190,8 +190,8 @@ const Index: React.FC = () => {
                   id="name"
                 />
                 <div className="text-block">
-                  <img src="\assets\Icons\x-02.svg" 
-                  alt="" />
+                  <img src="\assets\Icons\x-02.svg"
+                    alt="" />
                 </div>
               </div>
               <input type="submit" className="search-button w-button" value="Pretraži" id="search-user-btn" />
@@ -214,8 +214,15 @@ const Index: React.FC = () => {
                 <div className="user-post-user-info">
                   <div className="user-post-user-info-image-and-name">
                     <div className="user-post-user-info-profile-image">
-                      <img src={`/assets/Icons/${post.profileImage}`} alt="Profile" className="image-4" />
-                    </div>
+                      <img
+                        src={
+                          post.profileImage === "defaultProfilePicture.png"
+                            ? "/assets/Icons/defaultProfilePicture.svg" 
+                            : `${backendUrl}/api/posts/uploads/${post.profileImage}` 
+                        }
+                        alt="Profile"
+                        className="image-4"
+                      />                    </div>
                     <div className="user-post-user-info-name-and-date">
                       <div className="user-post-user-info-name">
                         @{<span className="text-span">{post.username}</span>}
