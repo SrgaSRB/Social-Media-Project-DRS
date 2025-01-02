@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
     is_blocked BOOLEAN DEFAULT FALSE,
     rejected_posts_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    profile_picture_url VARCHAR(255) DEFAULT 'defaultProfilePicture.jpg'
+    profile_picture_url VARCHAR(255) DEFAULT 'defaultProfilePicture.png'
 );
 
 -- Tabela za prijateljstva

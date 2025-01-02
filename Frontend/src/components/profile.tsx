@@ -209,7 +209,8 @@ const UserProfile: React.FC = () => {
       .then((data) => {
         const { user } = data;
         setUserType(user?.role || 'user');
-        setUserData(user); // Postavi korisničke podatke
+        setUserData(user); 
+        console.log(userData);
       })
       .catch((error) => {
         console.error('Error fetching session:', error);
