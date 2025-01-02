@@ -41,7 +41,7 @@ class User(Base):
     is_blocked = Column(Boolean, default=False) # Is user blocked
     rejected_posts_count = Column(Integer, default=0) # Number of rejected posts
     created_at = Column(TIMESTAMP, server_default=func.now()) # Time of creation
-    profile_picture_url = Column(String(255), default='defaultProfilePicture.png') # URL of the profile picture
+    profile_picture_url = Column(String(255), default='defaultProfilePicture.svg') # URL of the profile picture
 
     # Relations
     posts = relationship("Post", back_populates="user", foreign_keys="[Post.user_id]", cascade="all, delete-orphan") # Posts created by the user

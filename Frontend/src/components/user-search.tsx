@@ -208,7 +208,7 @@ const UserSearch: React.FC = () => {
                       <img
                         src=
                         {
-                          user.profileImage === "defaultProfilePicture.png"
+                          user.profileImage === "defaultProfilePicture.svg"
                             ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
                             : `${backendUrl}/api/posts/uploads/${user.profileImage}` // Putanja ka serveru
                         }

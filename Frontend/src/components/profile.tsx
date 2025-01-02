@@ -809,7 +809,7 @@ const UserProfile: React.FC = () => {
                               <img
                                 src=
                                 {
-                                  post.profileImage === "defaultProfilePicture.png"
+                                  post.profileImage === "defaultProfilePicture.svg"
                                     ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
                                     : `${backendUrl}/api/posts/uploads/${post.profileImage}` // Putanja ka serveru
                                 }
@@ -890,7 +890,7 @@ const UserProfile: React.FC = () => {
                           <img
                             src=
                             {
-                              user.profileImage === "defaultProfilePicture.png"
+                              user.profileImage === "defaultProfilePicture.svg"
                                 ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
                                 : `${backendUrl}/api/posts/uploads/${user.profileImage}` // Putanja ka serveru
                             }

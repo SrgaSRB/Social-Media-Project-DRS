@@ -216,7 +216,7 @@ const Index: React.FC = () => {
                     <div className="user-post-user-info-profile-image">
                       <img
                         src={
-                          post.profileImage === "defaultProfilePicture.png"
+                          post.profileImage === "defaultProfilePicture.svg"
                             ? "/assets/Icons/defaultProfilePicture.svg" 
                             : `${backendUrl}/api/posts/uploads/${post.profileImage}` 
                         }
