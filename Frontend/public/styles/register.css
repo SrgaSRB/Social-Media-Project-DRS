@@ -2103,7 +2103,8 @@ textarea.w-input, textarea.w-select {
 
 .content-wapper {
   flex: 1;
-  height: 97%;
+  height: auto;
+  min-height: 97%;
   display: flex;
 }
 
@@ -2184,7 +2185,8 @@ textarea.w-input, textarea.w-select {
   flex: 1;
   justify-content: center;
   align-items: stretch;
-  height: 97%;
+  height: auto;
+  min-height: 97%;
   display: flex;
 }
 
@@ -2419,4 +2421,8 @@ textarea.w-input, textarea.w-select {
   .field-label, .field-label-2 {
     color: #000;
   }
+}
+
+.error-message{
+  color:red;
 }

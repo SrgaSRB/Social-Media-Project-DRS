@@ -3,23 +3,26 @@ import { Helmet } from "react-helmet";
 import { useNavigate, redirect } from "react-router-dom";
 import { useNotification } from '../notification/NotificationContext';
 
-
 const loadCSS = (href: string) => {
-  // Ukloni sve postojeće CSS linkove osim trenutnog
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    if (link.getAttribute("href") !== href) {
+    if (link.getAttribute('href') !== href) {
       link.remove();
     }
   });
 
   const existingLink = document.querySelector(`link[href="${href}"]`);
   if (!existingLink) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
+
 
 const Register: React.FC = () => {
 
@@ -48,12 +51,17 @@ const Register: React.FC = () => {
     setTimeout(() => setIsLoading(false), 200); // Simulacija učitavanja CSS-a
   }, []);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
+  
+    if (name === "username" && /\s/.test(value)) {
+      showNotification('error' , "Korisničko ime ne može sadržavati razmake.");
+      return;
+    }
+  
     setFormData({ ...formData, [name]: value });
   };
+  
 
   const handleEmailBlur = async (): Promise<void> => {
     try {
@@ -212,7 +220,7 @@ const Register: React.FC = () => {
                     required
                   />
                   {usernameAvailable === false && (
-                    <span className="error-message" color="red">
+                    <span className="error-message">
                       Korisničko ime nije dostupno.
                     </span>
                   )}

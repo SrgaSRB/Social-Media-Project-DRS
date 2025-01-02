@@ -4,6 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useNotification } from '../notification/NotificationContext';
 
+const loadCSS = (href: string) => {
+  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+    if (link.getAttribute('href') !== href) {
+      link.remove();
+    }
+  });
+
+  const existingLink = document.querySelector(`link[href="${href}"]`);
+  if (!existingLink) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
+};
 
 interface BlockedUser {
   id: number;
@@ -39,22 +58,6 @@ interface Post {
   created_at: string;
 }
 
-
-const loadCSS = (href: string) => {
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    if (link.getAttribute('href') !== href) {
-      link.remove();
-    }
-  });
-
-  const existingLink = document.querySelector(`link[href="${href}"]`);
-  if (!existingLink) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  }
-};
 
 const UserProfile: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -175,15 +178,14 @@ const UserProfile: React.FC = () => {
         const data = await response.json();
 
         if (!data.user) {
-          navigate('/login'); // Preusmerava na stranicu za prijavu
+          navigate('/login'); 
         }
       } catch (error) {
         console.error('Error fetching session:', error);
-        navigate('/login'); // Preusmerava na stranicu za prijavu u slučaju greške
+        navigate('/login'); 
       }
     };
 
-    //User posts list
     const fetchUserPosts = async () => {
       try {
         const response = await fetch(`${backendUrl}/api/posts/user-posts`, {
@@ -196,7 +198,7 @@ const UserProfile: React.FC = () => {
         }
 
         const data = await response.json();
-        setPosts(data); // Postavi objave u stanje
+        setPosts(data); 
       } catch (error) {
         console.error('Error fetching user posts:', error);
       }
@@ -209,13 +211,13 @@ const UserProfile: React.FC = () => {
       .then((data) => {
         const { user } = data;
         setUserType(user?.role || 'user');
-        setUserData(user); 
-        console.log(userData);
+        setUserData(user);
       })
       .catch((error) => {
         console.error('Error fetching session:', error);
         setUserType('user');
-      });
+      })
+      .finally(() => setIsLoading(false));
 
     fetchUserPosts();
     checkSession();
@@ -224,7 +226,6 @@ const UserProfile: React.FC = () => {
       fetchBlockedUsers();
     }
 
-    setIsLoading(false);
 
     return () => {
       socket.disconnect();
@@ -578,7 +579,11 @@ const UserProfile: React.FC = () => {
               {error && <div className="error-message">{error}</div>}
               <div className="user-image">
                 <img
-                  src={`assets/Icons/${userData?.profileImage}`}
+                  src={
+                    userData?.profileImage === "defaultProfilePicture.svg"
+                      ? "/assets/Icons/defaultProfilePicture.svg"
+                      : `${backendUrl}/api/posts/uploads/${userData?.profileImage}`
+                  }
                   alt="" className="image-4" />
                 <div className="text-block-6">@{userData?.username || ''}</div>
                 <div className="div-block-4">
@@ -713,8 +718,8 @@ const UserProfile: React.FC = () => {
                     <div className="user-post-image-div">
                       {post.image_url ? (
                         <img
-                          src={`${backendUrl}/api/posts/uploads/${post.image_url}`} 
-                          alt={post.postImage} 
+                          src={`${backendUrl}/api/posts/uploads/${post.image_url}`}
+                          alt={post.postImage}
                           className="image"
                         />
                       ) : (
@@ -726,9 +731,9 @@ const UserProfile: React.FC = () => {
                         <img
                           src=
                           {
-                            post.profileImage === "defaultProfilePicture.png"
-                              ? "/assets/Icons/defaultProfilePicture.svg" 
-                              : `${backendUrl}/api/posts/uploads/${post.profileImage}` 
+                            post.profileImage === "defaultProfilePicture.svg"
+                              ? "/assets/Icons/defaultProfilePicture.svg"
+                              : `${backendUrl}/api/posts/uploads/${post.profileImage}`
                           }
                           alt="Profile"
                           className="image-15"

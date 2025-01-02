@@ -3,23 +3,24 @@ import { Helmet } from "react-helmet";
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 
-
-
 const loadCSS = (href: string) => {
-  // Ukloni sve linkove osim trenutnog
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    if (link.getAttribute("href") !== href) {
+    if (link.getAttribute('href') !== href) {
       link.remove();
     }
   });
 
   const existingLink = document.querySelector(`link[href="${href}"]`);
   if (!existingLink) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 interface FriendRequest {

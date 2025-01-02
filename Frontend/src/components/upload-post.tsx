@@ -5,7 +5,6 @@ import { text } from 'stream/consumers';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 
-
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
     if (link.getAttribute('href') !== href) {
@@ -20,6 +19,10 @@ const loadCSS = (href: string) => {
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 const UploadPost: React.FC = () => {

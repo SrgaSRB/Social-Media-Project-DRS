@@ -32,6 +32,9 @@ def register():
     if missing_fields:
         return jsonify({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
 
+    if ' ' in data['username']:
+        return jsonify({"error": "Username cannot contain whitespace"}), 400
+
     db = next(get_db())
     existing_user = db.query(User).filter((User.username == data['username']) | (User.email == data['email'])).first()
     if existing_user:
@@ -53,7 +56,11 @@ def register():
     db.add(new_user)
     db.commit()
     message_text = f"Kreiran korisnik! Korisnicko ime: {new_user.username} Lozinka: {new_user.password}"
-    send_email_in_thread("luka.zbucnovic@gmail.com","jndx ishq rgsd ehnb",[f"{new_user.email}"],"Korisnik uspesno kreiran",message_text,"smtp.gmail.com",587)
+    send_email_in_thread(
+        "luka.zbucnovic@gmail.com", "jndx ishq rgsd ehnb",
+        [f"{new_user.email}"], "Korisnik uspesno kreiran", message_text,
+        "smtp.gmail.com", 587
+    )
 
     return jsonify({"message": "Registration successful"}), 201
 
