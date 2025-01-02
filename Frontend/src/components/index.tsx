@@ -214,7 +214,7 @@ const Index: React.FC = () => {
                 <div className="user-post-user-info">
                   <div className="user-post-user-info-image-and-name">
                     <div className="user-post-user-info-profile-image">
-                      <img src={post.profileImage} alt="Profile" className="image-4" />
+                      <img src={`/assets/Icons/${post.profileImage}`} alt="Profile" className="image-4" />
                     </div>
                     <div className="user-post-user-info-name-and-date">
                       <div className="user-post-user-info-name">

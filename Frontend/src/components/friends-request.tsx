@@ -190,7 +190,7 @@ const FriendsRequest: React.FC = () => {
                   <div className="fr">
                     <div className="fr-user-image">
                       <img
-                        src={request.profileImage}
+                        src={`/assets/Icons/${request.profileImage}`}
                         alt="User Profile"
                         className="image-6"
                       />

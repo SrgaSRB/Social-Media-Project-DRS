@@ -206,7 +206,7 @@ const UserSearch: React.FC = () => {
                   <div className="user-info-block">
                     <div className="user-image">
                       <img
-                        src={user.profileImage}
+                        src={`/assets/Icons/${user.profileImage}`}
                         alt={user.name}
                         className="profile-image"
                       />
