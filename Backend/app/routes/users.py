@@ -278,6 +278,8 @@ def remove_friend():
 
     if not friendship:
         return jsonify({'error': 'Friendship not found'}), 404
+    
+    print(friendship)
 
     db.delete(friendship)
     db.commit()
