@@ -270,16 +270,22 @@ def remove_friend():
     if not user_session:
         return jsonify({'error': 'User not logged in'}), 401
 
+    user_id = user_session['id']
+    friend_id = data.get('friend_id')
+
+    if not friend_id:
+        return jsonify({'error': 'Friend ID is required'}), 400
+
     db = next(get_db())
+    
+    # Ispravan filter uslov sa zagradama i `&` operatorom
     friendship = db.query(Friendship).filter(
-        (Friendship.user1_id == user_session['id'] and Friendship.user2_id == data['friend_id']) |
-        (Friendship.user1_id == data['friend_id'] and Friendship.user2_id == user_session['id'])
+        ((Friendship.user1_id == user_id) & (Friendship.user2_id == friend_id)) |
+        ((Friendship.user1_id == friend_id) & (Friendship.user2_id == user_id))
     ).first()
 
     if not friendship:
         return jsonify({'error': 'Friendship not found'}), 404
-    
-    print(friendship)
 
     db.delete(friendship)
     db.commit()
