@@ -261,3 +261,54 @@ def unblock_user(user_id):
     user.is_blocked = False
     db.commit()
     return jsonify({'message': f'User {user.username} successfully unblocked'}), 200
+
+@users_bp.route('/remove-friend', methods=['POST'])
+def remove_friend():
+    data = request.get_json()
+    user_session = session.get('user')
+
+    if not user_session:
+        return jsonify({'error': 'User not logged in'}), 401
+
+    db = next(get_db())
+    friendship = db.query(Friendship).filter(
+        (Friendship.user1_id == user_session['id'] and Friendship.user2_id == data['friend_id']) |
+        (Friendship.user1_id == data['friend_id'] and Friendship.user2_id == user_session['id'])
+    ).first()
+
+    if not friendship:
+        return jsonify({'error': 'Friendship not found'}), 404
+
+    db.delete(friendship)
+    db.commit()
+    return jsonify({'message': 'Friendship removed successfully'}), 200
+
+@users_bp.route('/friend-statuses', methods=['GET'])
+def get_friend_statuses():
+    """
+    GET: Returns the friendship status for all users relative to the logged-in user.
+    """
+    user_session = session.get('user')
+
+    if not user_session:
+        return jsonify({'error': 'User not logged in'}), 401
+
+    user_id = user_session['id']
+    db = next(get_db())
+
+    # Dohvati sve prijateljstva gde je trenutni korisnik uključen
+    friendships = db.query(Friendship).filter(
+        (Friendship.user1_id == user_id) | (Friendship.user2_id == user_id)
+    ).all()
+
+    statuses = {}
+    for friendship in friendships:
+        if friendship.status == 'accepted':
+            statuses[friendship.user1_id if friendship.user1_id != user_id else friendship.user2_id] = "friends"
+        elif friendship.status == 'pending':
+            if friendship.user1_id == user_id:
+                statuses[friendship.user2_id] = "requestSent"
+            else:
+                statuses[friendship.user1_id] = "requestReceived"
+
+    return jsonify(statuses), 200

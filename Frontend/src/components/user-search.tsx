@@ -39,9 +39,11 @@ const UserSearch: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const searchTermFromLocation = location.state?.searchTerm || '';
-  const [searchTerm, setSearchTerm] = useState(searchTermFromLocation);  
+  const [searchTerm, setSearchTerm] = useState(searchTermFromLocation);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [friendStatuses, setFriendStatuses] = useState<{ [key: number]: string }>({});
+
   const backendUrl = process.env.REACT_APP_BACKEND_URL; //|| 'http://localhost:5000'; // URL iz environment varijable
 
   const { showNotification } = useNotification();
@@ -50,34 +52,37 @@ const UserSearch: React.FC = () => {
   useEffect(() => {
     loadCSS('/styles/user-search.css');
     setIsLoading(true);
-  
-    const fetchUsers = async () => {
+
+    const fetchUsersAndStatuses = async () => {
       try {
-        const response = await fetch(`${backendUrl}/api/users/`, {
-          method: 'GET',
-          credentials: 'include', // Neophodno za sesiju
-        });
-  
-        if (!response.ok) {
-          throw new Error('Failed to fetch users');
+        const [usersResponse, statusesResponse] = await Promise.all([
+          fetch(`${backendUrl}/api/users/`, { method: 'GET', credentials: 'include' }),
+          fetch(`${backendUrl}/api/users/friend-statuses`, { method: 'GET', credentials: 'include' }),
+        ]);
+
+        if (!usersResponse.ok || !statusesResponse.ok) {
+          throw new Error('Failed to fetch data');
         }
-  
-        const data = await response.json();
-        setUsers(data); 
-        setFilteredUsers(data); 
+
+        const usersData = await usersResponse.json();
+        const statusesData = await statusesResponse.json();
+
+        setUsers(usersData);
+        setFriendStatuses(statusesData);
+        setFilteredUsers(usersData);
 
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching users and statuses:', error);
+        showNotification("error", "Došlo je do greške prilikom učitavanja podataka.");
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     };
-  
-    fetchUsers(); 
+
+    fetchUsersAndStatuses();
   }, []);
 
   useEffect(() => {
-    // Ako postoji searchTerm, filtriraj korisnike
     if (searchTerm) {
       const results = users.filter((user) =>
         [user.name, user.username, user.email, user.address, user.city, user.country]
@@ -85,10 +90,10 @@ const UserSearch: React.FC = () => {
       );
       setFilteredUsers(results);
     } else {
-      setFilteredUsers(users); // Ako nije uneta vrednost, prikaži sve korisnike
+      setFilteredUsers(users);
     }
   }, [searchTerm, users]);
-  
+
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -116,15 +121,65 @@ const UserSearch: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-            showNotification('success', data.message); 
+        showNotification('success', data.message);
       } else {
-        showNotification('error', data.error); 
+        showNotification('error', data.error);
       }
     } catch (error) {
       console.error('Error sending friend request:', error);
-      showNotification('error','Došlo je do greške prilikom slanja zahteva.');
+      showNotification('error', 'Došlo je do greške prilikom slanja zahteva.');
     }
   };
+
+  const handleRemoveFriend = async (friendId: number) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/users/remove-friend`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ friend_id: friendId }),
+      });
+
+      if (response.ok) {
+        showNotification("success", "Prijatelj je uspešno obrisan.");
+        setFriendStatuses((prev) => ({ ...prev, [friendId]: "notFriends" }));
+      } else {
+        const data = await response.json();
+        showNotification("error", data.error);
+      }
+    } catch (error) {
+      console.error("Error removing friend:", error);
+      showNotification("error", "Došlo je do greške prilikom brisanja prijatelja.");
+    }
+  };
+
+  const handleAcceptFriendRequest = async (requestId: number) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/users/accept-friend-request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ request_id: requestId }),
+      });
+
+      if (response.ok) {
+        showNotification("success", "Zahtev je prihvaćen.");
+        setFriendStatuses((prev) => ({ ...prev, [requestId]: "friends" }));
+      } else {
+        const data = await response.json();
+        showNotification("error", data.error);
+      }
+    } catch (error) {
+      console.error("Error accepting friend request:", error);
+      showNotification("error", "Došlo je do greške prilikom prihvatanja zahteva.");
+    }
+  };
+
+
 
   if (isLoading) {
     return (
@@ -193,8 +248,8 @@ const UserSearch: React.FC = () => {
                   onChange={handleSearchInputChange}
                 />
                 <div className="text-block" onClick={() => setSearchTerm('')}>
-                  <img src="\assets\Icons\x-02.svg" 
-                  alt="" />
+                  <img src="\assets\Icons\x-02.svg"
+                    alt="" />
                 </div>
               </div>
             </div>
@@ -203,35 +258,12 @@ const UserSearch: React.FC = () => {
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
                 <div className="user-block" key={user.id}>
-                  <div className="user-info-block">
-                    <div className="user-image">
-                      <img
-                        src=
-                        {
-                          user.profileImage === "defaultProfilePicture.svg"
-                            ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
-                            : `${backendUrl}/api/posts/uploads/${user.profileImage}` // Putanja ka serveru
-                        }
-                        alt={user.name}
-                        className="profile-image"
-                      />
-                    </div>
-                    <div className="user-names-info">
-                      <div className="text-block-3">{user.name}</div>
-                      <div className="text-block-2">@{user.username}</div>
-                    </div>
-                    <div className="users-location-info">
-                      <img
-                        src="/assets/Icons/locationPin-RED.svg"
-                        alt="Location Icon"
-                        className="image-5"
-                      />
-                      <div className="user-location">
-                        <div className="text-block-5">{user.country},</div>
-                        <div className="text-block-6">{user.city}</div>
-                      </div>
-                    </div>
-                    <a href="#" className="link-block w-inline-block" onClick={() => handleSendFriendRequest(user.id)}>
+                  {friendStatuses[user.id] === "notFriends" && (
+                    <a
+                      href="#"
+                      className="link-block w-inline-block"
+                      onClick={() => handleSendFriendRequest(user.id)}
+                    >
                       <div className="text-block-4">Dodaj prijatelja</div>
                       <img
                         src="\assets\Icons\sendFriendRequest-BLUE.svg"
@@ -239,10 +271,42 @@ const UserSearch: React.FC = () => {
                         className="image-4"
                       />
                     </a>
-                  </div>
-                  <div className="user-block-hr"></div>
+                  )}
+                  {friendStatuses[user.id] === "requestSent" && (
+                    <a className="link-block padding-request w-inline-block">
+                      <div className="text-block-4">Zahtev je poslat</div>
+                      <img src="profile-right.svg" alt="Request Sent Icon" className="image-4" />
+                    </a>
+                  )}
+                  {friendStatuses[user.id] === "friends" && (
+                    <div className="accept-and-remove-buttons-block">
+                      <a
+                        href="#"
+                        className="link-block remove-friend w-inline-block"
+                        onClick={() => handleRemoveFriend(user.id)}
+                      >
+                        <div className="text-block-4">Obriši prijatelja</div>
+                        <img src="minus%20(1).svg" alt="Remove Friend Icon" className="image-4" />
+                      </a>
+                    </div>
+                  )}
+                  {friendStatuses[user.id] === "requestReceived" && (
+                    <a
+                      href="#"
+                      className="link-block accept-requests w-inline-block"
+                      onClick={() => handleAcceptFriendRequest(user.id)}
+                    >
+                      <div className="text-block-4">Prihvati zahtev korisnika</div>
+                      <img
+                        src="user-profile-left.svg"
+                        alt="Accept Request Icon"
+                        className="image-4"
+                      />
+                    </a>
+                  )}
                 </div>
               ))
+
             ) : (
               <div>Nema rezultata pretrage.</div>
             )}
