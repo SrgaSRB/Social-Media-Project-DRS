@@ -135,22 +135,35 @@ def send_friend_request():
 @users_bp.route('/accept-friend-request', methods=['POST'])
 def accept_friend_request():
     """
-    POST: Accepts a friend request by its ID.
+    POST: Accepts a friend request either by request_id or user1_id.
     """
     db = next(get_db())
 
     user_session = session.get('user')
     if not user_session:
         return jsonify({'error': 'User not logged in'}), 401
-    
+
     user_id = user_session['id']
     data = request.get_json()
+
     friend_request_id = data.get('request_id')
+    user1_id = data.get('user1_id')
 
-    if not friend_request_id:
-        return jsonify({'error': 'Friend request ID is required'}), 400
+    if not friend_request_id and not user1_id:
+        return jsonify({'error': 'Either request_id or user1_id is required'}), 400
 
-    friend_request = db.query(Friendship).filter_by(id=friend_request_id, user2_id=user_id, status='pending').first()
+    if friend_request_id:
+        friend_request = db.query(Friendship).filter_by(
+            id=friend_request_id,
+            user2_id=user_id,
+            status='pending'
+        ).first()
+    elif user1_id:
+        friend_request = db.query(Friendship).filter_by(
+            user1_id=user1_id,
+            user2_id=user_id,
+            status='pending'
+        ).first()
 
     if not friend_request:
         return jsonify({'error': 'Friend request not found or already accepted'}), 404

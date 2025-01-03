@@ -100,7 +100,6 @@ const UserSearch: React.FC = () => {
     const term = e.target.value;
     setSearchTerm(term);
 
-    // Automatsko filtriranje korisnika
     const results = users.filter((user) =>
       [user.name, user.username, user.email, user.address, user.city, user.country]
         .some((field) => field?.toLowerCase().includes(term.toLowerCase()))
@@ -159,7 +158,7 @@ const UserSearch: React.FC = () => {
     }
   };
 
-  const handleAcceptFriendRequest = async (requestId: number) => {
+  const handleAcceptFriendRequest = async (user1_id: number) => {
     try {
       const response = await fetch(`${backendUrl}/api/users/accept-friend-request`, {
         method: "POST",
@@ -167,14 +166,14 @@ const UserSearch: React.FC = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ request_id: requestId }),
+        body: JSON.stringify({ user1_id: user1_id }),
       });
 
+      const data = await response.json();
       if (response.ok) {
         showNotification("success", "Zahtev je prihvaćen.");
-        setFriendStatuses((prev) => ({ ...prev, [requestId]: "friends" }));
+        setFriendStatuses((prev) => ({ ...prev, [user1_id]: "friends" }));
       } else {
-        const data = await response.json();
         showNotification("error", data.error);
       }
     } catch (error) {

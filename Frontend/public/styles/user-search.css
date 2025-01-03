@@ -2244,6 +2244,7 @@ textarea.w-input, textarea.w-select {
   display: flex;
   position: absolute;
   inset: 0% 0% 0% auto;
+  justify-self: stretch;
 }
 
 .link-block:hover {
@@ -2662,7 +2663,7 @@ textarea.w-input, textarea.w-select {
   display: flex;
   position: relative;
   inset: 0% 0% 0% auto;
-  justify-self: right;
+  justify-self: stretch;
 }
 
 @media screen and (max-width: 991px) {
