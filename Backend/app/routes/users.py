@@ -296,15 +296,19 @@ def get_friend_statuses():
     user_id = user_session['id']
     db = next(get_db())
 
-    # Dohvati sve prijateljstva gde je trenutni korisnik uključen
+    all_users = db.query(User).all()
+
     friendships = db.query(Friendship).filter(
         (Friendship.user1_id == user_id) | (Friendship.user2_id == user_id)
     ).all()
 
-    statuses = {}
+    # Kreiraj osnovni objekat sa svim korisnicima i podrazumevanim statusom
+    statuses = {user.id: "notFriends" for user in all_users if user.id != user_id}
+
     for friendship in friendships:
         if friendship.status == 'accepted':
-            statuses[friendship.user1_id if friendship.user1_id != user_id else friendship.user2_id] = "friends"
+            friend_id = friendship.user1_id if friendship.user1_id != user_id else friendship.user2_id
+            statuses[friend_id] = "friends"
         elif friendship.status == 'pending':
             if friendship.user1_id == user_id:
                 statuses[friendship.user2_id] = "requestSent"
