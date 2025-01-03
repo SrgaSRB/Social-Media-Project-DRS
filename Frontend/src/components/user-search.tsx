@@ -123,6 +123,8 @@ const UserSearch: React.FC = () => {
       const data = await response.json();
       if (response.ok) {
         showNotification('success', data.message);
+        setFriendStatuses((prev) => ({ ...prev, [receiverId]: "requestSent" }));
+
       } else {
         showNotification('error', data.error);
       }
@@ -133,6 +135,7 @@ const UserSearch: React.FC = () => {
   };
 
   const handleRemoveFriend = async (friendId: number) => {
+    console.log(friendId);
     try {
       const response = await fetch(`${backendUrl}/api/users/remove-friend`, {
         method: "POST",
@@ -290,7 +293,7 @@ const UserSearch: React.FC = () => {
                     {friendStatuses[user.id] === "notFriends" && (
                       <a
                         href="#"
-                        className="link-block w-inline-block"
+                        className="link-block send-request w-inline-block"
                         onClick={() => handleSendFriendRequest(user.id)}
                       >
                         <div className="text-block-4">Dodaj prijatelja</div>

@@ -2386,6 +2386,7 @@ textarea.w-input, textarea.w-select {
 
 .container {
   max-width: 1200px;
+  padding-bottom: 70px;
 }
 
 .container.friends-requests-container {
@@ -2661,6 +2662,7 @@ textarea.w-input, textarea.w-select {
   display: flex;
   position: relative;
   inset: 0% 0% 0% auto;
+  justify-self: right;
 }
 
 @media screen and (max-width: 991px) {
