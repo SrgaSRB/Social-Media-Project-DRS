@@ -74,6 +74,11 @@ const UserProfile: React.FC = () => {
   const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL iz environment varijable
   const { showNotification } = useNotification();
 
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [currentPostId, setCurrentPostId] = useState<number | null>(null);
+
+
   //const [activeSection, setActiveSection] = useState<string>('profile');
 
 
@@ -178,11 +183,11 @@ const UserProfile: React.FC = () => {
         const data = await response.json();
 
         if (!data.user) {
-          navigate('/login'); 
+          navigate('/login');
         }
       } catch (error) {
         console.error('Error fetching session:', error);
-        navigate('/login'); 
+        navigate('/login');
       }
     };
 
@@ -198,7 +203,7 @@ const UserProfile: React.FC = () => {
         }
 
         const data = await response.json();
-        setPosts(data); 
+        setPosts(data);
       } catch (error) {
         console.error('Error fetching user posts:', error);
       }
@@ -375,15 +380,28 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleRejectPost = async (postId: number) => {
-    try {
-      const response = await fetch(`${backendUrl}/api/posts/${postId}/reject`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+  const handleRejectPost = (postId: number) => {
+    setCurrentPostId(postId);
+    setIsRejectModalOpen(true);
+  };
 
+  const handleRejectPostWithReason = async () => {
+    if (!currentPostId) return;
+  
+    try {
+      const response = await fetch(`${backendUrl}/api/posts/${currentPostId}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ reason: rejectionReason }),
+      });
+  
       if (response.ok) {
-        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+        setPendingPosts((prevPosts) =>
+          prevPosts.filter((post) => post.id !== currentPostId)
+        );
         showNotification('success', 'Post je odbijen.');
       } else {
         showNotification('error', 'Došlo je do greške prilikom odbijanja.');
@@ -391,8 +409,13 @@ const UserProfile: React.FC = () => {
     } catch (error) {
       showNotification('error', 'Greška pri povezivanju sa serverom.');
       console.error('Error rejecting post:', error);
+    } finally {
+      setIsRejectModalOpen(false);
+      setRejectionReason('');
+      setCurrentPostId(null);
     }
   };
+  
 
   const handleLogout = async () => {
     try {
@@ -570,6 +593,53 @@ const UserProfile: React.FC = () => {
           </div>
         </section>
       )}
+
+{isRejectModalOpen && (
+  <section className="reject-description-section">
+    <div className="w-layout-blockcontainer container container-reject-description w-container">
+      <div className="form-block w-form">
+        <form
+          id="reject-form"
+          name="reject-form"
+          className="form-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleRejectPostWithReason();
+          }}
+        >
+          <label htmlFor="rejectionReason" className="field-label">
+            Razlog odbijanja posta
+          </label>
+          <textarea
+            placeholder="Unesite razlog odbijanja objave"
+            maxLength={5000}
+            id="rejectionReason"
+            name="rejectionReason"
+            className="textarea w-input"
+            value={rejectionReason}
+            onChange={(e) => setRejectionReason(e.target.value)}
+            required
+          ></textarea>
+          <div className="reject-description-buttons-div">
+            <button
+              type="button"
+              className="reject-button give-up w-button"
+              onClick={() => {
+                setIsRejectModalOpen(false);
+                setRejectionReason('');
+              }}
+            >
+              Odustani
+            </button>
+            <button type="submit" className="reject-button w-button">
+              Pošalji
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+)}
 
 
       <section id='hero-section' className="hero-section">
@@ -816,8 +886,8 @@ const UserProfile: React.FC = () => {
                                 src=
                                 {
                                   post.profileImage === "defaultProfilePicture.svg"
-                                    ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
-                                    : `${backendUrl}/api/posts/uploads/${post.profileImage}` // Putanja ka serveru
+                                    ? "/assets/Icons/defaultProfilePicture.svg"
+                                    : `${backendUrl}/api/posts/uploads/${post.profileImage}`
                                 }
                                 alt="User Profile"
                                 className="image-6"

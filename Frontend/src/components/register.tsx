@@ -359,6 +359,21 @@ const Register: React.FC = () => {
                     required
                   />
 
+                  <label htmlFor="password-confirm" className="user-info-label">
+                    Potvrdite lozinku
+                  </label>
+
+                  <input
+                    className="user-info-input w-input"
+                    maxLength={256}
+                    name="password-confirm"
+                    id="password-confirm"
+                    placeholder="Potvrdite Vašu lozinku"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                  />
+
                   <input
                     type="submit"
                     className="submit-button-2 w-button"

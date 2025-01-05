@@ -2124,14 +2124,10 @@ textarea.w-input, textarea.w-select {
   position: relative;
 }
 
-.container.edit-post-container {
+.container.edit-post-container, .container.container-reject-description {
   justify-content: center;
   align-items: center;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Efekat senke */
-  width: 90%; /* Da bude responzivan */
-  animation: fadeIn 0.3s ease-in-out; /* Animacija za otvaranje */
+  animation: fadeIn 0.3s ease-in-out; 
 }
 
 .user-info {
@@ -2679,11 +2675,12 @@ textarea.w-input, textarea.w-select {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Zamagljena pozadina */
+  background: rgba(0, 0, 0, 0.5); 
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;}
+  z-index: 1000; 
+}
 
 .edit-post-image-block {
   flex-flow: column;
@@ -2890,7 +2887,7 @@ textarea.w-input, textarea.w-select {
   z-index: 1000;
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: #fff9;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -2931,6 +2928,86 @@ textarea.w-input, textarea.w-select {
 .image-2 {
   width: 200px;
   height: 100%;
+}
+
+.reject-description-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.reject-description-block {
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  display: flex;
+}
+
+.reject-description-buttons-div {
+  justify-content: space-between;
+  display: flex;
+}
+
+.form-block {
+  background-color: #fff;
+  border-radius: 8px;
+  width: 500px;
+  padding: 16px;
+}
+
+.textarea {
+  color: #000;
+  background-color: #d9d9d9;
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 300px;
+  max-height: 400px;
+  transition: all .2s;
+}
+
+.textarea:hover {
+  background-color: #bfbfbf;
+}
+
+.textarea:focus {
+  border: 1px solid #000;
+}
+
+.reject-button {
+  border-radius: 4px;
+  transition: all .3s;
+}
+
+.reject-button:hover {
+  background-color: #2f80c7;
+}
+
+.reject-button:active {
+  outline-offset: 0px;
+  color: #2f80c7;
+  background-color: #fff;
+  outline: 2px solid #2f80c7;
+}
+
+.reject-button.give-up {
+  color: #000;
+  background-color: #ccc;
+}
+
+.reject-button.give-up:hover {
+  background-color: #a6a6a6;
+}
+
+.field-label {
+  text-align: left;
+  font-size: 1.5rem;
 }
 
 @media screen and (max-width: 991px) {
@@ -3016,6 +3093,10 @@ textarea.w-input, textarea.w-select {
     width: 520px;
     max-width: 520px;
   }
+
+  .form-block {
+    width: 400px;
+  }
 }
 
 @media screen and (max-width: 479px) {
@@ -3025,9 +3106,9 @@ textarea.w-input, textarea.w-select {
 
   .container {
     flex-flow: column;
-    width: 95%;
-    max-width: 420px;
+    width: 100%;
     min-width: 320px;
+    max-width: 420px;
     padding-left: 0;
     padding-right: 0;
   }
@@ -3038,8 +3119,14 @@ textarea.w-input, textarea.w-select {
   }
 
   .container.hero-container {
+    width: 320px;
     padding-left: 0;
     padding-right: 0;
+  }
+
+  .container.container-reject-description {
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .user-info {
@@ -3065,6 +3152,10 @@ textarea.w-input, textarea.w-select {
     font-size: 2rem;
     position: sticky;
     top: 0;
+  }
+
+  .user-posts-block {
+    margin-top: 4rem;
   }
 
   .container-hr {
@@ -3138,7 +3229,9 @@ textarea.w-input, textarea.w-select {
   }
 
   .edit-post-block {
-    width: 300px;
+    width: 90%;
+    min-width: 300px;
+    max-width: 500px;
     height: 700px;
   }
 
@@ -3170,6 +3263,14 @@ textarea.w-input, textarea.w-select {
     width: 100%;
     max-width: 320px;
     max-width: 420px;
+  }
+
+  .form-block {
+    width: 100%;
+  }
+
+  .field-label {
+    font-size: 1.25rem;
   }
 }
 

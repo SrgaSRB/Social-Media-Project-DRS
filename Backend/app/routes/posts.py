@@ -384,7 +384,7 @@ def approve_post(post_id):
 @posts_bp.route('/<int:post_id>/reject', methods=['POST'])
 def reject_post(post_id):
     """
-    POST: Odbija post postavljanjem statusa na 'rejected'.
+    POST: Odbija post postavljanjem statusa na 'rejected' i dodaje razlog odbijanja.
     """
     db = next(get_db())
     user_session = session.get('user')
@@ -396,10 +396,14 @@ def reject_post(post_id):
     if not post:
         return jsonify({'error': 'Post not found'}), 404
 
+    data = request.get_json()
+    reason = data.get('reason', '')
+
     post.status = 'rejected'
+    post.rejection_reason = reason
     db.commit()
 
-    return send_post_rejection_email(post_id)
+    return jsonify({'message': 'Post rejected successfully'}), 200
 
 
 @posts_bp.route('/pending-posts', methods=['GET'])
@@ -417,7 +421,8 @@ def get_pending_posts():
             'username': post.user.username,
             'content': post.content,
             'image_url': post.image_url,
-            'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'profileImage' : post.user.profile_picture_url
         })
 
     return jsonify(result), 200
