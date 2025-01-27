@@ -1,9 +1,7 @@
-import { error } from 'console';
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { text } from 'stream/consumers';
 import { useNavigate } from 'react-router-dom';
-
+import { useNotification } from '../notification/NotificationContext';
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -19,6 +17,10 @@ const loadCSS = (href: string) => {
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 const UploadPost: React.FC = () => {
@@ -27,7 +29,10 @@ const UploadPost: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const navigate = useNavigate();
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     loadCSS('/styles/upload-post.css');
@@ -35,18 +40,18 @@ const UploadPost: React.FC = () => {
 
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/session', {
+        const response = await fetch(`${backendUrl}/api/auth/session`, {
           method: 'GET',
           credentials: 'include',
         });
         const data = await response.json();
 
         if (!data.user) {
-          navigate('/login'); // Preusmerava na stranicu za prijavu
+          navigate('/login'); // Redirect to login page if not logged in
         }
       } catch (error) {
         console.error('Error fetching session:', error);
-        navigate('/login'); // Preusmerava na stranicu za prijavu u slučaju greške
+        navigate('/login'); // Redirect to login page in case of error
       } finally {
         setIsLoading(false);
       }
@@ -54,7 +59,6 @@ const UploadPost: React.FC = () => {
 
     checkSession();
   }, []);
-
 
   if (isLoading) {
     return (
@@ -108,12 +112,12 @@ const UploadPost: React.FC = () => {
     );
   }
 
-  //Post description {text}
+  // Handle post text change
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPostText(e.target.value);
   };
 
-  //Post Image {file}
+  // Handle image upload
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
@@ -121,6 +125,13 @@ const UploadPost: React.FC = () => {
     }
   };
 
+  // Remove selected image
+  const removeImage = () => {
+    setImage(null);
+    setPreview(null);
+  };
+
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -132,34 +143,28 @@ const UploadPost: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/posts/upload-post', {
+      const response = await fetch(`${backendUrl}/api/posts/upload-post`, {
         method: 'POST',
-        credentials: 'include', // Za uključivanje kolačića
-        body: formData, // FormData objekat se direktno koristi
+        credentials: 'include',
+        body: formData,
       });
 
       if (response.ok) {
-        alert('Objava je uspešno kreirana!');
+        alert('The post was created successfully!');
         setPostText('');
         setImage(null);
         setPreview(null);
       } else {
         const errorData = await response.json();
-        alert(`Došlo je do greške: ${errorData.error || 'Pokušajte ponovo.'}`);
-        console.error('Greška:', errorData);
+        alert(`An error occurred: ${errorData.error || 'Please try again.'}`);
+        console.error('Error:', errorData);
       }
     } catch (error) {
-      console.error('Greška prilikom slanja objave:', error);
-      alert('Došlo je do greške. Pokušajte ponovo.');
+      console.error('Error while sending post:', error);
+      alert('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-
-  const removeImage = () => {
-    setImage(null);
-    setPreview(null);
   };
 
   return (
@@ -169,7 +174,7 @@ const UploadPost: React.FC = () => {
           <div className="upload-div-block">
             <div className="image-div-block">
               <div className="text-block">
-                Unesite sliku <span className="text-span">(opciono)</span>
+                Upload an image <span className="text-span">(optional)</span>
               </div>
               <div className="image-div">
                 {preview ? (
@@ -187,34 +192,40 @@ const UploadPost: React.FC = () => {
                   </>
                 ) : (
                   <>
+                    {/*
                     <div>Drag and Drop to upload file</div>
                     <div>or</div>
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    */}
+                    <input
+                      type="file"
+                      className="inputFile"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
                   </>
                 )}
               </div>
-
             </div>
             <div className="text-div">
               <div className="form-block w-form">
                 <form onSubmit={handleSubmit} className="form">
                   <label htmlFor="post-text" className="field-label">
-                    Tekst objave
+                    Post text
                   </label>
                   <textarea
                     required
-                    placeholder="Unesite tekst"
+                    placeholder="Enter text"
                     maxLength={5000}
                     id="post-text"
                     name="field"
                     className="textarea w-input"
                     value={postText}
                     onChange={handleTextChange}
-                  ></textarea>
+                  />
                   <input
                     type="submit"
                     className="submit-button w-button"
-                    value={isSubmitting ? 'Šalje se...' : 'Objavi'}
+                    value={isSubmitting ? 'Submitting...' : 'Submit'}
                     disabled={isSubmitting}
                   />
                 </form>

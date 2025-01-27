@@ -1,7 +1,6 @@
 import os
 from flask import Blueprint, request, jsonify, session, send_from_directory
 from werkzeug.utils import secure_filename
-from sqlalchemy.orm import joinedload
 from app.models import Post, User, Friendship, SessionLocal
 from app import socketio
 import uuid
@@ -105,7 +104,6 @@ def send_post_rejection_email(post_id: int):
     except Exception:
         return jsonify({"error": "Došlo je do greške pri slanju email-a."}), 500
     
-# Funkcija za proveru korisnika i blokiranje
 def block_user_if_rejected_posts_exceed_limit(user_id):
     
     db= next(get_db())
@@ -153,13 +151,11 @@ def friends_posts():
 
     user_id = user_session['id']
 
-    # Get friend relationships
     friends = db.query(Friendship).filter(
         (Friendship.user1_id == user_id) | (Friendship.user2_id == user_id),
         Friendship.status == 'accepted'
     ).all()
 
-    # Extract friend IDs
     friend_ids = set()
     for friend in friends:
         if friend.user1_id != user_id:
@@ -167,7 +163,6 @@ def friends_posts():
         if friend.user2_id != user_id:
             friend_ids.add(friend.user2_id)
 
-    # Fetch posts from friends
     posts = db.query(Post).filter(
         Post.user_id.in_(friend_ids),
         Post.status == 'approved'
@@ -180,8 +175,8 @@ def friends_posts():
             result.append({
                 'id': post.id,
                 'username': post.user.username,
-                'profileImage': '/default-profile.png',  # Zamenite sa stvarnim profilom
-                'postImage': image_path,  # Kompletna putanja za frontend
+                'profileImage': post.user.profile_picture_url,  
+                'postImage': image_path,  
                 'postText': post.content,
                 'timeAgo': post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             })
@@ -189,15 +184,14 @@ def friends_posts():
             result.append({
                 'id': post.id,
                 'username': post.user.username,
-                'profileImage': '/default-profile.png',  # Replace with actual profile image path
-                'postImage': None,  # No image available
+                'profileImage': post.user.profile_picture_url,  
+                'postImage': None,  
                 'postText': post.content,
                 'timeAgo': post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             })
 
     return jsonify(result), 200
 
-#Return a image as file
 @posts_bp.route('/uploads/<filename>')
 def uploaded_file(filename):
     """
@@ -218,7 +212,6 @@ def get_user_posts():
 
     user_id = user_session['id']
 
-    # Dohvata sve objave korisnika
     posts = db.query(Post).filter_by(user_id=user_id).order_by(Post.created_at.desc()).all()
 
     result = []
@@ -227,6 +220,7 @@ def get_user_posts():
         result.append({
             'id': post.id,
             'content': post.content,
+            'profileImage': post.user.profile_picture_url,  
             'image_url': image_path,
             'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'status': post.status
@@ -251,33 +245,26 @@ def update_post(post_id):
     if not post:
         return jsonify({'error': 'Post not found or unauthorized'}), 404
 
-    # Izmena sadržaja objave
     content = request.form.get('content')
     if content is not None:
         post.content = content
 
-    # Izmena slike objave
     if 'image' in request.files:
         image = request.files['image']
         if allowed_file(image.filename):
-            # Generiši jedinstveno ime fajla
             original_filename = secure_filename(image.filename)
             filename = generate_unique_filename(original_filename)
             upload_path = os.path.join(UPLOAD_FOLDER, filename)
 
-            # Sačuvaj novu sliku
             image.save(upload_path)
 
-            # Obriši staru sliku ako postoji
             if post.image_url:
                 old_image_path = os.path.join(UPLOAD_FOLDER, post.image_url)
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
 
-            # Postavi samo ime fajla u bazu
             post.image_url = filename
 
-    # Ažuriraj status objave na 'pending'
     post.status = 'pending'
 
     db.commit()
@@ -307,13 +294,11 @@ def delete_post(post_id):
     if not post:
         return jsonify({'error': 'Post not found or unauthorized'}), 404
 
-    # Brisanje slike ako postoji
     if post.image_url:
         image_path = os.path.join(UPLOAD_FOLDER, post.image_url)
         if os.path.exists(image_path):
             os.remove(image_path)
 
-    # Brisanje posta iz baze
     db.delete(post)
     db.commit()
 
@@ -330,12 +315,10 @@ def upload_post():
 
         user_id = user_session['id']
 
-        # Prikupljanje teksta iz forme
         text = request.form.get('text')
         if not text:
             return jsonify({'error': 'Text is required'}), 400
 
-        # Rad sa slikom
         image_file = request.files.get('image')
         image_filename = None
 
@@ -344,10 +327,8 @@ def upload_post():
             image_filename = generate_unique_filename(original_filename)
             upload_path = os.path.join(UPLOAD_FOLDER, image_filename)
 
-            # Čuvanje slike na disku
             image_file.save(upload_path)
 
-        # Kreiranje posta
         new_post = Post(
             user_id=user_id,
             content=text,
@@ -403,25 +384,26 @@ def approve_post(post_id):
 @posts_bp.route('/<int:post_id>/reject', methods=['POST'])
 def reject_post(post_id):
     """
-    POST: Odbija post postavljanjem statusa na 'rejected'.
+    POST: Odbija post postavljanjem statusa na 'rejected' i dodaje razlog odbijanja.
     """
     db = next(get_db())
     user_session = session.get('user')
 
-    # Proverite da li je korisnik administrator
     if not user_session or user_session.get('role') != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    # Pronađite post po ID-u
     post = db.query(Post).filter_by(id=post_id).first()
     if not post:
         return jsonify({'error': 'Post not found'}), 404
 
-    # Ažurirajte status posta na 'rejected'
+    data = request.get_json()
+    reason = data.get('reason', '')
+
     post.status = 'rejected'
+    post.rejection_reason = reason
     db.commit()
 
-    return send_post_rejection_email(post_id)
+    return jsonify({'message': 'Post rejected successfully'}), 200
 
 
 @posts_bp.route('/pending-posts', methods=['GET'])
@@ -439,7 +421,8 @@ def get_pending_posts():
             'username': post.user.username,
             'content': post.content,
             'image_url': post.image_url,
-            'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'profileImage' : post.user.profile_picture_url
         })
 
     return jsonify(result), 200

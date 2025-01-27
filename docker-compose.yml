@@ -1,21 +1,20 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  postgres:
-    image: postgres:17
-    container_name: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ftn
-      POSTGRES_DB: DRS
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data # Trajno čuvanje podataka baze
-      - ./DataBase:/docker-entrypoint-initdb.d # Mapiranje lokalnog foldera sa init.sql
-    networks:
-      - app_network
-
+#  postgres:
+#    image: postgres:17
+#    container_name: postgres
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: ftn
+#      POSTGRES_DB: DRS
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data # Trajno čuvanje podataka baze
+#      - ./DataBase:/docker-entrypoint-initdb.d # Mapiranje lokalnog foldera sa init.sql
+#    networks:
+#      - app_network
   backend:
     build:
       context: ./Backend # Folder gde se nalazi Dockerfile za backend
@@ -26,10 +25,10 @@ services:
     volumes:
       - ./Backend:/app # Sinhronizacija lokalnog foldera sa kontejnerom
       - ./Backend/uploads:/app/uploads
+    environment:
+      - DATABASE_URL=postgresql://drs_postgres:63CgcJb2GwEPOdU4UD1Hn7eBgGLMzEKA@dpg-ctol4al2ng1s73bjnla0-a.oregon-postgres.render.com:5432/drs_db_ewbp # External URL za bazu na Renderu
     networks:
       - app_network
-    depends_on:
-      - postgres # Backend čeka da PostgreSQL servis bude spreman
 
   frontend:
     build:
@@ -42,11 +41,9 @@ services:
       - REACT_APP_BACKEND_URL=http://backend:5000 # URL ka backendu
     networks:
       - app_network
-    depends_on:
-      - backend # Frontend čeka da backend bude spreman
 
 volumes:
-  pgdata: # Definicija volumena za čuvanje baze
+  pgdata: # Ovaj volumen je uklonjen jer više nije potreban za bazu
 
 networks:
   app_network:

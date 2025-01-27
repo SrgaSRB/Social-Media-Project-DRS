@@ -2103,7 +2103,8 @@ textarea.w-input, textarea.w-select {
 
 .content-wapper {
   flex: 1;
-  height: 97%;
+  height: auto;
+  min-height: 97%;
   display: flex;
 }
 
@@ -2127,7 +2128,9 @@ textarea.w-input, textarea.w-select {
 }
 
 .form-block {
+  flex-flow: column;
   width: 70%;
+  display: flex;
 }
 
 .image-2 {
@@ -2182,7 +2185,8 @@ textarea.w-input, textarea.w-select {
   flex: 1;
   justify-content: center;
   align-items: stretch;
-  height: 97%;
+  height: auto;
+  min-height: 97%;
   display: flex;
 }
 
@@ -2217,14 +2221,16 @@ textarea.w-input, textarea.w-select {
 }
 
 .user-info-label {
+  margin: 0;
   font-family: Lato, sans-serif;
   font-weight: 700;
 }
 
 .user-info-input {
   border-radius: 20px;
-  height: 40px;
+  height: 35px;
   transition: all .3s;
+  margin-bottom: 10px;
 }
 
 .user-info-input:hover {
@@ -2281,6 +2287,8 @@ textarea.w-input, textarea.w-select {
 
 .link-2 {
   color: #333;
+  text-align: center;
+  margin-top: 24px;
   text-decoration: none;
 }
 
@@ -2307,7 +2315,9 @@ textarea.w-input, textarea.w-select {
   }
 
   .container.hero-container {
-    max-width: 320px;
+    width: 100%;
+    min-width: 320px;
+    max-width: 420px;
     height: auto;
     padding-left: 0;
     padding-right: 0;
@@ -2413,4 +2423,8 @@ textarea.w-input, textarea.w-select {
   .field-label, .field-label-2 {
     color: #000;
   }
+}
+
+.error-message{
+  color:red;
 }

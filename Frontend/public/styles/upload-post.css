@@ -2204,7 +2204,7 @@ textarea.w-input, textarea.w-select {
   z-index: 1000;
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: #fff9;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -2279,23 +2279,24 @@ textarea.w-input, textarea.w-select {
 
 @media screen and (max-width: 479px) {
   .hero-section {
-    height: auto;
-    min-height: 100vh;
+    height: 100vh;
   }
 
   .container {
     justify-content: center;
     align-items: stretch;
-    max-width: 320px;
-    margin-top: 64px;
-    padding-left: 10px;
-    padding-right: 10px;
+    width: 96%;
+    min-width: 320px;
+    max-width: 420px;
+    height: 100%;
   }
 
   .upload-div-block {
     grid-column-gap: 24px;
     grid-row-gap: 24px;
     flex-flow: column;
+    justify-content: center;
+    align-items: stretch;
     margin-bottom: 50px;
   }
 
@@ -2330,7 +2331,12 @@ textarea.w-input, textarea.w-select {
   .navbar-icons-div {
     grid-column-gap: 1rem;
     grid-row-gap: 1rem;
-    width: 320px;
+    width: 100%;
     max-width: 320px;
+    max-width: 420px;
   }
+}
+
+.inputFile {
+  font-size: 1rem;
 }

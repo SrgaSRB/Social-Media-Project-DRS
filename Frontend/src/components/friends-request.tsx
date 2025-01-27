@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from 'react-router-dom';
-
+import { useNotification } from '../notification/NotificationContext';
 
 const loadCSS = (href: string) => {
-  // Ukloni sve linkove osim trenutnog
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    if (link.getAttribute("href") !== href) {
+    if (link.getAttribute('href') !== href) {
       link.remove();
     }
   });
 
   const existingLink = document.querySelector(`link[href="${href}"]`);
   if (!existingLink) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 interface FriendRequest {
@@ -33,15 +36,16 @@ const FriendsRequest: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const navigate = useNavigate();
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     loadCSS("/styles/friends-request.css");
     setIsLoading(true);
 
-
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/session', {
+        const response = await fetch(`${backendUrl}/api/auth/session`, {
           method: 'GET',
           credentials: 'include', // Include cookies for authentication
           headers: {
@@ -51,17 +55,17 @@ const FriendsRequest: React.FC = () => {
         const data = await response.json();
 
         if (!data.user) {
-          navigate('/login'); // Preusmerava na stranicu za prijavu
+          navigate('/login'); // Redirect to login page
         }
       } catch (error) {
         console.error('Error fetching session:', error);
-        navigate('/login'); // Preusmerava na stranicu za prijavu u slučaju greške
+        navigate('/login'); // Redirect to login in case of an error
       }
     };
 
     checkSession();
 
-    fetch('http://localhost:5000/api/users/friend-requests', {
+    fetch(`${backendUrl}/api/users/friend-requests`, {
       method: 'GET',
       credentials: 'include',
     })
@@ -69,13 +73,12 @@ const FriendsRequest: React.FC = () => {
       .then(data => setRequests(data))
       .catch(error => console.error('Error fetching requests:', error));
 
-      setIsLoading(false); 
-    
+    setIsLoading(false);
   }, [navigate]);
 
   const handleAccept = async (requestId: number) => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/accept-friend-request', {
+      const response = await fetch(`${backendUrl}/api/users/accept-friend-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,20 +89,20 @@ const FriendsRequest: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        alert(data.message);
+        showNotification('success', data.message);
         setRequests(prevRequests => prevRequests.filter(request => request.id !== requestId));
       } else {
-        alert(data.error);
+        showNotification('error', data.error);
       }
     } catch (error) {
       console.error('Error accepting friend request:', error);
-      alert('Došlo je do greške prilikom prihvatanja zahteva.');
+      showNotification('warning', 'An error occurred while accepting the request.');
     }
   };
 
   const handleReject = async (requestId: number) => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/reject-friend-request', {
+      const response = await fetch(`${backendUrl}/api/users/reject-friend-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,17 +110,17 @@ const FriendsRequest: React.FC = () => {
         credentials: 'include',
         body: JSON.stringify({ request_id: requestId }),
       });
-  
+
       const data = await response.json();
       if (response.ok) {
-        alert(data.message); 
+        showNotification('success', data.message);
         setRequests(prevRequests => prevRequests.filter(request => request.id !== requestId));
       } else {
-        alert(data.error); 
+        showNotification('error', data.error);
       }
     } catch (error) {
       console.error('Error rejecting friend request:', error);
-      alert('Došlo je do greške prilikom odbijanja zahteva.');
+      showNotification('warning', 'An error occurred while rejecting the request.');
     }
   };
 
@@ -171,9 +174,9 @@ const FriendsRequest: React.FC = () => {
       <section className="friends-requests-section">
         <div className="w-layout-blockcontainer container friends-requests-container w-container">
           <div className="div-block">
-            <div className="text-block-13">Vaši zahtevi za prijateljstvo</div>
+            <div className="text-block-13">Your Friend Requests</div>
             <img
-              src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/673d1b02e3744824fe7ef3f4_users-profiles-01.svg"
+              src="\assets\Icons\friends-requests-2people.svg"
               alt="Friends Requests"
               className="image-10"
             />
@@ -185,7 +188,11 @@ const FriendsRequest: React.FC = () => {
                   <div className="fr">
                     <div className="fr-user-image">
                       <img
-                        src={request.profileImage}
+                        src={
+                          request.profileImage === "defaultProfilePicture.svg"
+                            ? "/assets/Icons/defaultProfilePicture.svg"
+                            : `${backendUrl}/api/posts/uploads/${request.profileImage}`
+                        }
                         alt="User Profile"
                         className="image-6"
                       />
@@ -197,7 +204,7 @@ const FriendsRequest: React.FC = () => {
                     <div className="fr-user-location-block">
                       <div className="location-icon">
                         <img
-                          src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/67390a69e460f410ac3fc2b2_marker-02.svg"
+                          src="\assets\Icons\locationPin-RED.svg"
                           alt="Location Icon"
                           className="image-7"
                         />
@@ -217,9 +224,9 @@ const FriendsRequest: React.FC = () => {
                           handleAccept(request.id);
                         }}
                       >
-                        <div className="text-block-11">Prihvati</div>
+                        <div className="text-block-11">Accept</div>
                         <img
-                          src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/673d179fc30c1b34d7a651ea_user-profile-check%20(1).svg"
+                          src="\assets\Icons\accept-request-BLUE.svg"
                           alt="Accept"
                           className="image-8"
                         />
@@ -233,9 +240,9 @@ const FriendsRequest: React.FC = () => {
                           handleReject(request.id);
                         }}
                       >
-                        <div className="text-block-12">Odbij</div>
+                        <div className="text-block-12">Reject</div>
                         <img
-                          src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/673d1889ccda4abd35683f20_user-profile-x%20(1).svg"
+                          src="\assets\Icons\reject-request-RED.svg"
                           alt="Reject"
                           className="image-9"
                         />
@@ -244,7 +251,8 @@ const FriendsRequest: React.FC = () => {
                   </div>
                   <div className="fr-hr"></div>
                 </div>
-              ))) : (
+              ))
+            ) : (
               <div>No friend requests available</div>
             )}
           </div>

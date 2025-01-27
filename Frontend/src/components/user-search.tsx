@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useLocation } from 'react-router-dom';
+import { useNotification } from '../notification/NotificationContext';
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -16,6 +17,10 @@ const loadCSS = (href: string) => {
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 interface User {
@@ -26,47 +31,55 @@ interface User {
   address: string;
   city: string;
   country: string;
-  profileImage: string;
+  profileImage?: string;
 }
 
 const UserSearch: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const searchTermFromLocation = location.state?.searchTerm || '';
-  const [searchTerm, setSearchTerm] = useState(searchTermFromLocation);  
+  const [searchTerm, setSearchTerm] = useState(searchTermFromLocation);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [friendStatuses, setFriendStatuses] = useState<{ [key: number]: string }>({});
+
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     loadCSS('/styles/user-search.css');
     setIsLoading(true);
-  
-    const fetchUsers = async () => {
+
+    const fetchUsersAndStatuses = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/users/', {
-          method: 'GET',
-          credentials: 'include', // Neophodno za sesiju
-        });
-  
-        if (!response.ok) {
-          throw new Error('Failed to fetch users');
+        const [usersResponse, statusesResponse] = await Promise.all([
+          fetch(`${backendUrl}/api/users/`, { method: 'GET', credentials: 'include' }),
+          fetch(`${backendUrl}/api/users/friend-statuses`, { method: 'GET', credentials: 'include' }),
+        ]);
+
+        if (!usersResponse.ok || !statusesResponse.ok) {
+          throw new Error('Failed to fetch data');
         }
-  
-        const data = await response.json();
-        setUsers(data); 
-        setFilteredUsers(data); 
+
+        const usersData = await usersResponse.json();
+        const statusesData = await statusesResponse.json();
+
+        setUsers(usersData);
+        setFriendStatuses(statusesData);
+        console.log(statusesData);
+        setFilteredUsers(usersData);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching users and statuses:', error);
+        showNotification('error', 'An error occurred while loading data.');
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     };
-  
-    fetchUsers(); 
+
+    fetchUsersAndStatuses();
   }, []);
 
   useEffect(() => {
-    // Ako postoji searchTerm, filtriraj korisnike
     if (searchTerm) {
       const results = users.filter((user) =>
         [user.name, user.username, user.email, user.address, user.city, user.country]
@@ -74,16 +87,14 @@ const UserSearch: React.FC = () => {
       );
       setFilteredUsers(results);
     } else {
-      setFilteredUsers(users); // Ako nije uneta vrednost, prikaži sve korisnike
+      setFilteredUsers(users);
     }
   }, [searchTerm, users]);
-  
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
 
-    // Automatsko filtriranje korisnika
     const results = users.filter((user) =>
       [user.name, user.username, user.email, user.address, user.city, user.country]
         .some((field) => field?.toLowerCase().includes(term.toLowerCase()))
@@ -94,7 +105,7 @@ const UserSearch: React.FC = () => {
 
   const handleSendFriendRequest = async (receiverId: number) => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/send-friend-request', {
+      const response = await fetch(`${backendUrl}/api/users/send-friend-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,13 +116,63 @@ const UserSearch: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        alert(data.message); // Informiši korisnika o uspešnom zahtevu
+        showNotification('success', data.message);
+        setFriendStatuses((prev) => ({ ...prev, [receiverId]: 'requestSent' }));
       } else {
-        alert(data.error); // Informiši korisnika o grešci
+        showNotification('error', data.error);
       }
     } catch (error) {
       console.error('Error sending friend request:', error);
-      alert('Došlo je do greške prilikom slanja zahteva.');
+      showNotification('error', 'An error occurred while sending the request.');
+    }
+  };
+
+  const handleRemoveFriend = async (friendId: number) => {
+    console.log(friendId);
+    try {
+      const response = await fetch(`${backendUrl}/api/users/remove-friend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ friend_id: friendId }),
+      });
+
+      if (response.ok) {
+        showNotification('success', 'Friend has been successfully removed.');
+        setFriendStatuses((prev) => ({ ...prev, [friendId]: 'notFriends' }));
+      } else {
+        const data = await response.json();
+        showNotification('error', data.error);
+      }
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      showNotification('error', 'An error occurred while removing the friend.');
+    }
+  };
+
+  const handleAcceptFriendRequest = async (user1_id: number) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/users/accept-friend-request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ user1_id: user1_id }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        showNotification('success', 'The request has been accepted.');
+        setFriendStatuses((prev) => ({ ...prev, [user1_id]: 'friends' }));
+      } else {
+        showNotification('error', data.error);
+      }
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      showNotification('error', 'An error occurred while accepting the request.');
     }
   };
 
@@ -161,14 +222,14 @@ const UserSearch: React.FC = () => {
   return (
     <div className="body">
       <Helmet>
-        <title>Pretraga korisnika</title>
+        <title>User Search</title>
       </Helmet>
       <section className="hero-section">
         <div className="w-layout-blockcontainer container w-container">
           <div className="form-block w-form">
             <div className="form">
               <img
-                src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/67390545eb4c04a5a906afa5_search.png"
+                src="/assets/Icons/search.svg"
                 alt="Search Icon"
                 className="image"
               />
@@ -176,13 +237,16 @@ const UserSearch: React.FC = () => {
                 <input
                   className="search-input w-input"
                   maxLength={256}
-                  placeholder="Pretražite korisnike (ime, email, adresa, grad...)"
+                  placeholder="Search users (name, email, address, city...)"
                   type="text"
                   value={searchTerm}
                   onChange={handleSearchInputChange}
                 />
                 <div className="text-block" onClick={() => setSearchTerm('')}>
-                  X
+                  <img
+                    src="/assets/Icons/x-02.svg"
+                    alt=""
+                  />
                 </div>
               </div>
             </div>
@@ -194,7 +258,11 @@ const UserSearch: React.FC = () => {
                   <div className="user-info-block">
                     <div className="user-image">
                       <img
-                        src={user.profileImage}
+                        src={
+                          user.profileImage === 'defaultProfilePicture.svg'
+                            ? '/assets/Icons/defaultProfilePicture.svg'
+                            : `${backendUrl}/api/posts/uploads/${user.profileImage}`
+                        }
                         alt={user.name}
                         className="profile-image"
                       />
@@ -205,7 +273,7 @@ const UserSearch: React.FC = () => {
                     </div>
                     <div className="users-location-info">
                       <img
-                        src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/67390a69e460f410ac3fc2b2_marker-02.svg"
+                        src="/assets/Icons/locationPin-RED.svg"
                         alt="Location Icon"
                         className="image-5"
                       />
@@ -214,20 +282,75 @@ const UserSearch: React.FC = () => {
                         <div className="text-block-6">{user.city}</div>
                       </div>
                     </div>
-                    <a href="#" className="link-block w-inline-block" onClick={() => handleSendFriendRequest(user.id)}>
-                      <div className="text-block-4">Dodaj prijatelja</div>
-                      <img
-                        src="https://cdn.prod.website-files.com/6738f9a4904c77fbfa5e616a/6739088a6ccbf2bcc131e4f2_Icon%20(3).svg"
-                        alt="Add Friend Icon"
-                        className="image-4"
-                      />
-                    </a>
+                    {friendStatuses[user.id] === 'notFriends' && (
+                      <a
+                        href="#"
+                        className="link-block send-request w-inline-block"
+                        onClick={() => handleSendFriendRequest(user.id)}
+                      >
+                        <div className="text-block-4">Add Friend</div>
+                        <img
+                          src="/assets/Icons/user-profile-add-WHITE.svg"
+                          alt="Add Friend Icon"
+                          className="image-4"
+                        />
+                      </a>
+                    )}
+                    {friendStatuses[user.id] === 'requestSent' && (
+                      <a className="link-block padding-request w-inline-block">
+                        <div className="text-block-4">Request Sent</div>
+                        <img
+                          src="/assets/Icons/sendFriendRequest-BLUE.svg"
+                          alt="Request Sent Icon"
+                          className="image-4"
+                        />
+                      </a>
+                    )}
+                    {friendStatuses[user.id] === 'friends' && (
+                      <div className="accept-and-remove-buttons-block">
+                        <a href="#" className="link-block accept-request w-inline-block">
+                          <div className="text-block-4">Friends</div>
+                          <img
+                            src="/assets/Icons/accept-request-BLUE.svg"
+                            loading="lazy"
+                            alt=""
+                            className="image-4"
+                          />
+                        </a>
+                        <a
+                          href="#"
+                          className="link-block remove-friend w-inline-block"
+                          onClick={() => handleRemoveFriend(user.id)}
+                        >
+                          <div className="text-block-4">Remove Friend</div>
+                          <img
+                            src="/assets/Icons/user-profile-minus-WHITE.svg"
+                            alt="Remove Friend Icon"
+                            className="image-4"
+                          />
+                        </a>
+                      </div>
+                    )}
+                    {friendStatuses[user.id] === 'requestReceived' && (
+                      <a
+                        href="#"
+                        className="link-block accept-requests w-inline-block"
+                        onClick={() => handleAcceptFriendRequest(user.id)}
+                      >
+                        <div className="text-block-4">Accept User's Request</div>
+                        <img
+                          src="/assets/Icons/user-profile-left-WHITE.svg"
+                          alt="Accept Request Icon"
+                          className="image-4"
+                        />
+                      </a>
+                    )}
                   </div>
                   <div className="user-block-hr"></div>
                 </div>
               ))
             ) : (
-              <div>Nema rezultata pretrage.</div>
+              <div>No search results.</div>
             )}
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { useNotification } from '../notification/NotificationContext';
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -16,6 +16,10 @@ const loadCSS = (href: string) => {
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 const Login: React.FC = () => {
@@ -24,6 +28,8 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const hasCheckedSession = useRef(false); // Prevent double execution
   const navigate = useNavigate();
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     loadCSS('/styles/login.css');
@@ -32,7 +38,10 @@ const Login: React.FC = () => {
     if (hasCheckedSession.current) return; // Skip if already checked
     hasCheckedSession.current = true;
 
-    fetch('http://localhost:5000/api/auth/session', { method: 'GET', credentials: 'include' })
+    console.log(backendUrl);
+    console.log(process.env);
+
+    fetch(`${backendUrl}/api/auth/session`, { method: 'GET', credentials: 'include' })
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -54,23 +63,22 @@ const Login: React.FC = () => {
   }, []);
 
   const handleLogout = async () => {
-    await fetch('http://localhost:5000/api/auth/logout', {
+    await fetch(`${backendUrl}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include',
     });
-    alert('You have been logged out.');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         let errorMsg = 'Login failed';
         try {
@@ -82,17 +90,14 @@ const Login: React.FC = () => {
         alert(errorMsg);
         return;
       }
-  
+
       const data = await response.json();
-      alert('Login successful!');
-      navigate('/');
+      navigate('/', { state: { message: 'You have successfully logged in!', type: 'success' } });
     } catch (error) {
       console.error('Fetch error:', error);
-      alert('Failed to connect to the server. Please try again later.');
+      showNotification('warning', 'Failed to connect to the server. Please try again later.');
     }
   };
-  
-  
 
   const handleRegisterRedirect = () => {
     navigate('/register');
@@ -114,7 +119,7 @@ const Login: React.FC = () => {
           <div className="content-wapper">
             <div className="image-div">
               <img
-                src="https://cdn.prod.website-files.com/6733bafcd19b7050f46bc20f/6733bf542da3e7df93259236_Computer%20login-bro%20(1).svg"
+                src="\assets\Icons\login-background.svg"
                 loading="lazy"
                 alt="Login Illustration"
                 className="image-2"
@@ -123,24 +128,24 @@ const Login: React.FC = () => {
             <div className="login-form-div">
               <div className="form-block w-form">
                 <form onSubmit={handleSubmit} className="form">
-                  <label htmlFor="username">Korisničko ime</label>
+                  <label htmlFor="username">Username</label>
                   <input
                     className="text-field w-input"
                     maxLength={256}
                     name="username"
-                    placeholder="Unesite korisničko ime"
+                    placeholder="Enter your username"
                     type="text"
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
                   />
-                  <label htmlFor="password">Lozinka</label>
+                  <label htmlFor="password">Password</label>
                   <input
                     className="text-field w-input"
                     maxLength={256}
                     name="password"
-                    placeholder="Unesite lozinku"
+                    placeholder="Enter your password"
                     type="password"
                     id="password"
                     value={password}
@@ -150,20 +155,20 @@ const Login: React.FC = () => {
                   <input
                     type="submit"
                     className="submit-button w-button"
-                    value="Prijavi se"
+                    value="Login"
                   />
+                  <a
+                    href="#"
+                    className="link-2"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleRegisterRedirect();
+                    }}
+                  >
+                    Don't have an account?
+                  </a>
                 </form>
               </div>
-              <a
-                href="#"
-                className="link-2"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleRegisterRedirect();
-                }}
-              >
-                Nemate profil?
-              </a>
             </div>
           </div>
         </div>

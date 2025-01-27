@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet';
-import { useNavigate } from 'react-router-dom';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useNotification } from '../notification/NotificationContext';
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -16,6 +17,10 @@ const loadCSS = (href: string) => {
     link.href = href;
     document.head.appendChild(link);
   }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
 };
 
 interface Post {
@@ -32,6 +37,10 @@ const Index: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL from environment variable
+  const { showNotification } = useNotification();
+  const location = useLocation();
+  const [hasNotification, setHasNotification] = useState(false);
 
   useEffect(() => {
     loadCSS('/styles/index.css');
@@ -39,58 +48,58 @@ const Index: React.FC = () => {
 
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/session', {
+        const response = await fetch(`${backendUrl}/api/auth/session`, {
           method: 'GET',
           credentials: 'include', // Include cookies for authentication
           headers: {
             'Content-Type': 'application/json',
           },
         });
-  
+
         const data = await response.json();
-  
+
         if (!data.user) {
-          // Preusmeri korisnika na login ako nije ulogovan
+          // Redirect the user to login if not logged in
           navigate('/login');
         } else {
-          // Ako je korisnik ulogovan, preuzmi objave
           fetchPosts();
         }
       } catch (error) {
-        console.error('Greška prilikom provere sesije:', error);
-        navigate('/login'); // Ako se desi greška, preusmeri na login
+        console.error('Error while checking session:', error);
+        navigate('/login'); // Redirect to login in case of error
       }
     };
-  
+
     const fetchPosts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/posts/friends-posts', {
+        const response = await fetch(`${backendUrl}/api/posts/friends-posts`, {
           method: 'GET',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
         });
-  
+
         if (!response.ok) {
           throw new Error('Failed to fetch posts. Please try again.');
         }
-  
+
         const data: Post[] = await response.json();
         setPosts(data);
-        console.log(data);
       } catch (err: any) {
         setError(err.message || 'An unexpected error occurred.');
       } finally {
-        const timer = setTimeout(() => {
-        }, 5000);
         setIsLoading(false);
+        if (!hasNotification && location.state?.message) {
+          const { message, type } = location.state;
+          showNotification(type, message);
+          setHasNotification(true);
+        }
       }
     };
 
     checkSession();
-  }, [navigate]);
-  
+  }, [navigate, hasNotification, location.state]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +109,7 @@ const Index: React.FC = () => {
 
   if (isLoading) {
     return (
-      <>
+      <HelmetProvider>
         <Helmet>
           <style>
             {`
@@ -114,7 +123,7 @@ const Index: React.FC = () => {
                 color: #333;
                 font-family: Arial, sans-serif;
               }
-
+              
               .spinner {
                 border: 8px solid #f3f3f3;
                 border-top: 8px solid #3498db;
@@ -123,7 +132,7 @@ const Index: React.FC = () => {
                 height: 50px;
                 animation: spin 1s linear infinite;
               }
-
+              
               @keyframes spin {
                 0% {
                   transform: rotate(0deg);
@@ -139,7 +148,7 @@ const Index: React.FC = () => {
           <div className="spinner"></div>
           <span>Loading...</span>
         </div>
-      </>
+      </HelmetProvider>
     );
   }
 
@@ -160,7 +169,7 @@ const Index: React.FC = () => {
           <div className="form-block w-form">
             <form id="users-search" className="form" onSubmit={handleSearchSubmit}>
               <img
-                src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/673354bfba759d4139976ccc_search.png"
+                src="\assets\Icons\search.svg"
                 loading="lazy"
                 alt="Search"
                 className="image"
@@ -170,13 +179,15 @@ const Index: React.FC = () => {
                   className="search-input w-input"
                   maxLength={256}
                   name="name"
-                  placeholder="Pretražite prijatelje"
+                  placeholder="Search for friends"
                   type="text"
                   id="name"
                 />
-                <div className="text-block">X</div>
+                <div className="text-block">
+                  <img src="\assets\Icons\x-02.svg" alt="" />
+                </div>
               </div>
-              <input type="submit" className="search-button w-button" value="Pretraži" id="search-user-btn" />
+              <input type="submit" className="search-button w-button" value="Search" id="search-user-btn" />
             </form>
           </div>
           <div className="posts-div">
@@ -185,18 +196,26 @@ const Index: React.FC = () => {
                 <div className="user-post-image">
                   {post.postImage ? (
                     <img
-                      src={`http://localhost:5000/api/posts/uploads/${post.postImage}`} // Korigovan URL za rutu backend-a
-                      alt={post.postImage} // Set the alt tag to the filename
+                      src={`${backendUrl}/api/posts/uploads/${post.postImage}`}
+                      alt={post.postImage}
                       className="image-5"
                     />
                   ) : (
-                    <span className="image-placeholder">No Image Available</span> // Fallback for missing images
+                    <span className="image-placeholder">No Image Available</span>
                   )}
                 </div>
                 <div className="user-post-user-info">
                   <div className="user-post-user-info-image-and-name">
                     <div className="user-post-user-info-profile-image">
-                      <img src={post.profileImage} alt="Profile" className="image-4" />
+                      <img
+                        src={
+                          post.profileImage === "defaultProfilePicture.svg"
+                            ? "/assets/Icons/defaultProfilePicture.svg" 
+                            : `${backendUrl}/api/posts/uploads/${post.profileImage}` 
+                        }
+                        alt="Profile"
+                        className="image-4"
+                      />
                     </div>
                     <div className="user-post-user-info-name-and-date">
                       <div className="user-post-user-info-name">
@@ -213,7 +232,6 @@ const Index: React.FC = () => {
               </div>
             ))}
           </div>
-
         </div>
       </section>
     </div>
