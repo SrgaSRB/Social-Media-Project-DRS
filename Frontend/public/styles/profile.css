@@ -2233,7 +2233,7 @@ textarea.w-input, textarea.w-select {
   text-transform: capitalize;
   border-radius: 20px;
   align-self: center;
-  width: 80%;
+  width: auto;
   height: 35px;
   padding-top: 4px;
   padding-bottom: 4px;

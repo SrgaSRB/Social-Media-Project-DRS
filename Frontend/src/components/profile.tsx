@@ -283,7 +283,7 @@ const UserProfile: React.FC = () => {
   };
 
   const handleDeletePost = async (postId: number) => {
-    const confirmDelete = window.confirm('Da li ste sigurni da želite da obrišete ovu objavu?');
+    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
     if (!confirmDelete) return;
 
     try {
@@ -293,16 +293,16 @@ const UserProfile: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Brisanje objave nije uspelo');
+        throw new Error('Failed to delete the post');
       }
 
       // Uklanjanje posta iz lokalnog stanja
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
 
-      showNotification('success', 'Objava je uspešno obrisana.');
+      showNotification('success', 'The post was successfully deleted.');
     } catch (error) {
-      console.error('Greška prilikom brisanja objave:', error);
-      showNotification('warning', 'Došlo je do greške prilikom brisanja objave.');
+      console.error('Error deleting post:', error);
+      showNotification('warning', 'An error occurred while deleting the post.');
     }
   };
 
@@ -329,7 +329,7 @@ const UserProfile: React.FC = () => {
         prevPosts.map((post) => (post.id === updatedData.id ? updatedData : post))
       );
       handleCloseModal();
-      showNotification('success', 'Objava je uspešno izmenjena i poslana na odobravanje.');
+      showNotification('success', 'The post was successfully updated and sent for approval.');
     } catch (error) {
       console.error('Error updating post:', error);
     }
@@ -349,13 +349,13 @@ const UserProfile: React.FC = () => {
       });
 
       if (response.ok) {
-        showNotification('success', 'Profil je uspešno ažuriran.');
+        showNotification('success', 'The profile was successfully updated.');
       } else {
         const errorData = await response.json();
-        showNotification('error', errorData.error || 'Došlo je do greške prilikom ažuriranja profila.');
+        showNotification('error', errorData.error || 'An error occurred while updating the profile.');
       }
     } catch (error) {
-      showNotification('error', 'Greška pri povezivanju sa serverom.');
+      showNotification('error', 'Error connecting to the server.');
     } finally {
       setIsSaving(false);
     }
@@ -370,12 +370,12 @@ const UserProfile: React.FC = () => {
 
       if (response.ok) {
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-        showNotification('success', 'Post je odobren.');
+        showNotification('success', 'The post was approved.');
       } else {
-        showNotification('error', 'Došlo je do greške prilikom odobravanja.');
+        showNotification('error', 'An error occurred while approving.');
       }
     } catch (error) {
-      showNotification('error', 'Greška pri povezivanju sa serverom.');
+      showNotification('error', 'Error connecting to the server.');
       console.error('Error approving post:', error);
     }
   };
@@ -387,7 +387,7 @@ const UserProfile: React.FC = () => {
 
   const handleRejectPostWithReason = async () => {
     if (!currentPostId) return;
-  
+
     try {
       const response = await fetch(`${backendUrl}/api/posts/${currentPostId}/reject`, {
         method: 'POST',
@@ -397,17 +397,17 @@ const UserProfile: React.FC = () => {
         credentials: 'include',
         body: JSON.stringify({ reason: rejectionReason }),
       });
-  
+
       if (response.ok) {
         setPendingPosts((prevPosts) =>
           prevPosts.filter((post) => post.id !== currentPostId)
         );
-        showNotification('success', 'Post je odbijen.');
+        showNotification('success', 'The post was rejected.');
       } else {
-        showNotification('error', 'Došlo je do greške prilikom odbijanja.');
+        showNotification('error', 'An error occurred while rejecting.');
       }
     } catch (error) {
-      showNotification('error', 'Greška pri povezivanju sa serverom.');
+      showNotification('error', 'Error connecting to the server.');
       console.error('Error rejecting post:', error);
     } finally {
       setIsRejectModalOpen(false);
@@ -415,7 +415,7 @@ const UserProfile: React.FC = () => {
       setCurrentPostId(null);
     }
   };
-  
+
 
   const handleLogout = async () => {
     try {
@@ -425,17 +425,17 @@ const UserProfile: React.FC = () => {
       });
 
       if (response.ok) {
-        showNotification('success', 'Uspešno ste se izlogovali.');
+        showNotification('success', 'You have successfully logged out.');
         // Resetuj korisničko stanje i redirektuj na login stranicu
         setUserData(null);
         setUserType('user');
         window.location.href = '/login'; // Prilagodite putanju stranici za prijavu
       } else {
-        showNotification('error', 'Došlo je do greške prilikom odjave. Pokušajte ponovo.');
+        showNotification('error', 'An error occurred while logging out. Please try again.');
       }
     } catch (error) {
-      console.error('Greška prilikom odjave:', error);
-      showNotification('error', 'Greška pri povezivanju sa serverom.');
+      console.error('Error logging out:', error);
+      showNotification('error', 'Error connecting to the server.');
     }
   };
 
@@ -454,10 +454,10 @@ const UserProfile: React.FC = () => {
         prevUsers.filter((user) => user.id !== userId)
       );
 
-      showNotification('success', 'Korisnik je uspešno odblokiran.');
+      showNotification('success', 'The user was successfully unblocked.');
     } catch (error) {
       console.error('Error unblocking user:', error);
-      showNotification('error', 'Greška pri povezivanju sa serverom.');
+      showNotification('error', 'Error connecting to the server.');
     }
   };
 
@@ -512,7 +512,7 @@ const UserProfile: React.FC = () => {
               <div className="edit-post-image-and-text-block">
                 <div className="edit-post-image-block">
                   <div className="text-block-8">
-                    Slika <span className="text-span-3">(opciono)</span>
+                    Image <span className="text-span-3">(Optional)</span>
                   </div>
                   <div className="edit-post-image">
                     {currentPost?.image_url || currentPost?.newImage ? (
@@ -554,7 +554,7 @@ const UserProfile: React.FC = () => {
 
                 </div>
                 <div className="edit-post-text">
-                  <div className="text-block-9">Tekst objave:</div>
+                  <div className="text-block-9">Post Text:</div>
                   <textarea
                     id="post-text"
                     value={currentPost?.content || ''}
@@ -575,7 +575,7 @@ const UserProfile: React.FC = () => {
                     handleCloseModal();
                   }}
                 >
-                  <div>Odustani</div>
+                  <div>Cancel</div>
                 </a>
                 <a
                   href="#"
@@ -586,7 +586,7 @@ const UserProfile: React.FC = () => {
                     handleSaveChanges(currentPost);
                   }}
                 >
-                  <div>Izmeni</div>
+                  <div>Save</div>
                 </a>
               </div>
             </div>
@@ -594,52 +594,52 @@ const UserProfile: React.FC = () => {
         </section>
       )}
 
-{isRejectModalOpen && (
-  <section className="reject-description-section">
-    <div className="w-layout-blockcontainer container container-reject-description w-container">
-      <div className="form-block w-form">
-        <form
-          id="reject-form"
-          name="reject-form"
-          className="form-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleRejectPostWithReason();
-          }}
-        >
-          <label htmlFor="rejectionReason" className="field-label">
-            Razlog odbijanja posta
-          </label>
-          <textarea
-            placeholder="Unesite razlog odbijanja objave"
-            maxLength={5000}
-            id="rejectionReason"
-            name="rejectionReason"
-            className="textarea w-input"
-            value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
-            required
-          ></textarea>
-          <div className="reject-description-buttons-div">
-            <button
-              type="button"
-              className="reject-button give-up w-button"
-              onClick={() => {
-                setIsRejectModalOpen(false);
-                setRejectionReason('');
-              }}
-            >
-              Odustani
-            </button>
-            <button type="submit" className="reject-button w-button">
-              Pošalji
-            </button>
+      {isRejectModalOpen && (
+        <section className="reject-description-section">
+          <div className="w-layout-blockcontainer container container-reject-description w-container">
+            <div className="form-block w-form">
+              <form
+                id="reject-form"
+                name="reject-form"
+                className="form-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRejectPostWithReason();
+                }}
+              >
+                <label htmlFor="rejectionReason" className="field-label">
+                  Reason for post rejection
+                </label>
+                <textarea
+                  placeholder="Unesite razlog odbijanja objave"
+                  maxLength={5000}
+                  id="rejectionReason"
+                  name="rejectionReason"
+                  className="textarea w-input"
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  required
+                ></textarea>
+                <div className="reject-description-buttons-div">
+                  <button
+                    type="button"
+                    className="reject-button give-up w-button"
+                    onClick={() => {
+                      setIsRejectModalOpen(false);
+                      setRejectionReason('');
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="reject-button w-button">
+                    Send
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
-  </section>
-)}
+        </section>
+      )}
 
 
       <section id='hero-section' className="hero-section">
@@ -662,7 +662,7 @@ const UserProfile: React.FC = () => {
                     className="link-block-2 w-inline-block"
                     onClick={handleLogout}
                   >
-                    <div>Izloguj se</div>
+                    <div>Log out</div>
                     <img
                       src="\assets\Icons\logout.svg"
                       loading="lazy"
@@ -671,7 +671,7 @@ const UserProfile: React.FC = () => {
                   </a>
                 </div>
               </div>
-              <label htmlFor="username" className="user-info-label">Korisničko ime</label>
+              <label htmlFor="username" className="user-info-label">Username</label>
               <input
                 className="user-info-input w-input"
                 name="username"
@@ -679,7 +679,7 @@ const UserProfile: React.FC = () => {
                 value={userData?.username || ''} // Vraća prazan string ako je userData null
                 disabled={isSaving} // Disable while saving
               />
-              <label htmlFor="firstName" className="user-info-label">Ime</label>
+              <label htmlFor="firstName" className="user-info-label">First Name</label>
               <input
                 className="user-info-input w-input"
                 name="firstName"
@@ -687,7 +687,7 @@ const UserProfile: React.FC = () => {
                 value={userData?.firstName || ''} // Vraća prazan string ako je userData null
                 onChange={handleInputChange}
               />
-              <label htmlFor="lastName" className="user-info-label">Prezime</label>
+              <label htmlFor="lastName" className="user-info-label">Last Name</label>
               <input
                 className="user-info-input w-input"
                 name="lastName"
@@ -695,7 +695,7 @@ const UserProfile: React.FC = () => {
                 value={userData?.lastName || ''} // Vraća prazan string ako je userData null
                 onChange={handleInputChange}
               />
-              <label htmlFor="address" className="user-info-label">Adresa</label>
+              <label htmlFor="address" className="user-info-label">Address</label>
               <input
                 className="user-info-input w-input"
                 name="address"
@@ -703,7 +703,7 @@ const UserProfile: React.FC = () => {
                 value={userData?.address || ''} // Vraća prazan string ako je userData null
                 onChange={handleInputChange}
               />
-              <label htmlFor="city" className="user-info-label">Grad</label>
+              <label htmlFor="city" className="user-info-label">City</label>
               <input
                 className="user-info-input w-input"
                 name="city"
@@ -711,7 +711,7 @@ const UserProfile: React.FC = () => {
                 value={userData?.city || ''} // Vraća prazan string ako je userData null
                 onChange={handleInputChange}
               />
-              <label htmlFor="country" className="user-info-label">Država</label>
+              <label htmlFor="country" className="user-info-label">Country</label>
               <input
                 className="user-info-input w-input"
                 name="country"
@@ -719,7 +719,7 @@ const UserProfile: React.FC = () => {
                 value={userData?.country || ''} // Vraća prazan string ako je userData null
                 onChange={handleInputChange}
               />
-              <label htmlFor="phone" className="user-info-label">Broj telefona</label>
+              <label htmlFor="phone" className="user-info-label">Phone number</label>
               <input
                 className="user-info-input w-input"
                 name="phone"
@@ -735,7 +735,7 @@ const UserProfile: React.FC = () => {
                 value={userData?.email || ''} // Vraća prazan string ako je userData null
                 onChange={handleInputChange}
               />
-              <label htmlFor="password" className="user-info-label">Lozinka</label>
+              <label htmlFor="password" className="user-info-label">Password</label>
               <input
                 className="user-info-input w-input"
                 name="password"
@@ -747,7 +747,7 @@ const UserProfile: React.FC = () => {
               <input
                 type="submit"
                 className="submit-button w-button"
-                value={isSaving ? 'Čuvanje...' : 'Izmeni profil'}
+                value={isSaving ? 'Čuvanje...' : 'Save changes'}
                 disabled={isSaving}
               />
             </form>
@@ -755,7 +755,7 @@ const UserProfile: React.FC = () => {
           <div className="container-hr"></div>
           <div className="user-posts-block">
             <div className="div-block">
-              <div>Objave</div>
+              <div>Posts</div>
               <img
                 src="/assets/Icons/9-square.svg"
                 alt="Grid"
@@ -770,7 +770,7 @@ const UserProfile: React.FC = () => {
                       <>
                         <div className="user-post-padding-image-div">
                           <img src="/assets/Icons/alert-triangle.svg" loading="lazy" alt="" className="image-12" />
-                          <div className="text-block-10">Post je na čekanju.</div>
+                          <div className="text-block-10">The post is pending.</div>
                         </div>
 
                         <div className="div-block-5"></div>
@@ -781,7 +781,7 @@ const UserProfile: React.FC = () => {
                         <div className="user-postreject-div"></div>
                         <div className="user-post-padding-image-div">
                           <img src="\assets\Icons\alert-triangle-RED.svg" loading="lazy" alt="" className="image-12" />
-                          <div className="text-block-11">Post je odbijen!</div>
+                          <div className="text-block-11">Post is rejected!</div>
                         </div>
                       </>
                     )}
@@ -828,14 +828,14 @@ const UserProfile: React.FC = () => {
                           src="\assets\Icons\edit.svg"
                           alt="Edit"
                         />
-                        <div>Izmeni</div>
+                        <div>Edit</div>
                       </div>
                       <div className="user-post-remove" onClick={() => handleDeletePost(post.id)}>
                         <img
                           src="/assets/Icons/trash.svg"
                           alt="Delete"
                         />
-                        <div>Obriši</div>
+                        <div>Delete</div>
                       </div>
                     </div>
                   </div>
@@ -859,7 +859,7 @@ const UserProfile: React.FC = () => {
           <section id='admin-section' className="admin-section">
             <div className="w-layout-blockcontainer container admin-container w-container">
               <div className="div-block-3">
-                <div className="text-block-5">Kreirane objave</div>
+                <div className="text-block-5">Created posts</div>
               </div>
               <div className="created-posts">
 
@@ -918,7 +918,7 @@ const UserProfile: React.FC = () => {
                             handleApprovePost(post.id);
                           }}
                         >
-                          <div>Odobri</div>
+                          <div>Approve</div>
                           <img
                             src="/assets/Icons/success-GREEN.svg"
                             alt="Approve"
@@ -934,7 +934,7 @@ const UserProfile: React.FC = () => {
                             handleRejectPost(post.id);
                           }}
                         >
-                          <div>Odbij</div>
+                          <div>Reject</div>
                           <img
                             src="\assets\Icons\reject-request-RED.svg"
                             alt="Reject"
@@ -955,7 +955,7 @@ const UserProfile: React.FC = () => {
           <section id='admin-section-blocked-users' className="admin-section-blocked-users">
             <div className="w-layout-blockcontainer container blocked-users-container w-container">
               <div className="blocked-users-header">
-                <h2 className="heading">Blokirani korisnici</h2>
+                <h2 className="heading">Blocked users</h2>
               </div>
               <div className="blocked-blocked-users-list">
                 {blockedUsers.length > 0 ? (
@@ -979,23 +979,23 @@ const UserProfile: React.FC = () => {
                           <div className="info-bottom-text">@{user.username}</div>
                         </div>
                         <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Ime</div>
+                          <div className="info-upper-text">First Name</div>
                           <div className="info-bottom-text">{user.firstName}</div>
                         </div>
                         <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Prezime</div>
+                          <div className="info-upper-text">Last Name</div>
                           <div className="info-bottom-text">{user.lastName}</div>
                         </div>
                         <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Grad</div>
+                          <div className="info-upper-text">City</div>
                           <div className="info-bottom-text">{user.city}</div>
                         </div>
                         <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Država</div>
+                          <div className="info-upper-text">Country</div>
                           <div className="info-bottom-text">{user.country}</div>
                         </div>
                         <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Broj telefona</div>
+                          <div className="info-upper-text">Phone number</div>
                           <div className="info-bottom-text">{user.phone}</div>
                         </div>
                         <div className="blocked-user-info-block">
@@ -1007,7 +1007,7 @@ const UserProfile: React.FC = () => {
                           className="link-block-3 w-inline-block"
                           onClick={() => handleUnblock(user.id)}
                         >
-                          <div className="text-block-7">Odblokiraj korisnika</div>
+                          <div className="text-block-7">Unblock user</div>
                         </a>
                       </div>
                       <div className="blocked-user-hr"></div>

@@ -3,7 +3,6 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 
-
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
     if (link.getAttribute('href') !== href) {
@@ -38,7 +37,7 @@ const Index: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;// || 'http://localhost:5000'; // URL iz environment varijable
+  const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL from environment variable
   const { showNotification } = useNotification();
   const location = useLocation();
   const [hasNotification, setHasNotification] = useState(false);
@@ -46,12 +45,6 @@ const Index: React.FC = () => {
   useEffect(() => {
     loadCSS('/styles/index.css');
     setIsLoading(true);
-
-    if (!hasNotification && location.state?.message) {
-      const { message, type } = location.state;
-      showNotification('success', message);
-      setHasNotification(true);
-    }
 
     const checkSession = async () => {
       try {
@@ -66,14 +59,14 @@ const Index: React.FC = () => {
         const data = await response.json();
 
         if (!data.user) {
-          // Preusmeri korisnika na login ako nije ulogovan
+          // Redirect the user to login if not logged in
           navigate('/login');
         } else {
           fetchPosts();
         }
       } catch (error) {
-        console.error('Greška prilikom provere sesije:', error);
-        navigate('/login'); // Ako se desi greška, preusmeri na login
+        console.error('Error while checking session:', error);
+        navigate('/login'); // Redirect to login in case of error
       }
     };
 
@@ -93,16 +86,20 @@ const Index: React.FC = () => {
 
         const data: Post[] = await response.json();
         setPosts(data);
-
       } catch (err: any) {
         setError(err.message || 'An unexpected error occurred.');
       } finally {
         setIsLoading(false);
+        if (!hasNotification && location.state?.message) {
+          const { message, type } = location.state;
+          showNotification(type, message);
+          setHasNotification(true);
+        }
       }
     };
 
     checkSession();
-  }, [navigate, hasNotification, location.state, showNotification]);
+  }, [navigate, hasNotification, location.state]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,12 +109,10 @@ const Index: React.FC = () => {
 
   if (isLoading) {
     return (
-      <>
-        <HelmetProvider>
-
-          <Helmet>
-            <style>
-              {`
+      <HelmetProvider>
+        <Helmet>
+          <style>
+            {`
               .preloader {
                 display: flex;
                 align-items: center;
@@ -127,34 +122,33 @@ const Index: React.FC = () => {
                 background-color: #f5f5f5;
                 color: #333;
                 font-family: Arial, sans-serif;
+              }
+              
+              .spinner {
+                border: 8px solid #f3f3f3;
+                border-top: 8px solid #3498db;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 1s linear infinite;
+              }
+              
+              @keyframes spin {
+                0% {
+                  transform: rotate(0deg);
                 }
-                
-                .spinner {
-                  border: 8px solid #f3f3f3;
-                  border-top: 8px solid #3498db;
-                  border-radius: 50%;
-                  width: 50px;
-                  height: 50px;
-                  animation: spin 1s linear infinite;
-                  }
-                  
-                  @keyframes spin {
-                    0% {
-                      transform: rotate(0deg);
-                      }
-                      100% {
-                        transform: rotate(360deg);
-                        }
-                        }
-                        `}
-            </style>
-          </Helmet>
-          <div className="preloader">
-            <div className="spinner"></div>
-            <span>Loading...</span>
-          </div>
-        </HelmetProvider>
-      </>
+                100% {
+                  transform: rotate(360deg);
+                }
+              }
+            `}
+          </style>
+        </Helmet>
+        <div className="preloader">
+          <div className="spinner"></div>
+          <span>Loading...</span>
+        </div>
+      </HelmetProvider>
     );
   }
 
@@ -185,16 +179,15 @@ const Index: React.FC = () => {
                   className="search-input w-input"
                   maxLength={256}
                   name="name"
-                  placeholder="Pretražite prijatelje"
+                  placeholder="Search for friends"
                   type="text"
                   id="name"
                 />
                 <div className="text-block">
-                  <img src="\assets\Icons\x-02.svg"
-                    alt="" />
+                  <img src="\assets\Icons\x-02.svg" alt="" />
                 </div>
               </div>
-              <input type="submit" className="search-button w-button" value="Pretraži" id="search-user-btn" />
+              <input type="submit" className="search-button w-button" value="Search" id="search-user-btn" />
             </form>
           </div>
           <div className="posts-div">
@@ -203,12 +196,12 @@ const Index: React.FC = () => {
                 <div className="user-post-image">
                   {post.postImage ? (
                     <img
-                      src={`${backendUrl}/api/posts/uploads/${post.postImage}`} // Korigovan URL za rutu backend-a
-                      alt={post.postImage} // Set the alt tag to the filename
+                      src={`${backendUrl}/api/posts/uploads/${post.postImage}`}
+                      alt={post.postImage}
                       className="image-5"
                     />
                   ) : (
-                    <span className="image-placeholder">No Image Available</span> // Fallback for missing images
+                    <span className="image-placeholder">No Image Available</span>
                   )}
                 </div>
                 <div className="user-post-user-info">
@@ -222,7 +215,8 @@ const Index: React.FC = () => {
                         }
                         alt="Profile"
                         className="image-4"
-                      />                    </div>
+                      />
+                    </div>
                     <div className="user-post-user-info-name-and-date">
                       <div className="user-post-user-info-name">
                         @{<span className="text-span">{post.username}</span>}
@@ -238,7 +232,6 @@ const Index: React.FC = () => {
               </div>
             ))}
           </div>
-
         </div>
       </section>
     </div>

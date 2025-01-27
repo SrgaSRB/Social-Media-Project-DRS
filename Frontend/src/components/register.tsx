@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { useNavigate, redirect } from "react-router-dom";
-import { useNotification } from '../notification/NotificationContext';
+import { useNavigate } from "react-router-dom";
+import { useNotification } from "../notification/NotificationContext";
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -23,9 +23,7 @@ const loadCSS = (href: string) => {
   document.head.appendChild(link);
 };
 
-
 const Register: React.FC = () => {
-
   const [formData, setFormData] = useState({
     username: "",
     first_name: "",
@@ -37,42 +35,41 @@ const Register: React.FC = () => {
     email: "",
     password: "",
   });
+
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
-  const backendUrl = process.env.REACT_APP_BACKEND_URL; // URL iz environment varijable
+
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const { showNotification } = useNotification();
-
   const navigate = useNavigate();
-
 
   useEffect(() => {
     loadCSS("/styles/register.css");
-    setTimeout(() => setIsLoading(false), 200); // Simulacija učitavanja CSS-a
+    setTimeout(() => setIsLoading(false), 200); // Simulate CSS loading
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-  
+
     if (name === "username" && /\s/.test(value)) {
-      showNotification('error' , "Korisničko ime ne može sadržavati razmake.");
+      showNotification("error", "Username cannot contain spaces.");
       return;
     }
-  
+
     setFormData({ ...formData, [name]: value });
   };
-  
 
   const handleEmailBlur = async (): Promise<void> => {
     try {
       const response = await fetch(`${backendUrl}/api/auth/check-email`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email: formData.email }),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         setEmailAvailable(data.available);
@@ -80,17 +77,17 @@ const Register: React.FC = () => {
         setEmailAvailable(false);
       }
     } catch (error) {
-      console.error('Error checking email:', error);
+      console.error("Error checking email:", error);
       setEmailAvailable(false);
     }
-  };  
+  };
 
   const handleUsernameBlur = async (): Promise<void> => {
     try {
       const response = await fetch(`${backendUrl}/api/auth/check-username`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username: formData.username }),
       });
@@ -102,11 +99,10 @@ const Register: React.FC = () => {
         setUsernameAvailable(false);
       }
     } catch (error) {
-      console.error('Error checking username:', error);
+      console.error("Error checking username:", error);
       setUsernameAvailable(false);
     }
   };
-
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
@@ -114,33 +110,31 @@ const Register: React.FC = () => {
 
     try {
       const response = await fetch(`${backendUrl}/api/auth/register`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
 
       console.log("Backend response:", response);
       if (response.ok) {
-        alert('Registration successful!');
-        navigate('/login'); // Redirect to login page after successful registration
+        alert("Registration successful!");
+        navigate("/login"); // Redirect to login page after successful registration
       } else {
         const errorData = await response.json();
         console.error("Backend error:", errorData);
         alert(`Error: ${errorData.message || "An error occurred"}`);
       }
     } catch (error) {
-      console.error('Error during registration:', error);
-      alert('An error occurred. Please try again.');
+      console.error("Error during registration:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
-
-
   const handleLoginRedirect = () => {
     navigate("/login");
-  }
+  };
 
   if (isLoading) {
     return (
@@ -204,14 +198,14 @@ const Register: React.FC = () => {
                   onSubmit={handleSubmit}
                 >
                   <label htmlFor="username" className="user-info-label">
-                    Korisničko ime
+                    Username
                   </label>
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="username"
                     id="username"
-                    placeholder="Unesite korisničko ime"
+                    placeholder="Enter your username"
                     type="text"
                     autoComplete="username"
                     value={formData.username}
@@ -221,19 +215,19 @@ const Register: React.FC = () => {
                   />
                   {usernameAvailable === false && (
                     <span className="error-message">
-                      Korisničko ime nije dostupno.
+                      Username is not available.
                     </span>
                   )}
 
-                  <label htmlFor="first-name" className="user-info-label">
-                    Ime
+                  <label htmlFor="first_name" className="user-info-label">
+                    First name
                   </label>
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="first_name"
                     id="first_name"
-                    placeholder="Unesite Vaše ime"
+                    placeholder="Enter your first name"
                     type="text"
                     autoComplete="given-name"
                     value={formData.first_name}
@@ -241,15 +235,15 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="last-name" className="user-info-label">
-                    Prezime
+                  <label htmlFor="last_name" className="user-info-label">
+                    Last name
                   </label>
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="last_name"
                     id="last_name"
-                    placeholder="Unesite Vaše prezime"
+                    placeholder="Enter your last name"
                     type="text"
                     autoComplete="family-name"
                     value={formData.last_name}
@@ -257,15 +251,15 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="street-address" className="user-info-label">
-                    Adresa
+                  <label htmlFor="address" className="user-info-label">
+                    Address
                   </label>
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="address"
-                    id="street-address"
-                    placeholder="Unesite Vašu adresu (ulica, broj)"
+                    id="address"
+                    placeholder="Enter your address (street, number)"
                     type="text"
                     autoComplete="street-address"
                     value={formData.address}
@@ -274,14 +268,14 @@ const Register: React.FC = () => {
                   />
 
                   <label htmlFor="city" className="user-info-label">
-                    Grad
+                    City
                   </label>
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="city"
                     id="city"
-                    placeholder="Unesite grad u kome živite"
+                    placeholder="Enter the city you live in"
                     type="text"
                     autoComplete="address-level2"
                     value={formData.city}
@@ -290,14 +284,14 @@ const Register: React.FC = () => {
                   />
 
                   <label htmlFor="country" className="user-info-label">
-                    Država
+                    Country
                   </label>
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="country"
                     id="country"
-                    placeholder="Unesite državu u kojoj živite"
+                    placeholder="Enter the country you live in"
                     type="text"
                     autoComplete="country"
                     value={formData.country}
@@ -306,14 +300,14 @@ const Register: React.FC = () => {
                   />
 
                   <label htmlFor="tel" className="user-info-label">
-                    Broj telefona
+                    Phone number
                   </label>
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="phone_number"
                     id="tel"
-                    placeholder="Unesite Vaš broj telefona"
+                    placeholder="Enter your phone number"
                     type="tel"
                     autoComplete="tel"
                     value={formData.phone_number}
@@ -329,7 +323,7 @@ const Register: React.FC = () => {
                     maxLength={256}
                     name="email"
                     id="email"
-                    placeholder="Unesite Vašu email adresu"
+                    placeholder="Enter your email address"
                     type="email"
                     autoComplete="email"
                     value={formData.email}
@@ -338,20 +332,20 @@ const Register: React.FC = () => {
                     required
                   />
                   {emailAvailable === false && (
-                    <span className="error-message" color="red">
-                      Email adresa nije dostupna.
+                    <span className="error-message">
+                      Email address is not available.
                     </span>
                   )}
 
                   <label htmlFor="password" className="user-info-label">
-                    Lozinka
+                    Password
                   </label>
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="password"
                     id="password"
-                    placeholder="Unesite Vašu lozinku"
+                    placeholder="Enter your password"
                     type="password"
                     autoComplete="new-password"
                     value={formData.password}
@@ -360,15 +354,14 @@ const Register: React.FC = () => {
                   />
 
                   <label htmlFor="password-confirm" className="user-info-label">
-                    Potvrdite lozinku
+                    Confirm password
                   </label>
-
                   <input
                     className="user-info-input w-input"
                     maxLength={256}
                     name="password-confirm"
                     id="password-confirm"
-                    placeholder="Potvrdite Vašu lozinku"
+                    placeholder="Confirm your password"
                     type="password"
                     autoComplete="new-password"
                     required
@@ -377,7 +370,7 @@ const Register: React.FC = () => {
                   <input
                     type="submit"
                     className="submit-button-2 w-button"
-                    value="Registruj se"
+                    value="Register"
                   />
                 </form>
               </div>
@@ -388,7 +381,9 @@ const Register: React.FC = () => {
                   e.preventDefault();
                   handleLoginRedirect();
                 }}
-              >Imate profil?</a>
+              >
+                Already have an account?
+              </a>
             </div>
             <div className="image-register-div">
               <img

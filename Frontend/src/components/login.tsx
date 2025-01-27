@@ -22,7 +22,6 @@ const loadCSS = (href: string) => {
   document.head.appendChild(link);
 };
 
-
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +30,6 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const { showNotification } = useNotification();
-
 
   useEffect(() => {
     loadCSS('/styles/login.css');
@@ -42,7 +40,6 @@ const Login: React.FC = () => {
 
     console.log(backendUrl);
     console.log(process.env);
-
 
     fetch(`${backendUrl}/api/auth/session`, { method: 'GET', credentials: 'include' })
       .then((response) => {
@@ -70,7 +67,6 @@ const Login: React.FC = () => {
       method: 'POST',
       credentials: 'include',
     });
-    //alert('You have been logged out.');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,15 +92,12 @@ const Login: React.FC = () => {
       }
 
       const data = await response.json();
-      navigate('/', { state: { message: 'Uspešno ste se prijavili!', type: 'success' } });
-      //navigate('/');
+      navigate('/', { state: { message: 'You have successfully logged in!', type: 'success' } });
     } catch (error) {
       console.error('Fetch error:', error);
-      showNotification('warning','Failed to connect to the server. Please try again later.');
+      showNotification('warning', 'Failed to connect to the server. Please try again later.');
     }
   };
-
-
 
   const handleRegisterRedirect = () => {
     navigate('/register');
@@ -135,24 +128,24 @@ const Login: React.FC = () => {
             <div className="login-form-div">
               <div className="form-block w-form">
                 <form onSubmit={handleSubmit} className="form">
-                  <label htmlFor="username">Korisničko ime</label>
+                  <label htmlFor="username">Username</label>
                   <input
                     className="text-field w-input"
                     maxLength={256}
                     name="username"
-                    placeholder="Unesite korisničko ime"
+                    placeholder="Enter your username"
                     type="text"
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
                   />
-                  <label htmlFor="password">Lozinka</label>
+                  <label htmlFor="password">Password</label>
                   <input
                     className="text-field w-input"
                     maxLength={256}
                     name="password"
-                    placeholder="Unesite lozinku"
+                    placeholder="Enter your password"
                     type="password"
                     id="password"
                     value={password}
@@ -162,7 +155,7 @@ const Login: React.FC = () => {
                   <input
                     type="submit"
                     className="submit-button w-button"
-                    value="Prijavi se"
+                    value="Login"
                   />
                   <a
                     href="#"
@@ -172,7 +165,7 @@ const Login: React.FC = () => {
                       handleRegisterRedirect();
                     }}
                   >
-                    Nemate profil?
+                    Don't have an account?
                   </a>
                 </form>
               </div>

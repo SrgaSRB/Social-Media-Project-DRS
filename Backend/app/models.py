@@ -63,9 +63,10 @@ class Friendship(Base):
     receiver = relationship("User", foreign_keys=[user2_id], back_populates="received_requests") 
 
 
-DATABASE_URL_RENDER = "postgresql://drs_postgres:63CgcJb2GwEPOdU4UD1Hn7eBgGLMzEKA@dpg-ctol4al2ng1s73bjnla0-a.oregon-postgres.render.com:5432/drs_db_ewbp" 
-DATABASE_URL = "postgresql://drs_postgres:63CgcJb2GwEPOdU4UD1Hn7eBgGLMzEKA@dpg-ctol4al2ng1s73bjnla0-a.oregon-postgres.render.com/drs_db_ewbp" 
-engine = create_engine(DATABASE_URL_RENDER)
+DATABASE_URL_RENDER = "postgresql://drs_postgres:63CgcJb2GwEPOdU4UD1Hn7eBgGLMzEKA@dpg-ctol4al2ng1s73bjnla0-a.oregon-postgres.render.com:5432/drs_db_ewbp"
+DATABASE_URL_VERCEL = "postgresql://neondb_owner:npg_v4q3ylkTYfmz@ep-orange-grass-a2jbllss-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+
+engine = create_engine(DATABASE_URL_VERCEL)
 SessionLocal = sessionmaker(bind=engine)
 
 Base.metadata.create_all(bind=engine)
