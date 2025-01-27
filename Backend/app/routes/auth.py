@@ -149,7 +149,7 @@ def get_session():
     Returns the current user session if it exists.
     """
     user = session.get('user') 
-    print(user)
+    print("User :", user)
 
     if user:
         return jsonify({'user': user}), 200
