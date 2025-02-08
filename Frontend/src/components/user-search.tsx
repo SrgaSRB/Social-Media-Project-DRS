@@ -66,7 +66,6 @@ const UserSearch: React.FC = () => {
 
         setUsers(usersData);
         setFriendStatuses(statusesData);
-        console.log(statusesData);
         setFilteredUsers(usersData);
       } catch (error) {
         console.error('Error fetching users and statuses:', error);
@@ -128,7 +127,6 @@ const UserSearch: React.FC = () => {
   };
 
   const handleRemoveFriend = async (friendId: number) => {
-    console.log(friendId);
     try {
       const response = await fetch(`${backendUrl}/api/users/remove-friend`, {
         method: 'POST',

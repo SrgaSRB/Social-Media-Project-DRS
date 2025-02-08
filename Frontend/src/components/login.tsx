@@ -38,9 +38,6 @@ const Login: React.FC = () => {
     if (hasCheckedSession.current) return; // Skip if already checked
     hasCheckedSession.current = true;
 
-    console.log(backendUrl);
-    console.log(process.env);
-
     fetch(`${backendUrl}/api/auth/session`, { method: 'GET', credentials: 'include' })
       .then((response) => {
         if (response.ok) {

@@ -217,7 +217,6 @@ const UserProfile: React.FC = () => {
         const { user } = data;
         setUserType(user?.role || 'user');
         setUserData(user);
-        console.log('User data:', data);
       })
       .catch((error) => {
         console.error('Error fetching session:', error);
