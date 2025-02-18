@@ -22,6 +22,14 @@ const loadCSS = (href: string) => {
   link.rel = 'stylesheet';
   link.href = "/styles/notification.css";
   document.head.appendChild(link);
+
+  {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = "/styles/extern.css";
+    document.head.appendChild(link);
+  }
+
 };
 
 interface Post {

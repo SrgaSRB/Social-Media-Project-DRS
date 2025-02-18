@@ -1,0 +1,55 @@
+/* Overlay preko celog ekrana */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+/* Sadržaj modala */
+.modal-content {
+    position: relative;
+    min-width: 30%;
+    max-width: 90%;
+    max-height: 95%;
+    display: flex;
+}
+
+/* Prikaz slike u modalu */
+.modal-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Dugme za zatvaranje */
+.modal-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: white;
+    cursor: pointer;
+}
+
+.modal-close-button:hover {
+    color: #ff0000;
+}
+
+@media screen and (max-width: 767px) {
+
+    .modal-content {
+        max-width: 90%;
+    }
+
+}
