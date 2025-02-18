@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
+import ModalImage from './ModalImage';
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -42,9 +43,13 @@ const Index: React.FC = () => {
   const location = useLocation();
   const [hasNotification, setHasNotification] = useState(false);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState('');
+  const [modalAltText, setModalAltText] = useState('');
+
   useEffect(() => {
-    loadCSS('/styles/index.css');
     setIsLoading(true);
+    loadCSS('/styles/index.css');
 
     const checkSession = async () => {
       try {
@@ -107,6 +112,16 @@ const Index: React.FC = () => {
     navigate('/user-search', { state: { searchTerm } });
   };
 
+  const handleImageClick = (imageUrl: string, altText: string) => {
+    setModalImageUrl(imageUrl);
+    setModalAltText(altText);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   if (isLoading) {
     return (
       <HelmetProvider>
@@ -163,6 +178,7 @@ const Index: React.FC = () => {
   }
 
   return (
+    <>
     <div className="body">
       <section className="hero-section">
         <div className="w-layout-blockcontainer container hero-container w-container">
@@ -199,6 +215,12 @@ const Index: React.FC = () => {
                       src={`${backendUrl}/api/posts/uploads/${post.postImage}`}
                       alt={post.postImage}
                       className="image-5"
+                      onClick={() =>
+                        handleImageClick(
+                          `${backendUrl}/api/posts/uploads/${post.postImage}`,
+                          post.postImage
+                        )
+                      }
                     />
                   ) : (
                     <span className="image-placeholder">No Image Available</span>
@@ -235,6 +257,17 @@ const Index: React.FC = () => {
         </div>
       </section>
     </div>
+
+    {isModalOpen && (
+        <ModalImage
+          imageUrl={modalImageUrl}
+          altText={modalAltText}
+          onClose={handleCloseModal}
+        />
+      )}
+    
+    </>
+
   );
 };
 
