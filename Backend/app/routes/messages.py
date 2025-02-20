@@ -57,8 +57,10 @@ def send_message():
     new_msg = Message(sender_id=user_id, receiver_id=receiver_id, content=content, status='sent')
     db.add(new_msg)
     db.commit()
+    db.refresh(new_msg)
     
     # Emitovanje poruke putem Socket.IO za real-time ažuriranje (opciono)
+    """    
     socketio.emit('new_message', {
         'id': new_msg.id,
         'sender_id': user_id,
@@ -67,6 +69,16 @@ def send_message():
         'timestamp': new_msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
         'status': new_msg.status
     }, broadcast=True)
+    """
+    
+    socketio.emit('new_message', {
+    'id': new_msg.id,
+    'sender_id': user_id,
+    'receiver_id': receiver_id,
+    'content': content,
+    'timestamp': new_msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+    'status': new_msg.status
+    })
     
     return jsonify({'message': 'Message sent successfully'}), 201
 
