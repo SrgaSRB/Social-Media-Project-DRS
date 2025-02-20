@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 interface Friend {
   id: number;
@@ -8,7 +11,8 @@ interface Friend {
 
 interface ChatMessage {
   id: number;
-  senderId: number;
+  sender_id: number;
+  receiver_id: number;
   content: string;
   timestamp: string;
   status: string;
@@ -20,7 +24,6 @@ const loadCSS = (href: string) => {
       link.remove();
     }
   });
-
   const existingLink = document.querySelector(`link[href="${href}"]`);
   if (!existingLink) {
     const link = document.createElement('link');
@@ -30,7 +33,7 @@ const loadCSS = (href: string) => {
   }
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = "/styles/notification.css";
+  link.href = '/styles/notification.css';
   document.head.appendChild(link);
 };
 
@@ -38,18 +41,58 @@ const Messages: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  // Tekst nove poruke
   const [newMessage, setNewMessage] = useState('');
 
-  const currentUserId = 1; // Ovo zamenite stvarnim podatkom o ulogovanom korisniku
+  const navigate = useNavigate();
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
-  console.log(backendUrl);
 
-  // Učitavanje liste prijatelja sa endpointa /api/messages/friends
+  // Umesto hardkodovanog ID-ja, preuzmi stvarni ID ulogovanog korisnika (ovo je samo primer)
+  const [currentUserId, setCurrentUserId] = useState<number>();
+
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+
+  // Inicijalizuj socket (ovo možeš premestiti u globalni kontekst)
+  const socket = io(backendUrl);
+
+  // Učitavanje prijatelja
   useEffect(() => {
-
     loadCSS('/styles/messages.css');
+
+    const checkSession = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/auth/session`, {
+          method: 'GET',
+          credentials: 'include', // Include cookies for authentication
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+
+        if (!data.user) {
+          // Redirect the user to login if not logged in
+          navigate('/login');
+        }
+      } catch (error) {
+        console.error('Error while checking session:', error);
+        navigate('/login'); // Redirect to login in case of error
+      }
+    };
+
+    fetch(`${backendUrl}/api/auth/session`, {
+      credentials: 'include',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const { user } = data;
+        setCurrentUserId(data.user.id);
+      })
+      .catch((error) => {
+        console.error('Error fetching session:', error);
+      });
+
+    checkSession();
 
     fetch(`${backendUrl}/api/messages/friends`, {
       method: 'GET',
@@ -58,6 +101,7 @@ const Messages: React.FC = () => {
       .then(res => res.json())
       .then((data: Friend[]) => setFriends(data))
       .catch(err => console.error(err));
+
   }, [backendUrl]);
 
   // Učitavanje razgovora sa izabranim prijateljem
@@ -67,13 +111,37 @@ const Messages: React.FC = () => {
         credentials: 'include'
       })
         .then(res => res.json())
-        .then((data: ChatMessage[]) => setMessages(data))
+        .then((data: ChatMessage[]) => {
+          setMessages(data)
+        })
         .catch(err => console.error(err));
     }
   }, [selectedFriend, backendUrl]);
 
-  // Slanje poruke putem endpointa /api/messages/send
-  // Slanje poruke putem endpointa /api/messages/send
+  // Live osluškivanje novih poruka preko socket-a
+  useEffect(() => {
+    if (!currentUserId || !selectedFriend) return;
+
+    const handleNewMessage = (msg: ChatMessage) => {
+      console.log("Primljena nova poruka:", msg);
+
+      // Proveri da li poruka pripada trenutnom razgovoru
+      if (
+        msg.sender_id === selectedFriend.id && msg.receiver_id === currentUserId
+      ) {
+        setMessages(prev => [...prev, msg]);
+      }
+    };
+
+    socket.on('new_message', handleNewMessage);
+
+    return () => {
+      socket.off('new_message', handleNewMessage);
+    };
+  }, [selectedFriend, currentUserId]);
+
+
+  // Slanje poruke
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFriend || newMessage.trim() === '') return;
@@ -91,17 +159,10 @@ const Messages: React.FC = () => {
     })
       .then(res => res.json())
       .then((data) => {
-        // Pretpostavljamo da backend vraća objekat sa kreiranom porukom u polju 'msg'
-        // Primer odgovora: { message: "Message sent successfully", msg: { id: 123, senderId: 1, content: "...", timestamp: "...", status: "sent" } }
+        // Ako backend vraća novu poruku u polju 'msg', ona će biti dodata;
+        // u suprotnom, live listener će je dodati kad stigne preko socket-a.
         if (data && data.msg) {
-          const msg: ChatMessage = {
-            id: data.msg.id, // pravi ID iz backend-a
-            senderId: currentUserId,
-            content: data.msg.content, // ili newMessage.trim(), ako backend ne vraća sadržaj
-            timestamp: data.msg.timestamp, // timestamp koji je postavio backend
-            status: data.msg.status || 'sent'
-          };
-          setMessages([...messages, msg]);
+          setMessages(prev => [...prev, data.msg]);
           setNewMessage('');
         } else {
           console.error("Backend nije vratio poruku:", data);
@@ -110,11 +171,10 @@ const Messages: React.FC = () => {
       .catch(err => console.error(err));
   };
 
-
   return (
     <section className="chat-section">
       <div className="w-layout-blockcontainer container w-container">
-        {/* Leva strana – lista prijatelja */}
+        {/* Lista prijatelja */}
         <div className="side-chats-block">
           <div className="text-block">Messages</div>
           {friends.map(friend => (
@@ -135,7 +195,7 @@ const Messages: React.FC = () => {
           ))}
         </div>
 
-        {/* Desna strana – chat prozor */}
+        {/* Chat prozor */}
         <div className="chat-box-block">
           {selectedFriend ? (
             <>
@@ -156,7 +216,7 @@ const Messages: React.FC = () => {
               {/* Lista poruka */}
               <div className="chat-box-messages">
                 {messages.map(msg =>
-                  msg.senderId === currentUserId ? (
+                  msg.sender_id === currentUserId ? (
                     <div key={msg.id} className="chat-box-messages-user-message-block">
                       <div className="chat-box-messages-user-message-text">{msg.content}</div>
                     </div>
@@ -187,12 +247,12 @@ const Messages: React.FC = () => {
               </div>
             </>
           ) : (
-            // Ako nijedan prijatelj nije izabran
             <div className="chat-box-user">
               <div className="text-block-3">Select a friend to start a conversation</div>
             </div>
           )}
         </div>
+        
       </div>
     </section>
   );
