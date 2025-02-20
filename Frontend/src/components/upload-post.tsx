@@ -3,29 +3,21 @@ import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 
-const loadCSS = (href: string) => {
+
+const loadCSS = (hrefs: string[]) => {
+  // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    if (link.getAttribute('href') !== href) {
-      link.remove();
-    }
+    link.remove();
   });
 
-  const existingLink = document.querySelector(`link[href="${href}"]`);
-  if (!existingLink) {
+  // Dodajemo nove CSS fajlove
+  hrefs.forEach(href => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
+    link.onload = () => console.log(`Učitano: ${href}`);
     document.head.appendChild(link);
-  }
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = "/styles/notification.css";
-  document.head.appendChild(link);
-
-  link.rel = 'stylesheet';
-  link.href = "/styles/navbar.css";
-  document.head.appendChild(link);
-
+  });
 };
 
 const UploadPost: React.FC = () => {
@@ -40,8 +32,13 @@ const UploadPost: React.FC = () => {
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    loadCSS('/styles/upload-post.css');
     setIsLoading(true);
+
+    loadCSS([
+      '/styles/upload-post.css',
+      '/styles/notification.css',
+      '/styles/navbar.css'
+    ]);
 
     const checkSession = async () => {
       try {
