@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 interface Friend {
@@ -36,10 +36,13 @@ const loadCSS = (href: string) => {
   link.href = '/styles/notification.css';
   document.head.appendChild(link);
 
-  const link2 = document.createElement('link');
-  link2.rel = 'stylesheet';
-  link2.href = '/styles/extern.css';
-  document.head.appendChild(link2);
+  link.rel = 'stylesheet';
+  link.href = '/styles/extern.css';
+  document.head.appendChild(link);
+
+  link.rel = 'stylesheet';
+  link.href = "/styles/navbar.css";
+  document.head.appendChild(link);
 
 };
 
@@ -93,7 +96,6 @@ const Messages: React.FC = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        const { user } = data;
         setCurrentUserId(data.user.id);
       })
       .catch((error) => {
@@ -208,7 +210,7 @@ const Messages: React.FC = () => {
               }}>
                 <div className="side-chat-image-div">
                   <img
-                    src={friend.profileImage == 'defaultProfilePicture.svg' ? '/assets/Icons/defaultProfilePicture.svg' : friend.profileImage}
+                    src={friend.profileImage === 'defaultProfilePicture.svg' ? '/assets/Icons/defaultProfilePicture.svg' : friend.profileImage}
                     alt="Friend"
                     className="side-chat-image"
                   />
@@ -232,7 +234,7 @@ const Messages: React.FC = () => {
                 </div>
                 <div className="chat-boc-user-photo">
                   <img
-                    src={selectedFriend.profileImage == 'defaultProfilePicture.svg' ? '/assets/Icons/defaultProfilePicture.svg' : selectedFriend.profileImage}
+                    src={selectedFriend.profileImage === 'defaultProfilePicture.svg' ? '/assets/Icons/defaultProfilePicture.svg' : selectedFriend.profileImage}
                     alt="Friend"
                     className="image-3"
                   />

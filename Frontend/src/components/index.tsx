@@ -23,12 +23,13 @@ const loadCSS = (href: string) => {
   link.href = "/styles/notification.css";
   document.head.appendChild(link);
 
-  {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = "/styles/extern.css";
-    document.head.appendChild(link);
-  }
+  link.rel = 'stylesheet';
+  link.href = "/styles/extern.css";
+  document.head.appendChild(link);
+
+  link.rel = 'stylesheet';
+  link.href = "/styles/navbar.css";
+  document.head.appendChild(link);
 
 };
 
@@ -187,93 +188,93 @@ const Index: React.FC = () => {
 
   return (
     <>
-    <div className="body">
-      <section className="hero-section">
-        <div className="w-layout-blockcontainer container hero-container w-container">
-          <div className="form-block w-form">
-            <form id="users-search" className="form" onSubmit={handleSearchSubmit}>
-              <img
-                src="\assets\Icons\search.svg"
-                loading="lazy"
-                alt="Search"
-                className="image"
-              />
-              <div className="search-div">
-                <input
-                  className="search-input w-input"
-                  maxLength={256}
-                  name="name"
-                  placeholder="Search for friends"
-                  type="text"
-                  id="name"
+      <div className="body">
+        <section className="hero-section">
+          <div className="w-layout-blockcontainer container hero-container w-container">
+            <div className="form-block w-form">
+              <form id="users-search" className="form" onSubmit={handleSearchSubmit}>
+                <img
+                  src="\assets\Icons\search.svg"
+                  loading="lazy"
+                  alt="Search"
+                  className="image"
                 />
-                <div className="text-block">
-                  <img src="\assets\Icons\x-02.svg" alt="" />
+                <div className="search-div">
+                  <input
+                    className="search-input w-input"
+                    maxLength={256}
+                    name="name"
+                    placeholder="Search for friends"
+                    type="text"
+                    id="name"
+                  />
+                  <div className="text-block">
+                    <img src="\assets\Icons\x-02.svg" alt="" />
+                  </div>
                 </div>
-              </div>
-              <input type="submit" className="search-button w-button" value="Search" id="search-user-btn" />
-            </form>
-          </div>
-          <div className="posts-div">
-            {posts.map((post) => (
-              <div key={post.id} className="user-post">
-                <div className="user-post-image">
-                  {post.postImage ? (
-                    <img
-                      src={`${backendUrl}/api/posts/uploads/${post.postImage}`}
-                      alt={post.postImage}
-                      className="image-5"
-                      onClick={() =>
-                        handleImageClick(
-                          `${backendUrl}/api/posts/uploads/${post.postImage}`,
-                          post.postImage
-                        )
-                      }
-                    />
-                  ) : (
-                    <span className="image-placeholder">No Image Available</span>
-                  )}
-                </div>
-                <div className="user-post-user-info">
-                  <div className="user-post-user-info-image-and-name">
-                    <div className="user-post-user-info-profile-image">
+                <input type="submit" className="search-button w-button" value="Search" id="search-user-btn" />
+              </form>
+            </div>
+            <div className="posts-div">
+              {posts.map((post) => (
+                <div key={post.id} className="user-post">
+                  <div className="user-post-image">
+                    {post.postImage ? (
                       <img
-                        src={
-                          post.profileImage === "defaultProfilePicture.svg"
-                            ? "/assets/Icons/defaultProfilePicture.svg" 
-                            : `${backendUrl}/api/posts/uploads/${post.profileImage}` 
+                        src={`${backendUrl}/api/posts/uploads/${post.postImage}`}
+                        alt={post.postImage}
+                        className="image-5"
+                        onClick={() =>
+                          handleImageClick(
+                            `${backendUrl}/api/posts/uploads/${post.postImage}`,
+                            post.postImage
+                          )
                         }
-                        alt="Profile"
-                        className="image-4"
                       />
-                    </div>
-                    <div className="user-post-user-info-name-and-date">
-                      <div className="user-post-user-info-name">
-                        @{<span className="text-span">{post.username}</span>}
-                      </div>
-                      <div className="user-post-user-info-date">{post.timeAgo}</div>
-                    </div>
+                    ) : (
+                      <span className="image-placeholder">No Image Available</span>
+                    )}
                   </div>
-                  <div className="post-hr"></div>
-                  <div className="user-post-text">
-                    <div className="text-block-2">{post.postText}</div>
+                  <div className="user-post-user-info">
+                    <div className="user-post-user-info-image-and-name">
+                      <div className="user-post-user-info-profile-image">
+                        <img
+                          src={
+                            post.profileImage === "defaultProfilePicture.svg"
+                              ? "/assets/Icons/defaultProfilePicture.svg"
+                              : `${backendUrl}/api/posts/uploads/${post.profileImage}`
+                          }
+                          alt="Profile"
+                          className="image-4"
+                        />
+                      </div>
+                      <div className="user-post-user-info-name-and-date">
+                        <div className="user-post-user-info-name">
+                          @{<span className="text-span">{post.username}</span>}
+                        </div>
+                        <div className="user-post-user-info-date">{post.timeAgo}</div>
+                      </div>
+                    </div>
+                    <div className="post-hr"></div>
+                    <div className="user-post-text">
+                      <div className="text-block-2">{post.postText}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
 
-    {isModalOpen && (
+      {isModalOpen && (
         <ModalImage
           imageUrl={modalImageUrl}
           altText={modalAltText}
           onClose={handleCloseModal}
         />
       )}
-    
+
     </>
 
   );

@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
               loading="lazy"
               src="/assets/Icons/navbar-home.svg"
               alt="Home"
-              className="image-3"
+              className="image-2"
             />
           </NavLink>
           <NavLink
@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
               loading="lazy"
               src="./assets/Icons/navbar-upload.svg"
               alt="Upload"
-              className="image-3"
+              className="image-2"
             />
           </NavLink>
           <NavLink
@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
               loading="lazy"
               src="/assets/Icons/navbar-friendsRequests.svg"
               alt="Profile"
-              className="image-3"
+              className="image-2"
             />
           </NavLink>
           <NavLink
@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
               loading="lazy"
               src="https://cdn.prod.website-files.com/673928869b5a833529aa3a08/67b5f397cf52187542b24ae3_message-chat-01.svg"
               alt="Profile"
-              className="image-3"
+              className="image-2"
             />
           </NavLink>
           <NavLink
@@ -59,7 +59,7 @@ const Navbar: React.FC = () => {
               loading="lazy"
               src="/assets/Icons/navbar-userProfile.svg"
               alt="Settings"
-              className="image-3"
+              className="image-2"
             />
           </NavLink>
         </div>

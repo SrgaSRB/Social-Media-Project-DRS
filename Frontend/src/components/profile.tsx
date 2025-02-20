@@ -22,6 +22,11 @@ const loadCSS = (href: string) => {
   link.rel = 'stylesheet';
   link.href = "/styles/notification.css";
   document.head.appendChild(link);
+
+  link.rel = 'stylesheet';
+  link.href = "/styles/navbar.css";
+  document.head.appendChild(link);
+
 };
 
 interface BlockedUser {

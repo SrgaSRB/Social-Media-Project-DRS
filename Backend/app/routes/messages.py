@@ -77,7 +77,7 @@ def send_message():
     'content': content,
     'timestamp': new_msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
     'status': new_msg.status
-    },)  # Emituje se samo primaocu
+    },) 
 
     
     return jsonify({
