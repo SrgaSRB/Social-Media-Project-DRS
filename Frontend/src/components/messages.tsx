@@ -35,6 +35,12 @@ const loadCSS = (href: string) => {
   link.rel = 'stylesheet';
   link.href = '/styles/notification.css';
   document.head.appendChild(link);
+
+  const link2 = document.createElement('link');
+  link2.rel = 'stylesheet';
+  link2.href = '/styles/extern.css';
+  document.head.appendChild(link2);
+
 };
 
 const Messages: React.FC = () => {
@@ -42,6 +48,8 @@ const Messages: React.FC = () => {
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
   const navigate = useNavigate();
 
@@ -107,16 +115,23 @@ const Messages: React.FC = () => {
   // Učitavanje razgovora sa izabranim prijateljem
   useEffect(() => {
     if (selectedFriend) {
+      setIsLoadingMessages(true); // Početak učitavanja
+
       fetch(`${backendUrl}/api/messages/conversation/${selectedFriend.id}`, {
         credentials: 'include'
       })
         .then(res => res.json())
         .then((data: ChatMessage[]) => {
-          setMessages(data)
+          setMessages(data);
+          setIsLoadingMessages(false); // Kraj učitavanja
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+          console.error(err);
+          setIsLoadingMessages(false); // U slučaju greške, zaustaviti loader
+        });
     }
   }, [selectedFriend, backendUrl]);
+
 
   // Live osluškivanje novih poruka preko socket-a
   useEffect(() => {
@@ -139,7 +154,6 @@ const Messages: React.FC = () => {
       socket.off('new_message', handleNewMessage);
     };
   }, [selectedFriend, currentUserId]);
-
 
   // Slanje poruke
   const handleSendMessage = (e: React.FormEvent) => {
@@ -171,18 +185,30 @@ const Messages: React.FC = () => {
       .catch(err => console.error(err));
   };
 
+  const openChatOnMobile = () => {
+    setIsMobileChatOpen(true);
+  };
+
+  const closeChatOnMobile = () => {
+    setIsMobileChatOpen(false);
+  };
+
   return (
     <section className="chat-section">
       <div className="w-layout-blockcontainer container w-container">
+
         {/* Lista prijatelja */}
         <div className="side-chats-block">
           <div className="text-block">Messages</div>
-          {friends.map(friend => (
-            <div key={friend.id} className="side-chat" onClick={() => setSelectedFriend(friend)}>
-              <div className="side-chat-user">
+          <div className="side-chat">
+            {friends.map(friend => (
+              <div key={friend.id} className="side-chat-user" onClick={() => {
+                openChatOnMobile();
+                setSelectedFriend(friend)
+              }}>
                 <div className="side-chat-image-div">
                   <img
-                    src={friend.profileImage || '/assets/Icons/defaultProfilePicture.svg'}
+                    src={friend.profileImage == 'defaultProfilePicture.svg' ? '/assets/Icons/defaultProfilePicture.svg' : friend.profileImage}
                     alt="Friend"
                     className="side-chat-image"
                   />
@@ -191,19 +217,22 @@ const Messages: React.FC = () => {
                   <div className="text-block-2">{friend.name}</div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Chat prozor */}
-        <div className="chat-box-block">
+        <div className={`chat-box-block ${isMobileChatOpen ? 'show' : 'hide'}`}>
           {selectedFriend ? (
             <>
               {/* Zaglavlje razgovora */}
               <div className="chat-box-user">
+                <div className="chat-box-user-back-div" onClick={closeChatOnMobile}>
+                  <img src="https://cdn.prod.website-files.com/673928869b5a833529aa3a08/67b68e5d981b0268036acaf0_arrow-left.svg" loading="lazy" alt="Back" className="image-4" />
+                </div>
                 <div className="chat-boc-user-photo">
                   <img
-                    src={selectedFriend.profileImage || '/assets/Icons/defaultProfilePicture.svg'}
+                    src={selectedFriend.profileImage == 'defaultProfilePicture.svg' ? '/assets/Icons/defaultProfilePicture.svg' : selectedFriend.profileImage}
                     alt="Friend"
                     className="image-3"
                   />
@@ -215,18 +244,25 @@ const Messages: React.FC = () => {
 
               {/* Lista poruka */}
               <div className="chat-box-messages">
-                {messages.map(msg =>
-                  msg.sender_id === currentUserId ? (
-                    <div key={msg.id} className="chat-box-messages-user-message-block">
-                      <div className="chat-box-messages-user-message-text">{msg.content}</div>
-                    </div>
-                  ) : (
-                    <div key={msg.id} className="chat-box-messages-friend-message-block">
-                      <div className="chat-box-messages-friend-message-text">{msg.content}</div>
-                    </div>
+                {isLoadingMessages ? (
+                  <div className="loader-container">
+                    <div className="loader"></div>
+                  </div>
+                ) : (
+                  messages.map(msg =>
+                    msg.sender_id === currentUserId ? (
+                      <div key={msg.id} className="chat-box-messages-user-message-block">
+                        <div className="chat-box-messages-user-message-text">{msg.content}</div>
+                      </div>
+                    ) : (
+                      <div key={msg.id} className="chat-box-messages-friend-message-block">
+                        <div className="chat-box-messages-friend-message-text">{msg.content}</div>
+                      </div>
+                    )
                   )
                 )}
               </div>
+
 
               {/* Forma za slanje poruke */}
               <div className="chat-box-send-message-block">
@@ -252,7 +288,7 @@ const Messages: React.FC = () => {
             </div>
           )}
         </div>
-        
+
       </div>
     </section>
   );
