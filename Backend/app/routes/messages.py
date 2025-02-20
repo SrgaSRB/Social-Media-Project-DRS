@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, session
-from app.models import Message, SessionLocal
+from app.models import Message, SessionLocal, Friendship, User
 from app import socketio  # za real-time notifikacije, ako želiš
 from flask_socketio import emit
 

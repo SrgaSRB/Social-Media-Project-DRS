@@ -48,6 +48,7 @@ const Messages: React.FC = () => {
   const currentUserId = 1; // Ovo zamenite stvarnim podatkom o ulogovanom korisniku
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  console.log(backendUrl);
 
   // Učitavanje liste prijatelja sa endpointa /api/messages/friends
   useEffect(() => {
@@ -55,6 +56,7 @@ const Messages: React.FC = () => {
     loadCSS('/styles/messages.css');
 
     fetch(`${backendUrl}/api/messages/friends`, {
+      method: 'GET',
       credentials: 'include'
     })
       .then(res => res.json())

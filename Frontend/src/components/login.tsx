@@ -31,6 +31,8 @@ const Login: React.FC = () => {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const { showNotification } = useNotification();
 
+  console.log(backendUrl);
+
   useEffect(() => {
     loadCSS('/styles/login.css');
     setTimeout(() => setIsLoading(false), 200);
