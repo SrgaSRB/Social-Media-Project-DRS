@@ -2089,8 +2089,7 @@ textarea.w-input, textarea.w-select {
 }
 
 .hero-section {
-  height: 110vh;
-  padding-bottom: 70px;
+  height: auto;
   overflow: visible;
 }
 

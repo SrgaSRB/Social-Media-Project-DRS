@@ -80,6 +80,7 @@ const UploadPost: React.FC = () => {
                 background-color: #f5f5f5;
                 color: #333;
                 font-family: Arial, sans-serif;
+                z-index: 9999;
               }
 
               .spinner {
