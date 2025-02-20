@@ -78,9 +78,7 @@ const UserProfile: React.FC = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [currentPostId, setCurrentPostId] = useState<number | null>(null);
 
-
   //const [activeSection, setActiveSection] = useState<string>('profile');
-
 
   const navigate = useNavigate();
   const socket = io(`${backendUrl}`);

@@ -15,36 +15,32 @@ interface ChatMessage {
 }
 
 const loadCSS = (href: string) => {
-    document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-      if (link.getAttribute('href') !== href) {
-        link.remove();
-      }
-    });
-  
-    const existingLink = document.querySelector(`link[href="${href}"]`);
-    if (!existingLink) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = href;
-      document.head.appendChild(link);
+  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+    if (link.getAttribute('href') !== href) {
+      link.remove();
     }
+  });
+
+  const existingLink = document.querySelector(`link[href="${href}"]`);
+  if (!existingLink) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = "/styles/notification.css";
+    link.href = href;
     document.head.appendChild(link);
-  };
+  }
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = "/styles/notification.css";
+  document.head.appendChild(link);
+};
 
 const Messages: React.FC = () => {
-  // Lista prijatelja ulogovanog korisnika
   const [friends, setFriends] = useState<Friend[]>([]);
-  // Trenutno izabran prijatelj za chat
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
-  // Poruke u razgovoru sa izabranim prijateljem
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   // Tekst nove poruke
   const [newMessage, setNewMessage] = useState('');
 
-  // Pretpostavljamo da je currentUserId dostupan (ovde je za primer fiksiran broj)
   const currentUserId = 1; // Ovo zamenite stvarnim podatkom o ulogovanom korisniku
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -77,6 +73,7 @@ const Messages: React.FC = () => {
   }, [selectedFriend, backendUrl]);
 
   // Slanje poruke putem endpointa /api/messages/send
+  // Slanje poruke putem endpointa /api/messages/send
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFriend || newMessage.trim() === '') return;
@@ -93,20 +90,26 @@ const Messages: React.FC = () => {
       body: JSON.stringify(payload)
     })
       .then(res => res.json())
-      .then(() => {
-        // Dodajemo novu poruku u lokalno stanje
-        const msg: ChatMessage = {
-          id: Date.now(), // privremeni ID; pravi ID bi došao sa backend-a
-          senderId: currentUserId,
-          content: newMessage.trim(),
-          timestamp: new Date().toISOString(),
-          status: 'sent'
-        };
-        setMessages([...messages, msg]);
-        setNewMessage('');
+      .then((data) => {
+        // Pretpostavljamo da backend vraća objekat sa kreiranom porukom u polju 'msg'
+        // Primer odgovora: { message: "Message sent successfully", msg: { id: 123, senderId: 1, content: "...", timestamp: "...", status: "sent" } }
+        if (data && data.msg) {
+          const msg: ChatMessage = {
+            id: data.msg.id, // pravi ID iz backend-a
+            senderId: currentUserId,
+            content: data.msg.content, // ili newMessage.trim(), ako backend ne vraća sadržaj
+            timestamp: data.msg.timestamp, // timestamp koji je postavio backend
+            status: data.msg.status || 'sent'
+          };
+          setMessages([...messages, msg]);
+          setNewMessage('');
+        } else {
+          console.error("Backend nije vratio poruku:", data);
+        }
       })
       .catch(err => console.error(err));
   };
+
 
   return (
     <section className="chat-section">

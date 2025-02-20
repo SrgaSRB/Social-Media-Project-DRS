@@ -59,28 +59,27 @@ def send_message():
     db.commit()
     db.refresh(new_msg)
     
-    # Emitovanje poruke putem Socket.IO za real-time ažuriranje (opciono)
-    """    
     socketio.emit('new_message', {
         'id': new_msg.id,
         'sender_id': user_id,
         'receiver_id': receiver_id,
-        'content': content,
+        'content': new_msg.content,
         'timestamp': new_msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
         'status': new_msg.status
-    }, broadcast=True)
-    """
-    
-    socketio.emit('new_message', {
-    'id': new_msg.id,
-    'sender_id': user_id,
-    'receiver_id': receiver_id,
-    'content': content,
-    'timestamp': new_msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-    'status': new_msg.status
     })
     
-    return jsonify({'message': 'Message sent successfully'}), 201
+    return jsonify({
+        'message': 'Message sent successfully',
+        'msg': {
+            'id': new_msg.id,
+            'sender_id': user_id,
+            'receiver_id': receiver_id,
+            'content': new_msg.content,
+            'timestamp': new_msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+            'status': new_msg.status
+        }
+    }), 201
+
 
 @messages_bp.route('/friends', methods=['GET'])
 def get_friends():
