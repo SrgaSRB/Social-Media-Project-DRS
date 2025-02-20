@@ -8,6 +8,7 @@ import UploadPost from './components/upload-post';
 import UserProfile from './components/profile';
 import UserSearch from './components/user-search';
 import FriendsRequest from './components/friends-request';
+import Messages from './components/messages'
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -26,6 +27,7 @@ const App: React.FC = () => {
         <Route path="/upload" element={<UploadPost />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/user-search" element={<UserSearch />} />
+        <Route path="/messages" element={<Messages />} />
         <Route path="/friends-requests" element={<FriendsRequest />} />
       </Routes>
     </>

@@ -6,6 +6,17 @@ from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base() # Base class for ORM models
 
+class Message(Base):
+    __tablename__ = 'messages'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    sender_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    receiver_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=False)
+    timestamp = Column(TIMESTAMP, server_default=func.now())
+    status = Column(String(20), default='sent')  # kasnije možeš da dodaješ 'delivered', 'read', itd.
+
+    sender = relationship("User", foreign_keys=[sender_id])
+    receiver = relationship("User", foreign_keys=[receiver_id])
 
 class Post(Base):
     __tablename__ = 'posts'
