@@ -23,13 +23,15 @@ const loadCSS = (href: string) => {
   link.href = "/styles/notification.css";
   document.head.appendChild(link);
 
-  link.rel = 'stylesheet';
-  link.href = "/styles/extern.css";
-  document.head.appendChild(link);
+  const link2 = document.createElement('link');
+  link2.rel = 'stylesheet';
+  link2.href = "/styles/extern.css";
+  document.head.appendChild(link2);
 
-  link.rel = 'stylesheet';
-  link.href = "/styles/navbar.css";
-  document.head.appendChild(link);
+  const link3 = document.createElement('link');
+  link3.rel = 'stylesheet';
+  link3.href = "/styles/navbar.css";
+  document.head.appendChild(link3);
 
 };
 
