@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import Loader from "../components/Loader";
+import userEvent from '@testing-library/user-event';
 
 
 interface Friend {
@@ -47,6 +48,7 @@ const Messages: React.FC = () => {
 
   const navigate = useNavigate();
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Umesto hardkodovanog ID-ja, preuzmi stvarni ID ulogovanog korisnika (ovo je samo primer)
   const [currentUserId, setCurrentUserId] = useState<number>();
@@ -129,6 +131,7 @@ const Messages: React.FC = () => {
         .then((data: ChatMessage[]) => {
           setMessages(data);
           setIsLoadingMessages(false); // Kraj učitavanja
+          scrollToBottom(); 
         })
         .catch(err => {
           console.error(err);
@@ -143,13 +146,13 @@ const Messages: React.FC = () => {
     if (!currentUserId || !selectedFriend) return;
 
     const handleNewMessage = (msg: ChatMessage) => {
-      console.log("Primljena nova poruka:", msg);
 
       // Proveri da li poruka pripada trenutnom razgovoru
       if (
         msg.sender_id === selectedFriend.id && msg.receiver_id === currentUserId
       ) {
         setMessages(prev => [...prev, msg]);
+        scrollToBottom(); // **Pomeri skrol na dno kada stigne nova poruka**
       }
     };
 
@@ -159,6 +162,13 @@ const Messages: React.FC = () => {
       socket.off('new_message', handleNewMessage);
     };
   }, [selectedFriend, currentUserId]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages]);
+  
 
   // Slanje poruke
   const handleSendMessage = (e: React.FormEvent) => {
@@ -196,6 +206,12 @@ const Messages: React.FC = () => {
 
   const closeChatOnMobile = () => {
     setIsMobileChatOpen(false);
+  };
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
 
@@ -271,6 +287,7 @@ const Messages: React.FC = () => {
                     )
                   )
                 )}
+                <div ref={messagesEndRef} ></div>
               </div>
 
 
