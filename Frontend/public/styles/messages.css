@@ -2148,7 +2148,7 @@ textarea.w-input, textarea.w-select {
   border-left: 1px solid #ccc;
   flex-flow: column;
   flex: 1;
-  padding: 4px 0;
+  padding: 0 0 4px 0;
   display: flex;
 }
 

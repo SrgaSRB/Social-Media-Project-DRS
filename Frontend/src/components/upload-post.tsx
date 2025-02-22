@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
+import Loader from "../components/Loader";
 
 
 const loadCSS = (hrefs: string[]) => {
@@ -52,7 +53,6 @@ const UploadPost: React.FC = () => {
           navigate('/login'); // Redirect to login page if not logged in
         }
       } catch (error) {
-        console.error('Error fetching session:', error);
         navigate('/login'); // Redirect to login page in case of error
       } finally {
         setIsLoading(false);
@@ -63,57 +63,9 @@ const UploadPost: React.FC = () => {
   }, []);
 
   if (isLoading) {
-    return (
-      <>
-        <Helmet>
-          <style>
-            {`
-              .preloader {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                font-size: 24px;
-                background-color: #f5f5f5;
-                color: #333;
-                font-family: Arial, sans-serif;
-                z-index: 9999;
-              }
-
-              .spinner {
-                border: 8px solid #f3f3f3;
-                border-top: 8px solid #3498db;
-                border-radius: 50%;
-                width: 50px;
-                height: 50px;
-                animation: spin 1s linear infinite;
-              }
-
-              @keyframes spin {
-                0% {
-                  transform: rotate(0deg);
-                }
-                100% {
-                  transform: rotate(360deg);
-                }
-              }
-
-              .image-div img {
-                display: block;
-                max-width: 100%;
-                height: auto;
-                margin-top: 10000px;
-              }
-            `}
-          </style>
-        </Helmet>
-        <div className="preloader">
-          <div className="spinner"></div>
-          <span>Loading...</span>
-        </div>
-      </>
-    );
+    return <Loader />;
   }
+  
 
   // Handle post text change
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -153,18 +105,16 @@ const UploadPost: React.FC = () => {
       });
 
       if (response.ok) {
-        alert('The post was created successfully!');
+        showNotification("success" ,'The post was created successfully!');
         setPostText('');
         setImage(null);
         setPreview(null);
       } else {
         const errorData = await response.json();
-        alert(`An error occurred: ${errorData.error || 'Please try again.'}`);
-        console.error('Error:', errorData);
+        showNotification("error" ,`An error occurred: ${errorData.error || 'Please try again.'}`);
       }
     } catch (error) {
-      console.error('Error while sending post:', error);
-      alert('An error occurred. Please try again.');
+      showNotification("error" ,'An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

@@ -2308,6 +2308,7 @@ textarea.w-input, textarea.w-select {
   object-fit: contain;
   min-width: 100%;
   max-height: 100%;
+  cursor: pointer;
 }
 
 .user-post-user-info-image-and-name {

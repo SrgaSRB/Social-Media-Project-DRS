@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../notification/NotificationContext";
+import Loader from "../components/Loader";
+
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -44,9 +46,15 @@ const Register: React.FC = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
 
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(""); 
+
   useEffect(() => {
+    setIsLoading(true);
+
     loadCSS("/styles/register.css");
-    setTimeout(() => setIsLoading(false), 200); // Simulate CSS loading
+
+    setIsLoading(false);
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -77,7 +85,7 @@ const Register: React.FC = () => {
         setEmailAvailable(false);
       }
     } catch (error) {
-      console.error("Error checking email:", error);
+      showNotification("error","Error checking email: " + error);
       setEmailAvailable(false);
     }
   };
@@ -99,14 +107,18 @@ const Register: React.FC = () => {
         setUsernameAvailable(false);
       }
     } catch (error) {
-      console.error("Error checking username:", error);
+      showNotification("error","Error checking username: " + error);
       setUsernameAvailable(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-    console.log("Sending data to backend:", formData);
+
+    if (formData.password !== confirmPassword) {
+      setPasswordError("Passwords do not match!");
+      return;
+    }
 
     try {
       const response = await fetch(`${backendUrl}/api/auth/register`, {
@@ -119,16 +131,14 @@ const Register: React.FC = () => {
 
       console.log("Backend response:", response);
       if (response.ok) {
-        alert("Registration successful!");
+        showNotification("success","Registration successful!");
         navigate("/login"); // Redirect to login page after successful registration
       } else {
         const errorData = await response.json();
-        console.error("Backend error:", errorData);
-        alert(`Error: ${errorData.message || "An error occurred"}`);
+        showNotification("error" ,`Error: ${errorData.message || "An error occurred"}`);
       }
     } catch (error) {
-      console.error("Error during registration:", error);
-      alert("An error occurred. Please try again.");
+      showNotification( "error","An error occurred. Please try again.");
     }
   };
 
@@ -136,50 +146,20 @@ const Register: React.FC = () => {
     navigate("/login");
   };
 
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setConfirmPassword(e.target.value);
+
+    if (formData.password !== e.target.value) {
+      setPasswordError("Passwords do not match!");
+    } else {
+      setPasswordError("");
+    }
+  };
+
   if (isLoading) {
-    return (
-      <>
-        <Helmet>
-          <style>
-            {`
-              .preloader {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                font-size: 24px;
-                background-color: #f5f5f5;
-                color: #333;
-                font-family: Arial, sans-serif;
-              }
-
-              .spinner {
-                border: 8px solid #f3f3f3;
-                border-top: 8px solid #3498db;
-                border-radius: 50%;
-                width: 50px;
-                height: 50px;
-                animation: spin 1s linear infinite;
-              }
-
-              @keyframes spin {
-                0% {
-                  transform: rotate(0deg);
-                }
-                100% {
-                  transform: rotate(360deg);
-                }
-              }
-            `}
-          </style>
-        </Helmet>
-        <div className="preloader">
-          <div className="spinner"></div>
-          <span>Loading...</span>
-        </div>
-      </>
-    );
+    return <Loader />;
   }
+  
 
   return (
     <section>
@@ -358,14 +338,17 @@ const Register: React.FC = () => {
                   </label>
                   <input
                     className="user-info-input w-input"
-                    maxLength={256}
-                    name="password-confirm"
+                    name="confirmPassword"
                     id="password-confirm"
                     placeholder="Confirm your password"
                     type="password"
                     autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
                     required
                   />
+                  {passwordError && <span className="error-message">{passwordError}</span>}
+
 
                   <input
                     type="submit"

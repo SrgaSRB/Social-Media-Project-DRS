@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
+import Loader from "../components/Loader";
 
 
 const loadCSS = (hrefs: string[]) => {
@@ -129,50 +130,9 @@ const FriendsRequest: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <>
-        <Helmet>
-          <style>
-            {`
-              .preloader {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                font-size: 24px;
-                background-color: #f5f5f5;
-                color: #333;
-                font-family: Arial, sans-serif;
-                z-index: 9999;
-              }
-
-              .spinner {
-                border: 8px solid #f3f3f3;
-                border-top: 8px solid #3498db;
-                border-radius: 50%;
-                width: 50px;
-                height: 50px;
-                animation: spin 1s linear infinite;
-              }
-
-              @keyframes spin {
-                0% {
-                  transform: rotate(0deg);
-                }
-                100% {
-                  transform: rotate(360deg);
-                }
-              }
-            `}
-          </style>
-        </Helmet>
-        <div className="preloader">
-          <div className="spinner"></div>
-          <span>Loading...</span>
-        </div>
-      </>
-    );
+    return <Loader />;
   }
+  
 
   return (
     <div className="body 2">

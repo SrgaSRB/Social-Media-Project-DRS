@@ -3,6 +3,7 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useNotification } from '../notification/NotificationContext';
+import Loader from "../components/Loader";
 
 const loadCSS = (hrefs: string[]) => {
   // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
@@ -168,7 +169,7 @@ const UserProfile: React.FC = () => {
         const data = await response.json();
         setBlockedUsers(data);
       } catch (error) {
-        console.error('Error fetching blocked users:', error);
+        showNotification("error",'Error fetching blocked users:' + error);
       }
     };
 
@@ -462,46 +463,9 @@ const UserProfile: React.FC = () => {
 
 
   if (isLoading) {
-    return (
-      <HelmetProvider>
-        <Helmet>
-          <style>{`
-            .preloader {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              font-size: 24px;
-              background-color: #f5f5f5;
-              color: #333;
-              font-family: Arial, sans-serif;
-              z-index: 9999;
-            }
-            .spinner {
-              border: 8px solid #f3f3f3;
-              border-top: 8px solid #3498db;
-              border-radius: 50%;
-              width: 50px;
-              height: 50px;
-              animation: spin 1s linear infinite;
-            }
-            @keyframes spin {
-              0% {
-                transform: rotate(0deg);
-              }
-              100% {
-                transform: rotate(360deg);
-              }
-            }
-          `}</style>
-        </Helmet>
-        <div className="preloader">
-          <div className="spinner"></div>
-          <span>Loading...</span>
-        </div>
-      </HelmetProvider>
-    );
+    return <Loader />;
   }
+  
 
   return (
     <div className="body">

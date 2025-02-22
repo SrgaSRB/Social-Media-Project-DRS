@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
+import Loader from "../components/Loader";
 
 
 interface Friend {
@@ -42,6 +43,7 @@ const Messages: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isLoadingChats, setIsLoadingChats] = useState(true);
 
   const navigate = useNavigate();
 
@@ -54,23 +56,23 @@ const Messages: React.FC = () => {
   // Inicijalizuj socket (ovo možeš premestiti u globalni kontekst)
   const socket = io(backendUrl);
 
-  // Učitavanje prijatelja
   useEffect(() => {
-    
+    setIsLoadingChats(true); // Početak učitavanja prijatelja
+
     loadCSS([
-      '/styles/messages.css',
-      '/styles/notification.css',
-      '/styles/extern.css',
-      '/styles/navbar.css'
+      "/styles/messages.css",
+      "/styles/notification.css",
+      "/styles/extern.css",
+      "/styles/navbar.css",
     ]);
 
     const checkSession = async () => {
       try {
         const response = await fetch(`${backendUrl}/api/auth/session`, {
-          method: 'GET',
-          credentials: 'include', // Include cookies for authentication
+          method: "GET",
+          credentials: "include", // Include cookies for authentication
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
 
@@ -78,36 +80,42 @@ const Messages: React.FC = () => {
 
         if (!data.user) {
           // Redirect the user to login if not logged in
-          navigate('/login');
+          navigate("/login");
         }
       } catch (error) {
-        console.error('Error while checking session:', error);
-        navigate('/login'); // Redirect to login in case of error
+        console.error("Error while checking session:", error);
+        navigate("/login"); // Redirect to login in case of error
       }
     };
 
     fetch(`${backendUrl}/api/auth/session`, {
-      credentials: 'include',
+      credentials: "include",
     })
       .then((response) => response.json())
       .then((data) => {
         setCurrentUserId(data.user.id);
       })
       .catch((error) => {
-        console.error('Error fetching session:', error);
+        console.error("Error fetching session:", error);
       });
 
     checkSession();
 
     fetch(`${backendUrl}/api/messages/friends`, {
-      method: 'GET',
-      credentials: 'include'
+      method: "GET",
+      credentials: "include",
     })
-      .then(res => res.json())
-      .then((data: Friend[]) => setFriends(data))
-      .catch(err => console.error(err));
-
+      .then((res) => res.json())
+      .then((data: Friend[]) => {
+        setFriends(data);
+        setIsLoadingChats(false); // Kraj učitavanja
+      })
+      .catch((err) => {
+        console.error(err);
+        setIsLoadingChats(false); // U slučaju greške, onemogući loader
+      });
   }, [backendUrl]);
+
 
   // Učitavanje razgovora sa izabranim prijateljem
   useEffect(() => {
@@ -190,6 +198,7 @@ const Messages: React.FC = () => {
     setIsMobileChatOpen(false);
   };
 
+
   return (
     <section className="chat-section">
       <div className="w-layout-blockcontainer container w-container">
@@ -197,26 +206,32 @@ const Messages: React.FC = () => {
         {/* Lista prijatelja */}
         <div className="side-chats-block">
           <div className="text-block">Messages</div>
-          <div className="side-chat">
-            {friends.map(friend => (
-              <div key={friend.id} className="side-chat-user" onClick={() => {
-                openChatOnMobile();
-                setSelectedFriend(friend)
-              }}>
-                <div className="side-chat-image-div">
-                  <img
-                    src={friend.profileImage === 'defaultProfilePicture.svg' ? '/assets/Icons/defaultProfilePicture.svg' : friend.profileImage}
-                    alt="Friend"
-                    className="side-chat-image"
-                  />
+
+          {isLoadingChats ? (
+            <Loader /> // Prikaz loadera dok se učitavaju prijatelji
+          ) : (
+            <div className="side-chat">
+              {friends.map(friend => (
+                <div key={friend.id} className="side-chat-user" onClick={() => {
+                  openChatOnMobile();
+                  setSelectedFriend(friend);
+                }}>
+                  <div className="side-chat-image-div">
+                    <img
+                      src={friend.profileImage === "defaultProfilePicture.svg" ? "/assets/Icons/defaultProfilePicture.svg" : friend.profileImage}
+                      alt="Friend"
+                      className="side-chat-image"
+                    />
+                  </div>
+                  <div className="side-chat-user-info">
+                    <div className="text-block-2">{friend.name}</div>
+                  </div>
                 </div>
-                <div className="side-chat-user-info">
-                  <div className="text-block-2">{friend.name}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
+
 
         {/* Chat prozor */}
         <div className={`chat-box-block ${isMobileChatOpen ? 'show' : 'hide'}`}>
@@ -242,9 +257,7 @@ const Messages: React.FC = () => {
               {/* Lista poruka */}
               <div className="chat-box-messages">
                 {isLoadingMessages ? (
-                  <div className="loader-container">
-                    <div className="loader"></div>
-                  </div>
+                  <Loader />
                 ) : (
                   messages.map(msg =>
                     msg.sender_id === currentUserId ? (

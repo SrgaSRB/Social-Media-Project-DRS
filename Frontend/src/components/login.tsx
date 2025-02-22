@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
+import Loader from "../components/Loader";
 
 const loadCSS = (href: string) => {
   document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
@@ -86,7 +87,7 @@ const Login: React.FC = () => {
         } catch (jsonError) {
           console.error('Invalid JSON response:', jsonError);
         }
-        alert(errorMsg);
+        showNotification("warning", errorMsg);
         return;
       }
 
@@ -106,7 +107,7 @@ const Login: React.FC = () => {
     return (
       <div className="preloader">
         <div className="spinner"></div>
-        <span>Loading...</span>
+        <span> Loading...</span>
       </div>
     );
   }
