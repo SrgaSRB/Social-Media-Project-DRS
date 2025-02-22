@@ -5,6 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { NotificationProvider } from './notification/NotificationContext';
 import { NotificationList } from './notification/NotificationList';
+import { Analytics } from "@vercel/analytics/react"
+
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -13,6 +15,7 @@ root.render(
     <NotificationProvider>
       <App />
       <NotificationList />
+      <Analytics/>
     </NotificationProvider>
 );
 
