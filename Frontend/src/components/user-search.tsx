@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { useLocation } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 import Loader from "../components/Loader";
-
+import { useNavigate } from 'react-router-dom';
 
 const loadCSS = (hrefs: string[]) => {
   // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
@@ -16,7 +16,6 @@ const loadCSS = (hrefs: string[]) => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
-    link.onload = () => console.log(`Učitano: ${href}`);
     document.head.appendChild(link);
   });
 };
@@ -43,18 +42,36 @@ const UserSearch: React.FC = () => {
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
+
+
 
   useEffect(() => {
-    setIsLoading(true);
+    const fetchData = async () => {
+      setIsLoading(true); // Početak učitavanja prijatelja
 
-    loadCSS([
-      '/styles/user-search.css',
-      '/styles/notification.css',
-      '/styles/navbar.css'
-    ]);
+      loadCSS([
+        "/styles/messages.css",
+        "/styles/notification.css",
+        "/styles/extern.css",
+        "/styles/navbar.css",
+      ]);
 
-    const fetchUsersAndStatuses = async () => {
       try {
+        // Provera sesije korisnika
+        const sessionResponse = await fetch(`${backendUrl}/api/auth/session`, {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const sessionData = await sessionResponse.json();
+
+        if (!sessionData.user) {
+          navigate("/login"); // Ako nije ulogovan, preusmerava ga na login
+          return;
+        }
+
         const [usersResponse, statusesResponse] = await Promise.all([
           fetch(`${backendUrl}/api/users/`, { method: 'GET', credentials: 'include' }),
           fetch(`${backendUrl}/api/users/friend-statuses`, { method: 'GET', credentials: 'include' }),
@@ -70,15 +87,17 @@ const UserSearch: React.FC = () => {
         setUsers(usersData);
         setFriendStatuses(statusesData);
         setFilteredUsers(usersData);
+
       } catch (error) {
-        showNotification('error', 'An error occurred while loading data.');
+        console.error("Greška pri učitavanju podataka:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Kraj učitavanja
       }
     };
 
-    fetchUsersAndStatuses();
-  }, []);
+    fetchData();
+  }, [backendUrl]);
+
 
   useEffect(() => {
     if (searchTerm) {
@@ -176,7 +195,7 @@ const UserSearch: React.FC = () => {
   if (isLoading) {
     return <Loader />;
   }
-  
+
 
   return (
     <div className="body">

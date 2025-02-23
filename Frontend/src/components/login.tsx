@@ -32,11 +32,10 @@ const Login: React.FC = () => {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const { showNotification } = useNotification();
 
-  console.log(backendUrl);
-
   useEffect(() => {
+    setIsLoading(true);
+
     loadCSS('/styles/login.css');
-    setTimeout(() => setIsLoading(false), 200);
 
     if (hasCheckedSession.current) return; // Skip if already checked
     hasCheckedSession.current = true;

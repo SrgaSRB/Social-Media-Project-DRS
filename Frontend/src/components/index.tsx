@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 import ModalImage from './ModalImage';
 import Loader from "../components/Loader";
+import Post from "../components/Post";
 
 const loadCSS = (hrefs: string[]) => {
   // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
@@ -11,12 +12,10 @@ const loadCSS = (hrefs: string[]) => {
     link.remove();
   });
 
-  // Dodajemo nove CSS fajlove
   hrefs.forEach(href => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
-    link.onload = () => console.log(`Učitano: ${href}`);
     document.head.appendChild(link);
   });
 };
@@ -98,12 +97,12 @@ const Index: React.FC = () => {
       } catch (err: any) {
         setError(err.message || 'An unexpected error occurred.');
       } finally {
-        setIsLoading(false);
         if (!hasNotification && location.state?.message) {
           const { message, type } = location.state;
           showNotification(type, message);
           setHasNotification(true);
         }
+        setIsLoading(false);
       }
     };
 
@@ -129,7 +128,7 @@ const Index: React.FC = () => {
   if (isLoading) {
     return <Loader />;
   }
-  
+
 
   if (error) {
     return (
@@ -170,54 +169,23 @@ const Index: React.FC = () => {
                 <input type="submit" className="search-button w-button" value="Search" id="search-user-btn" />
               </form>
             </div>
+
             <div className="posts-div">
               {posts.map((post) => (
-                <div key={post.id} className="user-post">
-                  <div className="user-post-image">
-                    {post.postImage ? (
-                      <img
-                        src={`${backendUrl}/api/posts/uploads/${post.postImage}`}
-                        alt={post.postImage}
-                        className="image-5"
-                        onClick={() =>
-                          handleImageClick(
-                            `${backendUrl}/api/posts/uploads/${post.postImage}`,
-                            post.postImage
-                          )
-                        }
-                      />
-                    ) : (
-                      <span className="image-placeholder">No Image Available</span>
-                    )}
-                  </div>
-                  <div className="user-post-user-info">
-                    <div className="user-post-user-info-image-and-name">
-                      <div className="user-post-user-info-profile-image">
-                        <img
-                          src={
-                            post.profileImage === "defaultProfilePicture.svg"
-                              ? "/assets/Icons/defaultProfilePicture.svg"
-                              : `${backendUrl}/api/posts/uploads/${post.profileImage}`
-                          }
-                          alt="Profile"
-                          className="image-4"
-                        />
-                      </div>
-                      <div className="user-post-user-info-name-and-date">
-                        <div className="user-post-user-info-name">
-                          @{<span className="text-span">{post.username}</span>}
-                        </div>
-                        <div className="user-post-user-info-date">{post.timeAgo}</div>
-                      </div>
-                    </div>
-                    <div className="post-hr"></div>
-                    <div className="user-post-text">
-                      <div className="text-block-2">{post.postText}</div>
-                    </div>
-                  </div>
-                </div>
+                <Post
+                  key={post.id}
+                  id={post.id}
+                  username={post.username}
+                  profileImage={post.profileImage}
+                  postImage={post.postImage}
+                  postText={post.postText}
+                  timeAgo={post.timeAgo}
+                  backendUrl={backendUrl!}
+                  onImageClick={handleImageClick}
+                />
               ))}
             </div>
+
           </div>
         </section>
       </div>

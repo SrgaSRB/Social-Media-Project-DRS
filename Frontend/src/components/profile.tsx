@@ -16,7 +16,6 @@ const loadCSS = (hrefs: string[]) => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
-    link.onload = () => console.log(`Učitano: ${href}`);
     document.head.appendChild(link);
   });
 };

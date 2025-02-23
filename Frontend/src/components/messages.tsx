@@ -31,7 +31,6 @@ const loadCSS = (hrefs: string[]) => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
-    link.onload = () => console.log(`Učitano: ${href}`);
     document.head.appendChild(link);
   });
 };
@@ -59,113 +58,111 @@ const Messages: React.FC = () => {
   const socket = io(backendUrl);
 
   useEffect(() => {
-    setIsLoadingChats(true); // Početak učitavanja prijatelja
-
-    loadCSS([
-      "/styles/messages.css",
-      "/styles/notification.css",
-      "/styles/extern.css",
-      "/styles/navbar.css",
-    ]);
-
-    const checkSession = async () => {
+    const fetchData = async () => {
+      setIsLoadingChats(true); // Početak učitavanja prijatelja
+  
+      loadCSS([
+        "/styles/messages.css",
+        "/styles/notification.css",
+        "/styles/extern.css",
+        "/styles/navbar.css",
+      ]);
+  
       try {
-        const response = await fetch(`${backendUrl}/api/auth/session`, {
+        // Provera sesije korisnika
+        const sessionResponse = await fetch(`${backendUrl}/api/auth/session`, {
           method: "GET",
-          credentials: "include", // Include cookies for authentication
-          headers: {
-            "Content-Type": "application/json",
-          },
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
         });
-
-        const data = await response.json();
-
-        if (!data.user) {
-          // Redirect the user to login if not logged in
-          navigate("/login");
+  
+        const sessionData = await sessionResponse.json();
+  
+        if (!sessionData.user) {
+          navigate("/login"); // Ako nije ulogovan, preusmerava ga na login
+          return;
         }
+        
+        setCurrentUserId(sessionData.user.id);
+  
+        // Učitavanje liste prijatelja
+        const friendsResponse = await fetch(`${backendUrl}/api/messages/friends`, {
+          method: "GET",
+          credentials: "include",
+        });
+  
+        const friendsData: Friend[] = await friendsResponse.json();
+        setFriends(friendsData);
+  
       } catch (error) {
-        console.error("Error while checking session:", error);
-        navigate("/login"); // Redirect to login in case of error
+        console.error("Greška pri učitavanju podataka:", error);
+      } finally {
+        setIsLoadingChats(false); // Kraj učitavanja
       }
     };
-
-    fetch(`${backendUrl}/api/auth/session`, {
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setCurrentUserId(data.user.id);
-      })
-      .catch((error) => {
-        console.error("Error fetching session:", error);
-      });
-
-    checkSession();
-
-    fetch(`${backendUrl}/api/messages/friends`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data: Friend[]) => {
-        setFriends(data);
-        setIsLoadingChats(false); // Kraj učitavanja
-      })
-      .catch((err) => {
-        console.error(err);
-        setIsLoadingChats(false); // U slučaju greške, onemogući loader
-      });
-  }, [backendUrl]);
-
-
+  
+    fetchData();
+  }, [backendUrl, navigate]); 
+  
   // Učitavanje razgovora sa izabranim prijateljem
   useEffect(() => {
-    if (selectedFriend) {
+    if (!selectedFriend) return;
+  
+    const fetchMessages = async () => {
       setIsLoadingMessages(true); // Početak učitavanja
-
-      fetch(`${backendUrl}/api/messages/conversation/${selectedFriend.id}`, {
-        credentials: 'include'
-      })
-        .then(res => res.json())
-        .then((data: ChatMessage[]) => {
-          setMessages(data);
-          setIsLoadingMessages(false); // Kraj učitavanja
-          scrollToBottom(); 
-        })
-        .catch(err => {
-          console.error(err);
-          setIsLoadingMessages(false); // U slučaju greške, zaustaviti loader
+  
+      try {
+        const response = await fetch(`${backendUrl}/api/messages/conversation/${selectedFriend.id}`, {
+          credentials: "include",
         });
-    }
-  }, [selectedFriend, backendUrl]);
-
+  
+        const data: ChatMessage[] = await response.json();
+        setMessages(data);
+  
+        setTimeout(() => {
+          scrollToBottom(); // Pomeri skrol na dno nakon učitavanja
+        }, 100);
+  
+      } catch (error) {
+        console.error("Greška pri učitavanju poruka:", error);
+      } finally {
+        setIsLoadingMessages(false); // Kraj učitavanja
+      }
+    };
+  
+    fetchMessages();
+  }, [selectedFriend, backendUrl]); // Ponovno izvršenje kada se `selectedFriend` promeni
 
   // Live osluškivanje novih poruka preko socket-a
   useEffect(() => {
     if (!currentUserId || !selectedFriend) return;
-
+  
     const handleNewMessage = (msg: ChatMessage) => {
-
-      // Proveri da li poruka pripada trenutnom razgovoru
       if (
-        msg.sender_id === selectedFriend.id && msg.receiver_id === currentUserId
+        (msg.sender_id === selectedFriend.id && msg.receiver_id === currentUserId) ||
+        (msg.sender_id === currentUserId && msg.receiver_id === selectedFriend.id)
       ) {
         setMessages(prev => [...prev, msg]);
-        scrollToBottom(); // **Pomeri skrol na dno kada stigne nova poruka**
+  
+        setTimeout(() => {
+          scrollToBottom(); // Pomeri skrol na dno
+        }, 100);
       }
     };
-
-    socket.on('new_message', handleNewMessage);
-
+  
+    socket.on("new_message", handleNewMessage);
+  
     return () => {
-      socket.off('new_message', handleNewMessage);
+      socket.off("new_message", handleNewMessage); // Cleanup pri unmount-u
     };
   }, [selectedFriend, currentUserId]);
+  
 
   useEffect(() => {
     if (messages.length > 0) {
-      scrollToBottom();
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
     }
   }, [messages]);
   

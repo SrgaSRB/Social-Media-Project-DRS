@@ -46,7 +46,7 @@ const FriendsRequest: React.FC = () => {
       '/styles/notification.css',
       '/styles/navbar.css'
     ]);
-    
+
 
     const checkSession = async () => {
       try {
@@ -65,10 +65,10 @@ const FriendsRequest: React.FC = () => {
       } catch (error) {
         console.error('Error fetching session:', error);
         navigate('/login'); // Redirect to login in case of an error
+      } finally {
+        setIsLoading(false);
       }
     };
-
-    checkSession();
 
     fetch(`${backendUrl}/api/users/friend-requests`, {
       method: 'GET',
@@ -78,7 +78,9 @@ const FriendsRequest: React.FC = () => {
       .then(data => setRequests(data))
       .catch(error => console.error('Error fetching requests:', error));
 
-    setIsLoading(false);
+
+    checkSession();
+
   }, [navigate]);
 
   const handleAccept = async (requestId: number) => {
@@ -132,7 +134,7 @@ const FriendsRequest: React.FC = () => {
   if (isLoading) {
     return <Loader />;
   }
-  
+
 
   return (
     <div className="body 2">
