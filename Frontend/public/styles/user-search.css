@@ -2230,21 +2230,21 @@ textarea.w-input, textarea.w-select {
   color: #0847f2;
   -webkit-text-stroke-color: var(--color-4);
   background-color: #fff;
-  border: 4px solid #0847f2;
+  border: 3px solid #0847f2;
   border-radius: 8px;
   justify-content: center;
   align-items: center;
   height: 64px;
   margin-top: auto;
   margin-bottom: auto;
-  padding: 4px 9px;
-  font-size: 1.75rem;
+  padding: 4px 15px;
+  font-size: 1.5rem;
   text-decoration: none;
   transition: all .3s;
   display: flex;
   position: absolute;
   inset: 0% 0% 0% auto;
-  justify-self: stretch;
+  justify-self: right;
 }
 
 .link-block:hover {
@@ -2334,7 +2334,8 @@ textarea.w-input, textarea.w-select {
 }
 
 .image-4 {
-  width: 36px;
+  width: 28px;
+  font-size: 1.25rem;
 }
 
 .users-location-info {
@@ -2387,7 +2388,6 @@ textarea.w-input, textarea.w-select {
 
 .container {
   max-width: 1200px;
-  padding-bottom: 70px;
 }
 
 .container.friends-requests-container {
@@ -2564,12 +2564,8 @@ textarea.w-input, textarea.w-select {
   align-self: center;
   height: 52px;
 }
-.image-3, .image-11 {
-  width: 200px;
-  height: 100%;
-}
 
-.image-12 {
+.image-3, .image-11 {
   width: 200px;
   height: 100%;
 }
@@ -2578,10 +2574,12 @@ textarea.w-input, textarea.w-select {
   grid-column-gap: 12px;
   grid-row-gap: 12px;
   flex-flow: column;
+  justify-content: center;
+  align-items: stretch;
   display: flex;
   position: relative;
   inset: 0% 0% 0% auto;
-  justify-self: stretch;
+  justify-self: right;
 }
 
 @media screen and (max-width: 991px) {
@@ -2977,7 +2975,7 @@ textarea.w-input, textarea.w-select {
   justify-self: end;
 }
 
-#w-node-_79be45b3-88b8-442b-56c0-d51d2240299d-fa5e6170 {
+#w-node-_79be45b3-88b8-442b-56c0-d51d2240299d-fa5e6170, #w-node-_840c086b-a3e3-e171-5aed-128929271855-fa5e6170 {
   justify-self: end;
 }
 

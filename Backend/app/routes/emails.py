@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from typing import List
 import threading
 
-def send_email(sender_email: str, sender_password: str, recipients: List[str], subject: str, message: str, smtp_server: str, smtp_port: int):
+def send_email(sender_email: str, sender_password: str, recipients: str, subject: str, message: str, smtp_server: str, smtp_port: int):
     """
     Function to send an email.
 
@@ -38,7 +38,7 @@ def send_email(sender_email: str, sender_password: str, recipients: List[str], s
         print(f"Failed to send email: {e}")
 
 
-def send_email_in_thread(sender_email: str, sender_password: str, recipients: List[str], subject: str, message: str, smtp_server: str, smtp_port: int):
+def send_email_in_thread(sender_email: str, sender_password: str, recipients: str, subject: str, message: str, smtp_server: str, smtp_port: int):
     """
     Wrapper to send email in a separate thread.
     """

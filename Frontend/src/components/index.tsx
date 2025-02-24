@@ -112,7 +112,7 @@ const Index: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const searchTerm = (document.getElementById('name') as HTMLInputElement)?.value || '';
-    navigate('/user-search', { state: { searchTerm } });
+    navigate('/search', { state: { searchTerm } });
   };
 
   const handleImageClick = (imageUrl: string, altText: string) => {

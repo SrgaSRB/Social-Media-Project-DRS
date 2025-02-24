@@ -6,7 +6,7 @@ import Navbar from './components/navbar';
 import Index from './components/index';
 import UploadPost from './components/upload-post';
 import UserProfile from './components/profile';
-import UserSearch from './components/user-search';
+import UserSearch from './components/search';
 import FriendsRequest from './components/friends-request';
 import Messages from './components/messages'
 
@@ -26,7 +26,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/upload" element={<UploadPost />} />
         <Route path="/profile" element={<UserProfile />} />
-        <Route path="/user-search" element={<UserSearch />} />
+        <Route path="/search" element={<UserSearch />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/friends-requests" element={<FriendsRequest />} />
       </Routes>

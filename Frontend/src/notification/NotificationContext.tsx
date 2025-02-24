@@ -21,7 +21,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const id = Date.now().toString(); // Jedinstveni ID za svaku notifikaciju
     setNotifications((prev) => [...prev, { id, type, message }]);
   
-    setTimeout(() => removeNotification(id), 8000); // Automatsko uklanjanje posle 8s
+    setTimeout(() => removeNotification(id), 6000); // Automatsko uklanjanje posle 8s
   };
 
   const removeNotification = (id: string) => {

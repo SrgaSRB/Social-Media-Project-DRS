@@ -44,14 +44,15 @@ const UserSearch: React.FC = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
 
-
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true); // Početak učitavanja prijatelja
 
       loadCSS([
-        "/styles/messages.css",
+        "/styles/user-search.css",
         "/styles/notification.css",
         "/styles/extern.css",
         "/styles/navbar.css",
@@ -192,6 +193,23 @@ const UserSearch: React.FC = () => {
     }
   };
 
+  const openConfirmModal = (friendId: number) => {
+    setSelectedFriendId(friendId);
+    setIsConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setIsConfirmModalOpen(false);
+    setSelectedFriendId(null);
+  };
+
+  const confirmRemoveFriend = async () => {
+    if (selectedFriendId !== null) {
+      await handleRemoveFriend(selectedFriendId);
+      closeConfirmModal();
+    }
+  };
+
   if (isLoading) {
     return <Loader />;
   }
@@ -288,17 +306,11 @@ const UserSearch: React.FC = () => {
                       <div className="accept-and-remove-buttons-block">
                         <a href="#" className="link-block accept-request w-inline-block">
                           <div className="text-block-4">Friends</div>
-                          <img
-                            src="/assets/Icons/accept-request-BLUE.svg"
-                            loading="lazy"
-                            alt=""
-                            className="image-4"
-                          />
                         </a>
                         <a
                           href="#"
                           className="link-block remove-friend w-inline-block"
-                          onClick={() => handleRemoveFriend(user.id)}
+                          onClick={() => openConfirmModal(user.id)}
                         >
                           <div className="text-block-4">Remove Friend</div>
                           <img
@@ -333,6 +345,27 @@ const UserSearch: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* MODAL ZA POTVRDU BRISANJA */}
+      {isConfirmModalOpen && (
+        <div className="remove-friend-confirm-background">
+          <div className="remove-friend-confirm-div">
+            <div className="remove-friend-confirm-text">
+              Are you sure you want to delete the user from your friends list?
+            </div>
+            <div className="remove-friend-confirm-buttons-div">
+              <a href="#" className="remove-friend-confirm-cancel-button w-button" onClick={closeConfirmModal}>
+                Cancel
+              </a>
+              <a href="#" className="remove-friend-confirm-cancel-remove w-button" onClick={confirmRemoveFriend}>
+                Remove friend
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 };
