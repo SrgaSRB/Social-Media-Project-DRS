@@ -306,6 +306,12 @@ const UserSearch: React.FC = () => {
                       <div className="accept-and-remove-buttons-block">
                         <a href="#" className="link-block accept-request w-inline-block">
                           <div className="text-block-4">Friends</div>
+                          <img
+                            src="/assets/Icons/accept-request-BLUE.svg"
+                            loading="lazy"
+                            alt=""
+                            className="image-4"
+                          />
                         </a>
                         <a
                           href="#"

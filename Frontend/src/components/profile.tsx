@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useNotification } from '../notification/NotificationContext';
 import Loader from "../components/Loader";
+import Cropper from "react-easy-crop";
+import { Area } from "react-easy-crop"; // Importuj tipove za croppedArea i croppedAreaPixels
+
 
 const loadCSS = (hrefs: string[]) => {
   // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
@@ -74,6 +76,13 @@ const UserProfile: React.FC = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [currentPostId, setCurrentPostId] = useState<number | null>(null);
 
+  //For changing profile photo
+  const [isPhotoSettingsOpen, setIsPhotoSettingsOpen] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+
   //const [activeSection, setActiveSection] = useState<string>('profile');
 
   const navigate = useNavigate();
@@ -140,7 +149,7 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    
+
     loadCSS([
       '/styles/profile.css',
       '/styles/notification.css',
@@ -168,7 +177,7 @@ const UserProfile: React.FC = () => {
         const data = await response.json();
         setBlockedUsers(data);
       } catch (error) {
-        showNotification("error",'Error fetching blocked users:' + error);
+        showNotification("error", 'Error fetching blocked users:' + error);
       }
     };
 
@@ -460,11 +469,76 @@ const UserProfile: React.FC = () => {
     }
   };
 
+  // Funkcija za otvaranje prozora za dodavanje slike
+  const openPhotoSettings = () => {
+    setIsPhotoSettingsOpen(true);
+  };
+
+  // Funkcija za zatvaranje prozora
+  const closePhotoSettings = () => {
+    setIsPhotoSettingsOpen(false);
+    setImageSrc(null);
+  };
+
+  // Funkcija za selektovanje slike
+  const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setImageSrc(reader.result as string);
+      };
+    }
+  };
+
+  // Funkcija za isecanje slike
+  const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+    console.log("Cropped Area:", croppedArea);
+    console.log("Cropped Pixels:", croppedAreaPixels);
+  }, []);
+
+  // Funkcija za uklanjanje slike
+  const removePhoto = () => {
+    setImageSrc(null);
+    setCroppedImage(null);
+  };
+
+  // Funkcija za slanje slike na backend
+  const saveProfilePhoto = async () => {
+    if (!imageSrc) return;
+  
+    const formData = new FormData();
+    formData.append("file", imageSrc); 
+  
+    try {
+      const response = await fetch(`${backendUrl}/api/users/upload-profile-photo`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Slika uspešno sačuvana:", data);
+        
+        // Ažuriraj userData nakon uspešnog upload-a
+        setUserData((prevUser) => prevUser ? { ...prevUser, profileImage: data.profileImageUrl } : null);
+        
+        closePhotoSettings();
+      } else {
+        console.error("Greška pri čuvanju slike:", data);
+      }
+    } catch (error) {
+      console.error("Greška pri uploadu slike:", error);
+    }
+  };
+  
 
   if (isLoading) {
     return <Loader />;
   }
-  
+
 
   return (
     <div className="body">
@@ -604,6 +678,42 @@ const UserProfile: React.FC = () => {
         </section>
       )}
 
+      {/* Modal za izmenu slike */}
+      {isPhotoSettingsOpen && (
+        <div className="profile-photo-settings-background">
+          <div className="profile-photo-settings">
+            <div className="photo-div">
+              {/* Input za učitavanje slike */}
+              <input type="file" accept="image/*" onChange={onSelectFile} style={{ display: "none" }} id="upload-photo" />
+              <label htmlFor="upload-photo" className="w-button">Choose File</label>
+
+              {/* Prikaz kropovane slike */}
+              {imageSrc && (
+                <div className="crop-container">
+                  <Cropper
+                    image={imageSrc}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </div>
+              )}
+
+              {/* Ukloni sliku */}
+              <button className="button w-button" onClick={removePhoto}>Remove</button>
+            </div>
+
+            {/* Dugmići za zatvaranje i čuvanje */}
+            <div className="profile-photo-settings-buttons-div">
+              <button className="profile-photo-settings-button-cancel w-button" onClick={closePhotoSettings}>Cancel</button>
+              <button className="profile-photo-settings-button-save w-button" onClick={saveProfilePhoto}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section id='hero-section' className="hero-section">
         <div className="w-layout-blockcontainer container hero-container w-container">
@@ -611,13 +721,15 @@ const UserProfile: React.FC = () => {
             <form id="email-form" className="form" onSubmit={handleSubmit}>
               {error && <div className="error-message">{error}</div>}
               <div className="user-image">
-                <img
-                  src={
-                    userData?.profileImage === "defaultProfilePicture.svg"
-                      ? "/assets/Icons/defaultProfilePicture.svg"
-                      : `${backendUrl}/api/posts/uploads/${userData?.profileImage}`
-                  }
-                  alt="" className="image-4" />
+                <div className="user-info-image-div" onClick={openPhotoSettings}>
+                  <img
+                    src={userData?.profileImage || "/assets/Icons/defaultProfilePicture.svg"}
+                    alt="Profile"
+                    className="profile-image"
+                  />                  <div className="user-info-image-settings-div">
+                    <img src="/assets/Icons/arrow-up.svg" alt="Change" className="user-info-image-settings-icon" />
+                  </div>
+                </div>
                 <div className="text-block-6">@{userData?.username || ''}</div>
                 <div className="div-block-4">
                   <a

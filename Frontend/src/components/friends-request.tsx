@@ -220,7 +220,7 @@ const FriendsRequest: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div>No friend requests available</div>
+              <div style={{margin: "0 0 0 10px"}} >No friend requests available</div>
             )}
           </div>
         </div>
