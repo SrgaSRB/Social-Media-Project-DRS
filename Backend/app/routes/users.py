@@ -358,37 +358,15 @@ def get_friend_statuses():
 
     return jsonify(statuses), 200
 
-import os
-import uuid
-from flask import Blueprint, request, jsonify, session
-from werkzeug.utils import secure_filename
-from app.models import User, SessionLocal
-
-# Definisanje blueprint-a
-users_bp = Blueprint('users', __name__, url_prefix='/api/users')
-
-# Folder gde se čuvaju slike
-UPLOAD_FOLDER = os.path.abspath('./uploads')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-# Proverava da li fajl ima dozvoljenu ekstenziju
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# Generiše jedinstveno ime fajla koristeći UUID
-def generate_unique_filename(filename):
-    ext = filename.rsplit('.', 1)[1].lower()
-    return f"{uuid.uuid4().hex}.{ext}"
-
 # Ruta za upload profilne slike
 @users_bp.route('/upload-profile-photo', methods=['POST'])
 def upload_profile_photo():
+    
     if 'user' not in session:
-        return jsonify({"error": "User not logged in"}), 401  # Ne dozvoli upload ako korisnik nije ulogovan
+        return jsonify({"error": "User not logged in"}), 401
 
-    user_id = session['user']['id']
     if 'file' not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
+        return jsonify({"error": "No file uploaded"}), 400  
 
     file = request.files['file']
     if file.filename == '':
@@ -397,19 +375,17 @@ def upload_profile_photo():
     if not allowed_file(file.filename):
         return jsonify({"error": "File type not allowed"}), 400
 
-    # Generiše novo ime za fajl i čuva ga u /uploads folder
     filename = generate_unique_filename(file.filename)
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
 
-    # Ažuriraj profilnu sliku u bazi podataka
     db = SessionLocal()
-    user = db.query(User).filter_by(id=user_id).first()
+    user = db.query(User).filter_by(id=session['user']['id']).first()
 
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    user.profile_picture_url = filename  # Čuva samo naziv fajla u bazi, ne ceo put
+    user.profile_picture_url = filename
     db.commit()
     db.close()
 

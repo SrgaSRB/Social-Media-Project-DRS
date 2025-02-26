@@ -82,6 +82,8 @@ const UserProfile: React.FC = () => {
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
 
   //const [activeSection, setActiveSection] = useState<string>('profile');
 
@@ -484,6 +486,8 @@ const UserProfile: React.FC = () => {
   const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
+      setSelectedFile(file); // Čuvamo originalni fajl
+      
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
@@ -506,10 +510,10 @@ const UserProfile: React.FC = () => {
 
   // Funkcija za slanje slike na backend
   const saveProfilePhoto = async () => {
-    if (!imageSrc) return;
+    if (!selectedFile) return;
   
     const formData = new FormData();
-    formData.append("file", imageSrc); 
+    formData.append("file", selectedFile); // ✅ Ispravno dodajemo fajl
   
     try {
       const response = await fetch(`${backendUrl}/api/users/upload-profile-photo`, {
@@ -521,10 +525,10 @@ const UserProfile: React.FC = () => {
       const data = await response.json();
       if (response.ok) {
         console.log("Slika uspešno sačuvana:", data);
-        
+  
         // Ažuriraj userData nakon uspešnog upload-a
         setUserData((prevUser) => prevUser ? { ...prevUser, profileImage: data.profileImageUrl } : null);
-        
+  
         closePhotoSettings();
       } else {
         console.error("Greška pri čuvanju slike:", data);
