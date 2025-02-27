@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request, session
 from app.models import User, SessionLocal, Friendship
 from app.routes.emails import send_email_in_thread
 import uuid
+import cloudinary.uploader
 
 
 def generate_unique_filename(filename):
@@ -359,9 +360,14 @@ def get_friend_statuses():
     return jsonify(statuses), 200
 
 # Ruta za upload profilne slike
+from flask import Blueprint, request, jsonify, session
+import cloudinary.uploader
+from app.models import User, SessionLocal
+
+users_bp = Blueprint('users', __name__, url_prefix='/api/users')
+
 @users_bp.route('/upload-profile-photo', methods=['POST'])
 def upload_profile_photo():
-    
     if 'user' not in session:
         return jsonify({"error": "User not logged in"}), 401
 
@@ -372,12 +378,11 @@ def upload_profile_photo():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    if not allowed_file(file.filename):
-        return jsonify({"error": "File type not allowed"}), 400
+    # Upload na Cloudinary
+    upload_result = cloudinary.uploader.upload(file, folder="profile_pictures")
 
-    filename = generate_unique_filename(file.filename)
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(filepath)
+    if not upload_result.get("secure_url"):
+        return jsonify({"error": "Failed to upload image"}), 500
 
     db = SessionLocal()
     user = db.query(User).filter_by(id=session['user']['id']).first()
@@ -385,8 +390,11 @@ def upload_profile_photo():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    user.profile_picture_url = filename
+    user.profile_picture_url = upload_result["secure_url"]
     db.commit()
     db.close()
 
-    return jsonify({"message": "Profile picture updated successfully", "profileImageUrl": filename}), 200
+    return jsonify({
+        "message": "Profile picture updated successfully",
+        "profileImageUrl": upload_result["secure_url"]
+    }), 200

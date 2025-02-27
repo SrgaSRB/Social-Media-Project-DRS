@@ -20,7 +20,6 @@ const loadCSS = (hrefs: string[]) => {
   });
 };
 
-
 interface Post {
   id: number;
   username: string;

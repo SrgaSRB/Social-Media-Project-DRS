@@ -1,4 +1,6 @@
 import React from 'react';
+import ProfilePicture from "../components/ProfilePicture";
+
 
 interface PostProps {
   id: number;
@@ -40,15 +42,7 @@ const Post: React.FC<PostProps> = ({
       <div className="user-post-user-info">
         <div className="user-post-user-info-image-and-name">
           <div className="user-post-user-info-profile-image">
-            <img
-              src={
-                profileImage === "defaultProfilePicture.svg"
-                  ? "/assets/Icons/defaultProfilePicture.svg"
-                  : `${backendUrl}/api/posts/uploads/${profileImage}`
-              }
-              alt="Profile"
-              className="image-4"
-            />
+          <ProfilePicture profileImage={profileImage} />
           </div>
           <div className="user-post-user-info-name-and-date">
             <div className="user-post-user-info-name">

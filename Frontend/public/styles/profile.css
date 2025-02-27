@@ -2089,7 +2089,7 @@ textarea.w-input, textarea.w-select {
 }
 
 .hero-section {
-  height: 110vh;
+  height: auto;
   padding-bottom: 70px;
   overflow: visible;
 }
@@ -2141,6 +2141,7 @@ textarea.w-input, textarea.w-select {
   grid-template-rows: auto auto auto;
   grid-template-columns: 1fr 1fr;
   grid-auto-columns: 1fr;
+  max-height: 90%;
   margin-left: 32px;
   display: grid;
   overflow: auto;
@@ -2184,12 +2185,17 @@ textarea.w-input, textarea.w-select {
 
 .user-post-info {
   flex-flow: row;
+  margin-top: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   display: flex;
 }
 
 .user-post-profile-image {
   justify-content: center;
   align-items: center;
+  width: 40px;
+  height: 40px;
   display: flex;
 }
 
@@ -2209,13 +2215,13 @@ textarea.w-input, textarea.w-select {
 }
 
 .image-15 {
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
 }
 
 .user-post-text {
   flex: 1;
-  padding: 4px 8px;
+  padding: 4px;
   overflow: auto;
 }
 
@@ -2315,11 +2321,6 @@ textarea.w-input, textarea.w-select {
   display: flex;
 }
 
-.image-4 {
-  width: 100px;
-  height: 100px;
-}
-
 .div-block {
   grid-column-gap: 12px;
   grid-row-gap: 12px;
@@ -2338,6 +2339,7 @@ textarea.w-input, textarea.w-select {
 .user-posts-block {
   flex-flow: column;
   flex: 1;
+  max-height: 100vh;
   padding-bottom: 0;
   display: flex;
 }
@@ -2405,9 +2407,9 @@ textarea.w-input, textarea.w-select {
   color: gray;
 }
 
-.image-6 {
-  width: 50px;
-  height: 50px;
+.div-block-2 {
+  width: 52px;
+  height: 52px;
 }
 
 .text-block-4 {
@@ -2619,6 +2621,8 @@ textarea.w-input, textarea.w-select {
 .blocked-user-image {
   justify-content: center;
   align-items: center;
+  width: 48px;
+  height: 48px;
   display: flex;
 }
 
@@ -2651,8 +2655,9 @@ textarea.w-input, textarea.w-select {
 }
 
 .image-10 {
-  width: 48px;
-  height: 48px;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
 }
 
 .blocked-user-info {
@@ -3002,10 +3007,10 @@ textarea.w-input, textarea.w-select {
   display: flex;
   position: fixed;
   inset: 0%;
-  z-index: 9999;
 }
 
 .profile-photo-settings {
+  z-index: 1000;
   grid-column-gap: 12px;
   grid-row-gap: 12px;
   background-color: #fff;
@@ -3014,6 +3019,7 @@ textarea.w-input, textarea.w-select {
   align-items: center;
   padding: 24px;
   display: flex;
+  position: relative;
 }
 
 .photo-div {
@@ -3021,10 +3027,10 @@ textarea.w-input, textarea.w-select {
   border: 5px dashed #000;
   justify-content: center;
   align-items: center;
-  width: 600px;
-  max-width: 600px;
-  height: 600px;
-  max-height: 600px;
+  width: 500px;
+  max-width: 500px;
+  height: 500px;
+  max-height: 500px;
   display: flex;
   position: relative;
   overflow: visible;
@@ -3063,15 +3069,17 @@ textarea.w-input, textarea.w-select {
 }
 
 .user-info-image-div {
+  width: 150px;
+  height: 150px;
   position: relative;
 }
 
 .user-info-image-settings-icon {
+  cursor: pointer;
   background-color: #d9d9d9;
   border-radius: 50%;
   width: 36px;
   height: 36px;
-  cursor: pointer;
 }
 
 .user-info-image-settings-div {

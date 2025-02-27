@@ -2214,10 +2214,6 @@ textarea.w-input, textarea.w-select {
   inset: 0% 0% 0% auto;
 }
 
-.text-block:hover{
-  background-color: rgb(215, 215, 215);
-}
-
 .upload-div {
   height: 100%;
 }
@@ -2248,13 +2244,12 @@ textarea.w-input, textarea.w-select {
 }
 
 .user-post-image {
-  aspect-ratio: auto;
-  object-fit: fill;
   background-color: #fff;
   flex: 1;
   justify-content: center;
   align-items: center;
   min-width: 70%;
+  max-height: 1200px;
   display: flex;
 }
 
@@ -2268,14 +2263,17 @@ textarea.w-input, textarea.w-select {
   flex: 1;
   justify-content: flex-start;
   align-items: flex-start;
-  min-width: 28%;
+  min-width: 29%;
   margin: 5px;
+  padding: 4px;
   display: flex;
 }
 
 .user-post-user-info-profile-image {
   justify-content: center;
   align-items: center;
+  width: 52px;
+  height: 52px;
   display: flex;
 }
 
@@ -2294,27 +2292,20 @@ textarea.w-input, textarea.w-select {
   font-size: .75rem;
 }
 
-.image-4 {
-  width: 50px;
-  height: 50px;
-}
-
 .text-span {
   font-weight: 700;
 }
 
 .image-5 {
   object-fit: contain;
-  width: 100%;
-  max-height: 1200px;
-  cursor: pointer;
+  min-width: 100%;
+  max-height: 100%;
 }
 
 .user-post-user-info-image-and-name {
   grid-column-gap: 8px;
   grid-row-gap: 8px;
   width: 100%;
-  margin-left: 8px;
   display: flex;
 }
 
@@ -2330,13 +2321,15 @@ textarea.w-input, textarea.w-select {
   margin-left: 8px;
 }
 
-.image-6 {
+.image-6, .image-2 {
   width: 200px;
   height: 100%;
 }
 
 @media screen and (max-width: 991px) {
-
+  .container.hero-container {
+    max-width: 700px;
+  }
 
   .form {
     width: 700px;
@@ -2369,8 +2362,6 @@ textarea.w-input, textarea.w-select {
   .text-block-2 {
     font-size: .9rem;
   }
-
-
 }
 
 @media screen and (max-width: 767px) {
@@ -2414,13 +2405,13 @@ textarea.w-input, textarea.w-select {
   .image-5 {
     object-fit: contain;
     object-position: 50% 50%;
-    max-height: 700px;
+    width: auto;
+    max-width: 100%;
   }
 
   .text-block-2 {
     font-size: .8rem;
   }
-
 }
 
 @media screen and (max-width: 479px) {
@@ -2456,8 +2447,8 @@ textarea.w-input, textarea.w-select {
 
   .form-block {
     border-radius: 0;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
     overflow: hidden;
   }
 
@@ -2509,7 +2500,6 @@ textarea.w-input, textarea.w-select {
 
   .image-5 {
     object-fit: contain;
-    width: 100%;
     min-width: auto;
     max-width: 100%;
     height: auto;
@@ -2519,5 +2509,4 @@ textarea.w-input, textarea.w-select {
   .user-post-text {
     padding-bottom: 8px;
   }
-
 }
