@@ -781,7 +781,7 @@ const UserProfile: React.FC = () => {
                 <div className="div-block-4">
                   <a
                     href="#"
-                    className="link-block-2 w-inline-block"
+                    className="link-block-2"
                     onClick={handleLogout}
                   >
                     <div>Log out</div>

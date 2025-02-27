@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 import Loader from "../components/Loader";
+import ProfilePicture from "../components/ProfilePicture";
 
 
 const loadCSS = (hrefs: string[]) => {
@@ -44,7 +45,8 @@ const FriendsRequest: React.FC = () => {
     loadCSS([
       '/styles/friends-request.css',
       '/styles/notification.css',
-      '/styles/navbar.css'
+      '/styles/navbar.css',
+      '/styles/extern.css'
     ]);
 
 
@@ -154,15 +156,9 @@ const FriendsRequest: React.FC = () => {
                 <div key={request.id} className="fr-block">
                   <div className="fr">
                     <div className="fr-user-image">
-                      <img
-                        src={
-                          request.profileImage === "defaultProfilePicture.svg"
-                            ? "/assets/Icons/defaultProfilePicture.svg"
-                            : `${backendUrl}/api/posts/uploads/${request.profileImage}`
-                        }
-                        alt="User Profile"
-                        className="image-6"
-                      />
+
+                    <ProfilePicture profileImage={request?.profileImage} />
+
                     </div>
                     <div className="fr-user-info">
                       <div className="text-block-7">{request.name}</div>

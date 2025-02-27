@@ -37,7 +37,8 @@ const UploadPost: React.FC = () => {
     loadCSS([
       '/styles/upload-post.css',
       '/styles/notification.css',
-      '/styles/navbar.css'
+      '/styles/navbar.css',
+      '/styles/extern.css'
     ]);
 
     const checkSession = async () => {

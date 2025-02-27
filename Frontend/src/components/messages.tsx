@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import Loader from "../components/Loader";
-import userEvent from '@testing-library/user-event';
+import ProfilePicture from "../components/ProfilePicture";
 
 
 interface Friend {
@@ -60,14 +60,14 @@ const Messages: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoadingChats(true); // Početak učitavanja prijatelja
-  
+
       loadCSS([
         "/styles/messages.css",
         "/styles/notification.css",
         "/styles/extern.css",
         "/styles/navbar.css",
       ]);
-  
+
       try {
         // Provera sesije korisnika
         const sessionResponse = await fetch(`${backendUrl}/api/auth/session`, {
@@ -75,88 +75,88 @@ const Messages: React.FC = () => {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
         });
-  
+
         const sessionData = await sessionResponse.json();
-  
+
         if (!sessionData.user) {
           navigate("/login"); // Ako nije ulogovan, preusmerava ga na login
           return;
         }
-        
+
         setCurrentUserId(sessionData.user.id);
-  
+
         // Učitavanje liste prijatelja
         const friendsResponse = await fetch(`${backendUrl}/api/messages/friends`, {
           method: "GET",
           credentials: "include",
         });
-  
+
         const friendsData: Friend[] = await friendsResponse.json();
         setFriends(friendsData);
-  
+
       } catch (error) {
         console.error("Greška pri učitavanju podataka:", error);
       } finally {
         setIsLoadingChats(false); // Kraj učitavanja
       }
     };
-  
+
     fetchData();
-  }, [backendUrl, navigate]); 
-  
+  }, [backendUrl, navigate]);
+
   // Učitavanje razgovora sa izabranim prijateljem
   useEffect(() => {
     if (!selectedFriend) return;
-  
+
     const fetchMessages = async () => {
       setIsLoadingMessages(true); // Početak učitavanja
-  
+
       try {
         const response = await fetch(`${backendUrl}/api/messages/conversation/${selectedFriend.id}`, {
           credentials: "include",
         });
-  
+
         const data: ChatMessage[] = await response.json();
         setMessages(data);
-  
+
         setTimeout(() => {
           scrollToBottom(); // Pomeri skrol na dno nakon učitavanja
         }, 100);
-  
+
       } catch (error) {
         console.error("Greška pri učitavanju poruka:", error);
       } finally {
         setIsLoadingMessages(false); // Kraj učitavanja
       }
     };
-  
+
     fetchMessages();
   }, [selectedFriend, backendUrl]); // Ponovno izvršenje kada se `selectedFriend` promeni
 
   // Live osluškivanje novih poruka preko socket-a
   useEffect(() => {
     if (!currentUserId || !selectedFriend) return;
-  
+
     const handleNewMessage = (msg: ChatMessage) => {
       if (
         (msg.sender_id === selectedFriend.id && msg.receiver_id === currentUserId) ||
         (msg.sender_id === currentUserId && msg.receiver_id === selectedFriend.id)
       ) {
         setMessages(prev => [...prev, msg]);
-  
+
         setTimeout(() => {
           scrollToBottom(); // Pomeri skrol na dno
         }, 100);
       }
     };
-  
+
     socket.on("new_message", handleNewMessage);
-  
+
     return () => {
       socket.off("new_message", handleNewMessage); // Cleanup pri unmount-u
     };
   }, [selectedFriend, currentUserId]);
-  
+
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -165,7 +165,7 @@ const Messages: React.FC = () => {
       }, 100);
     }
   }, [messages]);
-  
+
 
   // Slanje poruke
   const handleSendMessage = (e: React.FormEvent) => {
@@ -212,7 +212,7 @@ const Messages: React.FC = () => {
       }
     }, 100);
   };
-  
+
 
 
   return (
@@ -233,11 +233,9 @@ const Messages: React.FC = () => {
                   setSelectedFriend(friend);
                 }}>
                   <div className="side-chat-image-div">
-                    <img
-                      src={friend.profileImage === "defaultProfilePicture.svg" ? "/assets/Icons/defaultProfilePicture.svg" : friend.profileImage}
-                      alt="Friend"
-                      className="side-chat-image"
-                    />
+
+                    <ProfilePicture profileImage={friend?.profileImage} />
+
                   </div>
                   <div className="side-chat-user-info">
                     <div className="text-block-2">{friend.name}</div>
@@ -259,11 +257,9 @@ const Messages: React.FC = () => {
                   <img src="https://cdn.prod.website-files.com/673928869b5a833529aa3a08/67b68e5d981b0268036acaf0_arrow-left.svg" loading="lazy" alt="Back" className="image-4" />
                 </div>
                 <div className="chat-boc-user-photo">
-                  <img
-                    src={selectedFriend.profileImage === 'defaultProfilePicture.svg' ? '/assets/Icons/defaultProfilePicture.svg' : selectedFriend.profileImage}
-                    alt="Friend"
-                    className="image-3"
-                  />
+
+                  <ProfilePicture profileImage={selectedFriend?.profileImage} />
+
                 </div>
                 <div className="chat-box-user-info">
                   <div className="text-block-3">{selectedFriend.name}</div>

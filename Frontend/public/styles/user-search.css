@@ -2204,6 +2204,8 @@ textarea.w-input, textarea.w-select {
   flex-flow: row;
   justify-content: center;
   align-items: center;
+  width: 80px;
+  height: 80px;
   display: flex;
 }
 
@@ -2221,7 +2223,10 @@ textarea.w-input, textarea.w-select {
 }
 
 .profile-image {
-  width: 72px;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: clip;
 }
 
 .link-block {
@@ -2244,7 +2249,6 @@ textarea.w-input, textarea.w-select {
   display: flex;
   position: absolute;
   inset: 0% 0% 0% auto;
-  justify-self: right;
 }
 
 .link-block:hover {
@@ -2388,6 +2392,7 @@ textarea.w-input, textarea.w-select {
 
 .container {
   max-width: 1200px;
+  height: 100%;
 }
 
 .container.friends-requests-container {
@@ -2400,16 +2405,22 @@ textarea.w-input, textarea.w-select {
 }
 
 .fr {
-  justify-content: flex-start;
-  align-items: stretch;
-  display: flex;
+  grid-column-gap: 16px;
+  grid-row-gap: 16px;
+  grid-template-rows: auto;
+  grid-template-columns: .25fr 1fr .75fr .75fr;
+  grid-auto-columns: 1fr;
+  justify-content: stretch;
+  place-items: center start;
+  display: grid;
   position: relative;
 }
 
 .fr-user-info {
   flex-flow: column;
+  justify-content: center;
   align-self: stretch;
-  margin-left: 8px;
+  align-items: flex-start;
   display: flex;
 }
 
@@ -2417,11 +2428,14 @@ textarea.w-input, textarea.w-select {
   flex-flow: column;
   justify-content: center;
   align-items: stretch;
+  width: 80px;
+  height: 80px;
   display: flex;
 }
 
 .fr-user-location-block {
-  margin-left: 72px;
+  justify-content: flex-start;
+  align-items: center;
   display: flex;
 }
 
@@ -2434,16 +2448,16 @@ textarea.w-input, textarea.w-select {
 .request-accept-dontaccept-block {
   grid-column-gap: 24px;
   grid-row-gap: 24px;
+  justify-content: flex-start;
+  align-items: center;
   display: flex;
-  position: absolute;
-  inset: 0% 0% 0% auto;
 }
 
 .request-accept {
   grid-column-gap: 8px;
   grid-row-gap: 8px;
   background-color: #fff;
-  border: 4px solid #009dff;
+  border: 3px solid #009dff;
   justify-content: center;
   align-self: center;
   align-items: center;
@@ -2454,8 +2468,8 @@ textarea.w-input, textarea.w-select {
 }
 
 .request-accept:hover {
-  transform: translate(0, -4px);
-  box-shadow: 2px 2px 5px #009dff;
+  transform: translate(0, -2px);
+  box-shadow: 2px 2px 5px #009dff99;
 }
 
 .request-dontaccept {
@@ -2472,8 +2486,8 @@ textarea.w-input, textarea.w-select {
 }
 
 .request-dontaccept:hover {
-  transform: translate(0, -4px);
-  box-shadow: 2px 2px 5px red;
+  transform: translate(0, -2px);
+  box-shadow: 2px 2px 5px #f009;
 }
 
 .text-block-7 {
@@ -2483,10 +2497,6 @@ textarea.w-input, textarea.w-select {
 .text-block-8 {
   color: gray;
   font-size: 1rem;
-}
-
-.image-6 {
-  width: 64px;
 }
 
 .image-7 {
@@ -2565,7 +2575,7 @@ textarea.w-input, textarea.w-select {
   height: 52px;
 }
 
-.image-3, .image-11 {
+.image-3, .image-11, .image-2, .image-12 {
   width: 200px;
   height: 100%;
 }
@@ -2579,7 +2589,70 @@ textarea.w-input, textarea.w-select {
   display: flex;
   position: relative;
   inset: 0% 0% 0% auto;
-  justify-self: right;
+}
+
+.confirm-remove-user-from-friend {
+  height: 100vh;
+  display: none;
+}
+
+.remove-friend-confirm-div {
+  grid-column-gap: 24px;
+  grid-row-gap: 24px;
+  background-color: #fff;
+  border: 4px solid gray;
+  border-radius: 24px;
+  flex-flow: column;
+  justify-content: center;
+  align-items: stretch;
+  width: 600px;
+  margin: auto;
+  padding: 24px;
+  display: flex;
+  position: relative;
+  inset: 0%;
+}
+
+.remove-friend-confirm-text {
+  font-size: 1.5rem;
+}
+
+.removi-friend-confirm-buttons-div {
+  justify-content: space-between;
+  display: flex;
+}
+
+.remove-friend-confirm-background {
+  background-color: #0006;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: fixed;
+  inset: 0%;
+}
+
+.remove-friend-confirm-cancel-remove {
+  color: #fff;
+  background-color: red;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 400;
+  transition: all .3s;
+}
+
+.remove-friend-confirm-cancel-remove:hover {
+  background-color: #b30000;
+}
+
+.remove-friend-confirm-cancel-button {
+  color: #fff;
+  background-color: gray;
+  border-radius: 8px;
+  transition: all .3s;
+}
+
+.remove-friend-confirm-cancel-button:hover {
+  background-color: #595959;
 }
 
 @media screen and (max-width: 991px) {
@@ -2598,6 +2671,8 @@ textarea.w-input, textarea.w-select {
   }
 
   .user-image {
+    width: 68px;
+    height: 68px;
     display: block;
   }
 
@@ -2642,30 +2717,57 @@ textarea.w-input, textarea.w-select {
   }
 
   .fr {
-    justify-content: space-between;
+    grid-column-gap: 8px;
+    grid-row-gap: 8px;
+    grid-template-columns: .25fr .75fr .5fr .75fr;
+    justify-content: flex-start;
   }
 
-  .fr-user-info, .fr-user-location-block {
-    margin-left: 0;
+  .fr-user-image {
+    width: 64px;
+    height: 64px;
   }
 
   .request-accept-dontaccept-block {
     grid-column-gap: 16px;
     grid-row-gap: 16px;
-    position: relative;
   }
 
-  .request-accept, .request-dontaccept {
+  .request-accept {
+    border-width: 3px;
     padding-left: 9px;
     padding-right: 9px;
   }
 
+  .request-accept:hover {
+    transform: translate(0, -2px);
+    box-shadow: 2px 2px 5px #009dff99;
+  }
+
+  .request-dontaccept {
+    border-width: 3px;
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .request-dontaccept:hover {
+    transform: translate(0, -2px);
+    box-shadow: 2px 2px 5px #f009;
+  }
+
   .text-block-7 {
     color: #000;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 400;
   }
 
+  .text-block-9 {
+    font-size: 1.25rem;
+  }
+
+  .text-block-10 {
+    font-size: 1.1rem;
+  }
 }
 
 @media screen and (max-width: 767px) {
@@ -2719,12 +2821,18 @@ textarea.w-input, textarea.w-select {
   }
 
   .fr {
+    grid-template-columns: .25fr .6fr .5fr .4fr;
     align-items: center;
   }
 
   .fr-user-info {
     justify-content: center;
     align-items: flex-start;
+  }
+
+  .fr-user-image {
+    width: 52px;
+    height: 52px;
   }
 
   .request-accept-dontaccept-block {
@@ -2751,6 +2859,10 @@ textarea.w-input, textarea.w-select {
     width: 52px;
   }
 
+  .image-7 {
+    width: 48px;
+  }
+
   .image-8, .image-9 {
     width: 24px;
   }
@@ -2768,6 +2880,13 @@ textarea.w-input, textarea.w-select {
     height: 44px;
   }
 
+  .remove-friend-confirm-div {
+    justify-content: center;
+    align-items: stretch;
+    width: 400px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
 }
 
 @media screen and (max-width: 479px) {
@@ -2810,6 +2929,11 @@ textarea.w-input, textarea.w-select {
     border-radius: 30px;
     width: 80px;
     padding: 4px 9px;
+  }
+
+  .user-image {
+    width: 52px;
+    height: 52px;
   }
 
   .user-names-info {
@@ -2903,6 +3027,21 @@ textarea.w-input, textarea.w-select {
     overflow: auto;
   }
 
+  .fr {
+    grid-column-gap: 4px;
+    grid-row-gap: 4px;
+    grid-template-rows: auto;
+    grid-template-columns: .3fr .75fr .75fr .25fr;
+    grid-auto-columns: 1fr;
+    place-items: center start;
+    display: grid;
+  }
+
+  .fr-user-image {
+    width: 100%;
+    height: 100%;
+  }
+
   .request-accept, .request-dontaccept {
     border-width: 2px;
     padding-left: 5px;
@@ -2918,7 +3057,7 @@ textarea.w-input, textarea.w-select {
   }
 
   .image-6 {
-    width: 36px;
+    width: auto;
   }
 
   .image-7 {
@@ -2961,16 +3100,32 @@ textarea.w-input, textarea.w-select {
     margin-left: 0;
     margin-right: 0;
     padding: 16px 0;
-    box-shadow: 0 2px 5px #0003;
+    position: relative;
+    inset: 0% 0% auto;
   }
 
   .image-10 {
     height: 32px;
   }
 
+  .remove-friend-confirm-div {
+    width: 100%;
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .remove-friend-confirm-text {
+    font-size: 1rem;
+  }
+
+  .remove-friend-confirm-cancel-remove, .remove-friend-confirm-cancel-button {
+    border-radius: 4px;
+    padding: 4px 9px;
+  }
 }
 
 #w-node-_9e60180d-3271-e6c2-85f3-f98132901065-fa5e6170 {
+  order: 0;
   grid-area: span 1 / span 1 / span 1 / span 1;
   justify-self: end;
 }
@@ -2979,8 +3134,12 @@ textarea.w-input, textarea.w-select {
   justify-self: end;
 }
 
+#w-node-e85b8283-62de-02ee-cf8d-d2375af55ed0-07d5652f {
+  justify-self: start;
+}
+
 @media screen and (max-width: 991px) {
-  #w-node-_1c51c3da-017e-6e20-8477-66bf394f876e-fa5e6170, #w-node-bf39271b-5619-9eff-f933-beaf6310b655-fa5e6170, #w-node-_8e421328-55ad-6826-9486-5b706b309ef5-fa5e6170 {
+  #w-node-_1c51c3da-017e-6e20-8477-66bf394f876e-fa5e6170, #w-node-bf39271b-5619-9eff-f933-beaf6310b655-fa5e6170, #w-node-_8e421328-55ad-6826-9486-5b706b309ef5-fa5e6170, #w-node-b4425f84-2ecf-ef88-5754-3c4b3adc4568-fa5e6170 {
     justify-self: end;
   }
 }

@@ -222,3 +222,12 @@
   max-height: 100%;
   border-radius: 50%;
 }
+
+/*Button for accept/remove and frednship status in search*/
+.accept-and-remove-buttons-block{
+  justify-self: right;
+}
+
+.link-block{
+  justify-self: right;
+}

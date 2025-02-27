@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 import Loader from "../components/Loader";
 import { useNavigate } from 'react-router-dom';
+import ProfilePicture from "../components/ProfilePicture";
 
 const loadCSS = (hrefs: string[]) => {
   // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
@@ -253,15 +254,9 @@ const UserSearch: React.FC = () => {
                 <div className="user-block" key={user.id}>
                   <div className="user-info-block">
                     <div className="user-image">
-                      <img
-                        src={
-                          user.profileImage === 'defaultProfilePicture.svg'
-                            ? '/assets/Icons/defaultProfilePicture.svg'
-                            : `${backendUrl}/api/posts/uploads/${user.profileImage}`
-                        }
-                        alt={user.name}
-                        className="profile-image"
-                      />
+
+                      <ProfilePicture profileImage={user?.profileImage} />
+
                     </div>
                     <div className="user-names-info">
                       <div className="text-block-3">{user.name}</div>
