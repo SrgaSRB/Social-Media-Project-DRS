@@ -6,11 +6,10 @@ interface ProfilePictureProps {
 }
 
 const ProfilePicture: React.FC<ProfilePictureProps> = ({ profileImage, onClick }) => {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   return (
       <img
-        src={profileImage !== "defaultProfilePicture.svg" ? `${backendUrl}/api/posts/uploads/${profileImage}` : "/assets/Icons/defaultProfilePicture.svg"}
+        src={profileImage !== "defaultProfilePicture.svg" ? `${profileImage}` : "/assets/Icons/defaultProfilePicture.svg"}
         alt="Profile"
         className="user-profile-photo"
       />

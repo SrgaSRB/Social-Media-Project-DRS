@@ -360,12 +360,6 @@ def get_friend_statuses():
     return jsonify(statuses), 200
 
 # Ruta za upload profilne slike
-from flask import Blueprint, request, jsonify, session
-import cloudinary.uploader
-from app.models import User, SessionLocal
-
-users_bp = Blueprint('users', __name__, url_prefix='/api/users')
-
 @users_bp.route('/upload-profile-photo', methods=['POST'])
 def upload_profile_photo():
     if 'user' not in session:
