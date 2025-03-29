@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../notification/NotificationContext";
@@ -48,14 +48,6 @@ const Register: React.FC = () => {
 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState(""); 
-
-  useEffect(() => {
-    setIsLoading(true);
-
-    loadCSS("/styles/register.css");
-
-    setIsLoading(false);
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -155,33 +147,28 @@ const Register: React.FC = () => {
       setPasswordError("");
     }
   };
-
-  if (isLoading) {
-    return <Loader />;
-  }
   
-
   return (
     <section>
       <Helmet>
         <title>Register</title>
       </Helmet>
-      <section className="hero-section">
-        <div className="w-layout-blockcontainer container hero-container w-container">
+      <section className="register-section">
+        <div className="w-layout-blockcontainer container w-container">
           <div className="register-wapper">
             <div className="register-form">
               <div className="form-block-2 w-form">
                 <form
                   id="register-form"
                   name="register-form"
-                  className="form"
+                  className="form-2"
                   onSubmit={handleSubmit}
                 >
-                  <label htmlFor="username" className="user-info-label">
+                  <label htmlFor="username" className="user-info-label-2">
                     Username
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="username"
                     id="username"
@@ -199,11 +186,11 @@ const Register: React.FC = () => {
                     </span>
                   )}
 
-                  <label htmlFor="first_name" className="user-info-label">
+                  <label htmlFor="first_name" className="user-info-label-2">
                     First name
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="first_name"
                     id="first_name"
@@ -215,11 +202,11 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="last_name" className="user-info-label">
+                  <label htmlFor="last_name" className="user-info-label-2">
                     Last name
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="last_name"
                     id="last_name"
@@ -231,11 +218,11 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="address" className="user-info-label">
+                  <label htmlFor="address" className="user-info-label-2">
                     Address
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="address"
                     id="address"
@@ -247,11 +234,11 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="city" className="user-info-label">
+                  <label htmlFor="city" className="user-info-label-2">
                     City
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="city"
                     id="city"
@@ -263,11 +250,11 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="country" className="user-info-label">
+                  <label htmlFor="country" className="user-info-label-2">
                     Country
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="country"
                     id="country"
@@ -279,11 +266,11 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="tel" className="user-info-label">
+                  <label htmlFor="tel" className="user-info-label-2">
                     Phone number
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="phone_number"
                     id="tel"
@@ -295,11 +282,11 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="email" className="user-info-label">
+                  <label htmlFor="email" className="user-info-label-2">
                     Email
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="email"
                     id="email"
@@ -317,11 +304,11 @@ const Register: React.FC = () => {
                     </span>
                   )}
 
-                  <label htmlFor="password" className="user-info-label">
+                  <label htmlFor="password" className="user-info-label-2">
                     Password
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     maxLength={256}
                     name="password"
                     id="password"
@@ -333,11 +320,11 @@ const Register: React.FC = () => {
                     required
                   />
 
-                  <label htmlFor="password-confirm" className="user-info-label">
+                  <label htmlFor="password-confirm" className="user-info-label-2">
                     Confirm password
                   </label>
                   <input
-                    className="user-info-input w-input"
+                    className="user-info-input-2 w-input"
                     name="confirmPassword"
                     id="password-confirm"
                     placeholder="Confirm your password"
@@ -372,7 +359,7 @@ const Register: React.FC = () => {
               <img
                 src="/assets/Icons/register-background.svg"
                 alt="Sign Up"
-                className="image-5"
+                className="image-21"
               />
             </div>
           </div>

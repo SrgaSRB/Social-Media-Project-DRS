@@ -9,6 +9,9 @@ import UserProfile from './components/profile';
 import UserSearch from './components/search';
 import FriendsRequest from './components/friends-request';
 import Messages from './components/messages'
+import './styles/index.css'
+import './styles/notification.css'
+import './App.css'; // Import your CSS file
 
 const App: React.FC = () => {
   const location = useLocation();

@@ -40,15 +40,8 @@ const FriendsRequest: React.FC = () => {
   const { showNotification } = useNotification();
 
   useEffect(() => {
+
     setIsLoading(true);
-
-    loadCSS([
-      '/styles/friends-request.css',
-      '/styles/notification.css',
-      '/styles/navbar.css',
-      '/styles/extern.css'
-    ]);
-
 
     const checkSession = async () => {
       try {
@@ -139,9 +132,9 @@ const FriendsRequest: React.FC = () => {
 
 
   return (
-    <div className="body 2">
-      <section className="friends-requests-section">
-        <div className="w-layout-blockcontainer container friends-requests-container w-container">
+    <section className="friends-requests-section">
+      <div className="w-layout-blockcontainer container friends-requests-container w-container">
+        <div className="friends-requests-wrapper">
           <div className="div-block">
             <div className="text-block-13">Your Friend Requests</div>
             <img
@@ -157,19 +150,19 @@ const FriendsRequest: React.FC = () => {
                   <div className="fr">
                     <div className="fr-user-image">
 
-                    <ProfilePicture profileImage={request?.profileImage} />
+                      <ProfilePicture profileImage={request?.profileImage} />
 
                     </div>
                     <div className="fr-user-info">
-                      <div className="text-block-7">{request.name}</div>
-                      <div className="text-block-8">{request.username}</div>
+                      <div className="text-block-15">{request.name}</div>
+                      <div className="text-block-16">{request.username}</div>
                     </div>
                     <div className="fr-user-location-block">
                       <div className="location-icon">
                         <img
                           src="\assets\Icons\locationPin-RED.svg"
                           alt="Location Icon"
-                          className="image-7"
+                          className="image-16"
                         />
                       </div>
                       <div className="fr-user-location">
@@ -191,7 +184,7 @@ const FriendsRequest: React.FC = () => {
                         <img
                           src="\assets\Icons\accept-request-BLUE.svg"
                           alt="Accept"
-                          className="image-8"
+                          className="image-15"
                         />
                       </a>
                       <a
@@ -216,12 +209,12 @@ const FriendsRequest: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div style={{margin: "0 0 0 10px"}} >No friend requests available</div>
+              <div style={{ margin: "0 0 0 10px" }} >No friend requests available</div>
             )}
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };
 

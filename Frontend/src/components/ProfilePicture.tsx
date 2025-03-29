@@ -11,7 +11,7 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ profileImage, onClick }
       <img
         src={profileImage !== "defaultProfilePicture.svg" ? `${profileImage}` : "/assets/Icons/defaultProfilePicture.svg"}
         alt="Profile"
-        className="user-profile-photo"
+        className="user-profile-photo-2"
       />
   );
 };

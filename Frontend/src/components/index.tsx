@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 import ModalImage from './ModalImage';
@@ -45,14 +44,7 @@ const Index: React.FC = () => {
 
   useEffect(() => {
     setIsLoading(true);
-
-    loadCSS([
-      '/styles/index.css',
-      '/styles/extern.css',
-      '/styles/notification.css',
-      '/styles/navbar.css'
-    ]);
-
+    
     const checkSession = async () => {
       try {
         const response = await fetch(`${backendUrl}/api/auth/session`, {

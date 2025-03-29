@@ -49,16 +49,10 @@ const UserSearch: React.FC = () => {
   const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
 
   useEffect(() => {
+    
+    setIsLoading(true); // Početak učitavanja prijatelja
+    
     const fetchData = async () => {
-      setIsLoading(true); // Početak učitavanja prijatelja
-
-      loadCSS([
-        "/styles/user-search.css",
-        "/styles/notification.css",
-        "/styles/extern.css",
-        "/styles/navbar.css",
-      ]);
-
       try {
         // Provera sesije korisnika
         const sessionResponse = await fetch(`${backendUrl}/api/auth/session`, {
@@ -221,10 +215,10 @@ const UserSearch: React.FC = () => {
       <Helmet>
         <title>User Search</title>
       </Helmet>
-      <section className="hero-section">
+      <section className="user-search-section">
         <div className="w-layout-blockcontainer container w-container">
-          <div className="form-block w-form">
-            <div className="form">
+          <div className="search-form-block w-form">
+            <div className="search-form">
               <img
                 src="/assets/Icons/search.svg"
                 alt="Search Icon"
@@ -232,14 +226,14 @@ const UserSearch: React.FC = () => {
               />
               <div className="search-div">
                 <input
-                  className="search-input w-input"
+                  className="search-input-2 w-input"
                   maxLength={256}
                   placeholder="Search users (name, email, address, city...)"
                   type="text"
                   value={searchTerm}
                   onChange={handleSearchInputChange}
                 />
-                <div className="text-block" onClick={() => setSearchTerm('')}>
+                <div className="text-block-7" onClick={() => setSearchTerm('')}>
                   <img
                     src="/assets/Icons/x-02.svg"
                     alt=""
@@ -260,17 +254,17 @@ const UserSearch: React.FC = () => {
                     </div>
                     <div className="user-names-info">
                       <div className="text-block-3">{user.name}</div>
-                      <div className="text-block-2">@{user.username}</div>
+                      <div className="text-block-6">@{user.username}</div>
                     </div>
                     <div className="users-location-info">
                       <img
                         src="/assets/Icons/locationPin-RED.svg"
                         alt="Location Icon"
-                        className="image-5"
+                        className="image-7"
                       />
                       <div className="user-location">
                         <div className="text-block-5">{user.country},</div>
-                        <div className="text-block-6">{user.city}</div>
+                        <div className="text-block-8">{user.city}</div>
                       </div>
                     </div>
                     {friendStatuses[user.id] === 'notFriends' && (
@@ -283,7 +277,7 @@ const UserSearch: React.FC = () => {
                         <img
                           src="/assets/Icons/user-profile-add-WHITE.svg"
                           alt="Add Friend Icon"
-                          className="image-4"
+                          className="image-8"
                         />
                       </a>
                     )}
@@ -293,7 +287,7 @@ const UserSearch: React.FC = () => {
                         <img
                           src="/assets/Icons/sendFriendRequest-BLUE.svg"
                           alt="Request Sent Icon"
-                          className="image-4"
+                          className="image-8"
                         />
                       </a>
                     )}
@@ -305,8 +299,8 @@ const UserSearch: React.FC = () => {
                             src="/assets/Icons/accept-request-BLUE.svg"
                             loading="lazy"
                             alt=""
-                            className="image-4"
-                          />
+                            className="image-8"
+                            />
                         </a>
                         <a
                           href="#"
@@ -317,8 +311,8 @@ const UserSearch: React.FC = () => {
                           <img
                             src="/assets/Icons/user-profile-minus-WHITE.svg"
                             alt="Remove Friend Icon"
-                            className="image-4"
-                          />
+                            className="image-8"
+                            />
                         </a>
                       </div>
                     )}
@@ -332,7 +326,7 @@ const UserSearch: React.FC = () => {
                         <img
                           src="/assets/Icons/user-profile-left-WHITE.svg"
                           alt="Accept Request Icon"
-                          className="image-4"
+                          className="image-8"
                         />
                       </a>
                     )}

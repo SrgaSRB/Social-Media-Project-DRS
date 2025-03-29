@@ -58,16 +58,9 @@ const Messages: React.FC = () => {
   const socket = io(backendUrl);
 
   useEffect(() => {
+    setIsLoadingChats(true); // Početak učitavanja prijatelja
+
     const fetchData = async () => {
-      setIsLoadingChats(true); // Početak učitavanja prijatelja
-
-      loadCSS([
-        "/styles/messages.css",
-        "/styles/notification.css",
-        "/styles/extern.css",
-        "/styles/navbar.css",
-      ]);
-
       try {
         // Provera sesije korisnika
         const sessionResponse = await fetch(`${backendUrl}/api/auth/session`, {
@@ -218,100 +211,102 @@ const Messages: React.FC = () => {
   return (
     <section className="chat-section">
       <div className="w-layout-blockcontainer container w-container">
+        <div className='chat-wrapper'>
 
-        {/* Lista prijatelja */}
-        <div className="side-chats-block">
-          <div className="text-block">Messages</div>
+          {/* Lista prijatelja */}
+          <div className="side-chats-block">
+            <div className="text-block-17">Messages</div>
 
-          {isLoadingChats ? (
-            <Loader /> // Prikaz loadera dok se učitavaju prijatelji
-          ) : (
-            <div className="side-chat">
-              {friends.map(friend => (
-                <div key={friend.id} className="side-chat-user" onClick={() => {
-                  openChatOnMobile();
-                  setSelectedFriend(friend);
-                }}>
-                  <div className="side-chat-image-div">
+            {isLoadingChats ? (
+              <Loader /> // Prikaz loadera dok se učitavaju prijatelji
+            ) : (
+              <div className="side-chat">
+                {friends.map(friend => (
+                  <div key={friend.id} className="side-chat-user" onClick={() => {
+                    openChatOnMobile();
+                    setSelectedFriend(friend);
+                  }}>
+                    <div className="side-chat-image-div">
 
-                    <ProfilePicture profileImage={friend?.profileImage} />
+                      <ProfilePicture profileImage={friend?.profileImage} />
 
+                    </div>
+                    <div className="side-chat-user-info">
+                      <div className="text-block-19">{friend.name}</div>
+                    </div>
                   </div>
-                  <div className="side-chat-user-info">
-                    <div className="text-block-2">{friend.name}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-
-        {/* Chat prozor */}
-        <div className={`chat-box-block ${isMobileChatOpen ? 'show' : 'hide'}`}>
-          {selectedFriend ? (
-            <>
-              {/* Zaglavlje razgovora */}
-              <div className="chat-box-user">
-                <div className="chat-box-user-back-div" onClick={closeChatOnMobile}>
-                  <img src="https://cdn.prod.website-files.com/673928869b5a833529aa3a08/67b68e5d981b0268036acaf0_arrow-left.svg" loading="lazy" alt="Back" className="image-4" />
-                </div>
-                <div className="chat-boc-user-photo">
-
-                  <ProfilePicture profileImage={selectedFriend?.profileImage} />
-
-                </div>
-                <div className="chat-box-user-info">
-                  <div className="text-block-3">{selectedFriend.name}</div>
-                </div>
+                ))}
               </div>
+            )}
+          </div>
 
-              {/* Lista poruka */}
-              <div className="chat-box-messages">
-                {isLoadingMessages ? (
-                  <Loader />
-                ) : (
-                  messages.map(msg =>
-                    msg.sender_id === currentUserId ? (
-                      <div key={msg.id} className="chat-box-messages-user-message-block">
-                        <div className="chat-box-messages-user-message-text">{msg.content}</div>
-                      </div>
-                    ) : (
-                      <div key={msg.id} className="chat-box-messages-friend-message-block">
-                        <div className="chat-box-messages-friend-message-text">{msg.content}</div>
-                      </div>
+
+          {/* Chat prozor */}
+          <div className={`chat-box-block ${isMobileChatOpen ? 'show' : 'hide'}`}>
+            {selectedFriend ? (
+              <>
+                {/* Zaglavlje razgovora */}
+                <div className="chat-box-user">
+                  <div className="chat-box-user-back-div" onClick={closeChatOnMobile}>
+                    <img src="https://cdn.prod.website-files.com/673928869b5a833529aa3a08/67b68e5d981b0268036acaf0_arrow-left.svg" loading="lazy" alt="Back" className="image-18" />
+                  </div>
+                  <div className="chat-boc-user-photo">
+
+                    <ProfilePicture profileImage={selectedFriend?.profileImage} />
+
+                  </div>
+                  <div className="chat-box-user-info">
+                    <div className="text-block-18">{selectedFriend.name}</div>
+                  </div>
+                </div>
+
+                {/* Lista poruka */}
+                <div className="chat-box-messages">
+                  {isLoadingMessages ? (
+                    <Loader />
+                  ) : (
+                    messages.map(msg =>
+                      msg.sender_id === currentUserId ? (
+                        <div key={msg.id} className="chat-box-messages-user-message-block">
+                          <div className="chat-box-messages-user-message-text">{msg.content}</div>
+                        </div>
+                      ) : (
+                        <div key={msg.id} className="chat-box-messages-friend-message-block">
+                          <div className="chat-box-messages-friend-message-text">{msg.content}</div>
+                        </div>
+                      )
                     )
-                  )
-                )}
-                <div ref={messagesEndRef} ></div>
-              </div>
-
-
-              {/* Forma za slanje poruke */}
-              <div className="chat-box-send-message-block">
-                <div className="form-block w-form">
-                  <form onSubmit={handleSendMessage} className="send-message-form">
-                    <input
-                      className="message-text w-input"
-                      maxLength={256}
-                      name="text-message"
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      required
-                    />
-                    <input type="submit" className="message-send-button w-button" value="Send" />
-                  </form>
+                  )}
+                  <div ref={messagesEndRef} ></div>
                 </div>
-              </div>
-            </>
-          ) : (
-            <div className="chat-box-user">
-              <div className="text-block-3">Select a friend to start a conversation</div>
-            </div>
-          )}
-        </div>
 
+
+                {/* Forma za slanje poruke */}
+                <div className="chat-box-send-message-block">
+                  <div className="send-message-form-block w-form">
+                    <form onSubmit={handleSendMessage} className="send-message-form">
+                      <input
+                        className="message-text w-input"
+                        maxLength={256}
+                        name="text-message"
+                        type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        required
+                      />
+                      <input type="submit" className="message-send-button w-button" value="Send" />
+                    </form>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="chat-box-user">
+                <div className="text-block-18">Select a friend to start a conversation</div>
+              </div>
+            )}
+          </div>
+
+        </div>
       </div>
     </section>
   );

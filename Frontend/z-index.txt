@@ -1,0 +1,6 @@
+profile.tsx
+	100 - user-post-padding-image-div
+	
+
+navbar
+	1000

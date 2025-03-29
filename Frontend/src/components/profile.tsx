@@ -152,13 +152,6 @@ const UserProfile: React.FC = () => {
   useEffect(() => {
     setIsLoading(true);
 
-    loadCSS([
-      '/styles/profile.css',
-      '/styles/notification.css',
-      '/styles/navbar.css',
-      '/styles/extern.css'
-    ]);
-
     // Testiranje prijema događaja
     socket.on('new_pending_post', (data) => {
       //setPendingPosts((prevPosts) => [...prevPosts, data]);
@@ -547,7 +540,7 @@ const UserProfile: React.FC = () => {
   };
 
   // Funkcija za slanje slike na backend
- const saveProfilePhoto = async () => {
+  const saveProfilePhoto = async () => {
     if (!imageSrc || !croppedAreaPixels) return;
 
     const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
@@ -589,7 +582,7 @@ const UserProfile: React.FC = () => {
 
   return (
     <div className="body">
-      
+
       {isEditModalOpen && (
         <section className="edit-post-section">
           <div className="w-layout-blockcontainer container edit-post-container w-container">
@@ -733,7 +726,7 @@ const UserProfile: React.FC = () => {
             <div className="photo-div">
               {/* Input za učitavanje slike */}
               <input type="file" accept="image/*" onChange={onSelectFile} style={{ display: "none" }} id="upload-photo" />
-              <label htmlFor="upload-photo" className="w-button">Choose File</label>
+              <label htmlFor="upload-photo" className=" w-button">Choose File</label>
 
               {/* Prikaz kropovane slike */}
               {imageSrc && (
@@ -751,7 +744,7 @@ const UserProfile: React.FC = () => {
               )}
 
               {/* Ukloni sliku */}
-              <button className="button w-button" onClick={removePhoto}>Remove</button>
+              <button className="button-2 w-button" onClick={removePhoto}>Remove</button>
             </div>
 
             {/* Dugmići za zatvaranje i čuvanje */}
@@ -763,202 +756,206 @@ const UserProfile: React.FC = () => {
         </div>
       )}
 
-      <section id='hero-section' className="hero-section">
-        <div className="w-layout-blockcontainer container hero-container w-container">
-          <div className="user-info">
-            <form id="email-form" className="form" onSubmit={handleSubmit}>
-              {error && <div className="error-message">{error}</div>}
-              <div className="user-image">
-                <div className="user-info-image-div" onClick={openPhotoSettings}>
+      <section id='hero-section' className="user-profile-section">
+        <div className="w-layout-blockcontainer container w-container">
+          <div className='user-profile-wrapper'>
 
-                <ProfilePicture profileImage={userData?.profileImage} />
+            <div className="user-info">
+              <form className="user-info-form" onSubmit={handleSubmit}>
+                {error && <div className="error-message">{error}</div>}
+                <div className="user-image-2">
+                  <div className="user-info-image-div" onClick={openPhotoSettings}>
 
-                  <div className="user-info-image-settings-div">
-                    <img src="/assets/Icons/arrow-up.svg" alt="Change" className="user-info-image-settings-icon" />
+                    <ProfilePicture profileImage={userData?.profileImage} />
+
+                    <div className="user-info-image-settings-div">
+                      <img src="/assets/Icons/arrow-up.svg" alt="Change" className="user-info-image-settings-icon" />
+                    </div>
+                  </div>
+                  <div className="text-block-22">@{userData?.username || ''}</div>
+                  <div className="div-block-4">
+                    <a
+                      href="#"
+                      className="link-block-2"
+                      onClick={handleLogout}
+                    >
+                      <div>Log out</div>
+                      <img
+                        src="\assets\Icons\logout.svg"
+                        loading="lazy"
+                        alt="Logout"
+                      />
+                    </a>
                   </div>
                 </div>
-                <div className="text-block-6">@{userData?.username || ''}</div>
-                <div className="div-block-4">
-                  <a
-                    href="#"
-                    className="link-block-2"
-                    onClick={handleLogout}
-                  >
-                    <div>Log out</div>
-                    <img
-                      src="\assets\Icons\logout.svg"
-                      loading="lazy"
-                      alt="Logout"
-                    />
-                  </a>
-                </div>
+                <label htmlFor="username" className="user-info-label">Username</label>
+                <input
+                  className="user-info-input w-input"
+                  name="username"
+                  id="username"
+                  value={userData?.username || ''} // Vraća prazan string ako je userData null
+                  disabled={isSaving} // Disable while saving
+                />
+                <label htmlFor="firstName" className="user-info-label">First Name</label>
+                <input
+                  className="user-info-input w-input"
+                  name="firstName"
+                  id="firstName"
+                  value={userData?.firstName || ''} // Vraća prazan string ako je userData null
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="lastName" className="user-info-label">Last Name</label>
+                <input
+                  className="user-info-input w-input"
+                  name="lastName"
+                  id="lastName"
+                  value={userData?.lastName || ''} // Vraća prazan string ako je userData null
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="address" className="user-info-label">Address</label>
+                <input
+                  className="user-info-input w-input"
+                  name="address"
+                  id="address"
+                  value={userData?.address || ''} // Vraća prazan string ako je userData null
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="city" className="user-info-label">City</label>
+                <input
+                  className="user-info-input w-input"
+                  name="city"
+                  id="city"
+                  value={userData?.city || ''} // Vraća prazan string ako je userData null
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="country" className="user-info-label">Country</label>
+                <input
+                  className="user-info-input w-input"
+                  name="country"
+                  id="country"
+                  value={userData?.country || ''} // Vraća prazan string ako je userData null
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="phone" className="user-info-label">Phone number</label>
+                <input
+                  className="user-info-input w-input"
+                  name="phone"
+                  id="phone"
+                  value={userData?.phone || ''} // Vraća prazan string ako je userData null
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="email" className="user-info-label">Email</label>
+                <input
+                  className="user-info-input w-input"
+                  name="email"
+                  id="email"
+                  value={userData?.email || ''} // Vraća prazan string ako je userData null
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="password" className="user-info-label">Password</label>
+                <input
+                  className="user-info-input w-input"
+                  name="password"
+                  id="password"
+                  type="password"
+                  value={userData?.password || ''} // Vraća prazan string ako je userData null
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="submit"
+                  className="submit-button w-button"
+                  value={isSaving ? 'Čuvanje...' : 'Save changes'}
+                  disabled={isSaving}
+                />
+              </form>
+            </div>
+
+            <div className="container-hr"></div>
+
+            <div className="user-posts-block">
+              <div className="div-block-5">
+                <div>Posts</div>
+                <img
+                  src="/assets/Icons/9-square.svg"
+                  alt="Grid"
+                  className="image-21"
+                />
               </div>
-              <label htmlFor="username" className="user-info-label">Username</label>
-              <input
-                className="user-info-input w-input"
-                name="username"
-                id="username"
-                value={userData?.username || ''} // Vraća prazan string ako je userData null
-                disabled={isSaving} // Disable while saving
-              />
-              <label htmlFor="firstName" className="user-info-label">First Name</label>
-              <input
-                className="user-info-input w-input"
-                name="firstName"
-                id="firstName"
-                value={userData?.firstName || ''} // Vraća prazan string ako je userData null
-                onChange={handleInputChange}
-              />
-              <label htmlFor="lastName" className="user-info-label">Last Name</label>
-              <input
-                className="user-info-input w-input"
-                name="lastName"
-                id="lastName"
-                value={userData?.lastName || ''} // Vraća prazan string ako je userData null
-                onChange={handleInputChange}
-              />
-              <label htmlFor="address" className="user-info-label">Address</label>
-              <input
-                className="user-info-input w-input"
-                name="address"
-                id="address"
-                value={userData?.address || ''} // Vraća prazan string ako je userData null
-                onChange={handleInputChange}
-              />
-              <label htmlFor="city" className="user-info-label">City</label>
-              <input
-                className="user-info-input w-input"
-                name="city"
-                id="city"
-                value={userData?.city || ''} // Vraća prazan string ako je userData null
-                onChange={handleInputChange}
-              />
-              <label htmlFor="country" className="user-info-label">Country</label>
-              <input
-                className="user-info-input w-input"
-                name="country"
-                id="country"
-                value={userData?.country || ''} // Vraća prazan string ako je userData null
-                onChange={handleInputChange}
-              />
-              <label htmlFor="phone" className="user-info-label">Phone number</label>
-              <input
-                className="user-info-input w-input"
-                name="phone"
-                id="phone"
-                value={userData?.phone || ''} // Vraća prazan string ako je userData null
-                onChange={handleInputChange}
-              />
-              <label htmlFor="email" className="user-info-label">Email</label>
-              <input
-                className="user-info-input w-input"
-                name="email"
-                id="email"
-                value={userData?.email || ''} // Vraća prazan string ako je userData null
-                onChange={handleInputChange}
-              />
-              <label htmlFor="password" className="user-info-label">Password</label>
-              <input
-                className="user-info-input w-input"
-                name="password"
-                id="password"
-                type="password"
-                value={userData?.password || ''} // Vraća prazan string ako je userData null
-                onChange={handleInputChange}
-              />
-              <input
-                type="submit"
-                className="submit-button w-button"
-                value={isSaving ? 'Čuvanje...' : 'Save changes'}
-                disabled={isSaving}
-              />
-            </form>
-          </div>
-          <div className="container-hr"></div>
-          <div className="user-posts-block">
-            <div className="div-block">
-              <div>Posts</div>
-              <img
-                src="/assets/Icons/9-square.svg"
-                alt="Grid"
-                className="image-5"
-              />
-            </div>
-            <div className="user-posts">
-              {posts.length > 0 ? (
-                posts.map((post, index) => (
-                  <div className={`user-post ${post.status === 'pending' ? 'pending-post' : ''}`} key={index}>
-                    {post.status === 'pending' && (
-                      <>
-                        <div className="user-post-padding-image-div">
-                          <img src="/assets/Icons/alert-triangle.svg" loading="lazy" alt="" className="image-12" />
-                          <div className="text-block-10">The post is pending.</div>
-                        </div>
+              <div className="user-posts">
+                {posts.length > 0 ? (
+                  posts.map((post, index) => (
+                    <div className={`user-post-2 ${post.status === 'pending' ? 'pending-post' : ''}`} key={index}>
+                      {post.status === 'pending' && (
+                        <>
+                          <div className="user-post-padding-image-div">
+                            <img src="/assets/Icons/alert-triangle.svg" loading="lazy" alt="" className="image-12" />
+                            <div className="text-block-23">The post is pending.</div>
+                          </div>
 
-                        <div className="div-block-5"></div>
-                      </>
-                    )}
-                    {post.status === 'rejected' && (
-                      <>
-                        <div className="user-postreject-div"></div>
-                        <div className="user-post-padding-image-div">
-                          <img src="\assets\Icons\alert-triangle-RED.svg" loading="lazy" alt="" className="image-12" />
-                          <div className="text-block-11">Post is rejected!</div>
-                        </div>
-                      </>
-                    )}
-                    <div className="user-post-image-div">
-                      {post.image_url ? (
-                        <img
-                          src={`${backendUrl}/api/posts/uploads/${post.image_url}`}
-                          alt={post.postImage}
-                          className="image"
-                        />
-                      ) : (
-                        <div className="no-image">No Image</div>
+                          <div className="div-block-6"></div>
+                        </>
                       )}
-                    </div>
-                    <div className="user-post-info">
-                      <div className="user-post-profile-image">
-                      <ProfilePicture profileImage={userData?.profileImage} />
+                      {post.status === 'rejected' && (
+                        <>
+                          <div className="user-postreject-div"></div>
+                          <div className="user-post-padding-image-div">
+                            <img src="\assets\Icons\alert-triangle-RED.svg" loading="lazy" alt="" className="image-12" />
+                            <div className="text-block-20">Post is rejected!</div>
+                          </div>
+                        </>
+                      )}
+                      <div className="user-post-image-div">
+                        {post.image_url ? (
+                          <img
+                            src={`${backendUrl}/api/posts/uploads/${post.image_url}`}
+                            alt={post.postImage}
+                            className="image-20"
+                          />
+                        ) : (
+                          <div className="no-image">No Image</div>
+                        )}
                       </div>
-                      <div className="user-post-info-name-and-date">
-                        <div className="user-post-info-name">
-                          <div className="text-block">@{userData?.username || ''}</div>
+                      <div className="user-post-info">
+                        <div className="user-post-profile-image">
+                          <ProfilePicture profileImage={userData?.profileImage} />
                         </div>
-                        <div className="user-post-info-date">
-                          <div className="text-block-2">{new Date(post.created_at).toLocaleString()}</div>
+                        <div className="user-post-info-name-and-date">
+                          <div className="user-post-info-name">
+                            <div className="text-block-24">@{userData?.username || ''}</div>
+                          </div>
+                          <div className="user-post-info-date">
+                            <div className="text-block-21">{new Date(post.created_at).toLocaleString()}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="user-info-hr"></div>
+                      <div className="user-post-text-2">
+                        <div>{post.content}</div>
+                      </div>
+                      <div className="user-post-remove-and-edit-div">
+                        <div className="user-post-edit" onClick={() => handleEditPost(post)}>
+                          <img
+                            src="\assets\Icons\edit.svg"
+                            alt="Edit"
+                          />
+                          <div>Edit</div>
+                        </div>
+                        <div className="user-post-remove" onClick={() => handleDeletePost(post.id)}>
+                          <img
+                            src="/assets/Icons/trash.svg"
+                            alt="Delete"
+                          />
+                          <div>Delete</div>
                         </div>
                       </div>
                     </div>
-                    <div className="user-info-hr"></div>
-                    <div className="user-post-text">
-                      <div>{post.content}</div>
-                    </div>
-                    <div className="user-post-remove-and-edit-div">
-                      <div className="user-post-edit" onClick={() => handleEditPost(post)}>
-                        <img
-                          src="\assets\Icons\edit.svg"
-                          alt="Edit"
-                        />
-                        <div>Edit</div>
-                      </div>
-                      <div className="user-post-remove" onClick={() => handleDeletePost(post.id)}>
-                        <img
-                          src="/assets/Icons/trash.svg"
-                          alt="Delete"
-                        />
-                        <div>Delete</div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div>No posts available</div>
-              )}
+                  ))
+                ) : (
+                  <div>No posts available</div>
+                )}
+              </div>
+
             </div>
-
-
           </div>
         </div>
       </section>
@@ -966,169 +963,171 @@ const UserProfile: React.FC = () => {
       {userType === 'admin' && (
         <>
 
-          <div className="body-hr">
-            <div className="w-layout-blockcontainer container body-hr-container w-container"></div>
-          </div>
+          <div className="body-hr container"></div>
+
           <section id='admin-section' className="admin-section">
-            <div className="w-layout-blockcontainer container admin-container w-container">
-              <div className="div-block-3">
-                <div className="text-block-5">Created posts</div>
-              </div>
-              <div className="created-posts">
+            <div className="w-layout-blockcontainer container w-container">
+              <div className="admin-section-wrapper">
+                <div className="div-block-3">
+                  <div className="text-block-25">Created posts</div>
+                </div>
+                <div className="created-posts">
 
-                {pendingPosts.length > 0 ? (
-                  pendingPosts.map((post) => (
-                    <div className="created-post-block" key={post.id}>
-                      <div className="created-post">
-                        <div className="image-div">
-                          {post.image_url ? (
-                            <img
-                              id="created-post-image"
-                              src={`${backendUrl}/api/posts/uploads/${post.image_url}`}
-                              alt="Post"
-                              className="image-7"
-                            />
-                          ) : (
-                            <div>No Image</div>
-                          )}
-                        </div>
-                        <div className="created-post-user-info">
-                          <div className="created-post-user-info-block">
-                            <div className="div-block-2">
+                  {pendingPosts.length > 0 ? (
+                    pendingPosts.map((post) => (
+                      <div className="created-post-block" key={post.id}>
+                        <div className="created-post">
+                          <div className="image-div-2">
+                            {post.image_url ? (
                               <img
-                                src=
-                                {
-                                  post.profileImage === "defaultProfilePicture.svg"
-                                    ? "/assets/Icons/defaultProfilePicture.svg"
-                                    : `${backendUrl}/api/posts/uploads/${post.profileImage}`
-                                }
-                                alt="User Profile"
-                                className="image-6"
+                                id="created-post-image"
+                                src={`${backendUrl}/api/posts/uploads/${post.image_url}`}
+                                alt="Post"
+                                className="image-24"
                               />
-                            </div>
-                            <div>
-                              <div className="text-block-4">
-                                @{post.username}
-                              </div>
-                              <div className="text-block-3">{new Date(post.created_at).toLocaleString()}</div>
-                            </div>
+                            ) : (
+                              <div>No Image</div>
+                            )}
                           </div>
-                          <div className="created-post-hr"></div>
-                          <div className="created-post-info-div">
-                            <div id="created-post-desc" className="created-post-info">
-                              {post.content}
+                          <div className="created-post-user-info">
+                            <div className="created-post-user-info-block">
+                              <div className="div-block-2">
+                                <img
+                                  src=
+                                  {
+                                    post.profileImage === "defaultProfilePicture.svg"
+                                      ? "/assets/Icons/defaultProfilePicture.svg"
+                                      : `${backendUrl}/api/posts/uploads/${post.profileImage}`
+                                  }
+                                  alt="User Profile"
+                                  className="image-26"
+                                />
+                              </div>
+                              <div>
+                                <div className="text-block-26">
+                                  @{post.username}
+                                </div>
+                                <div className="text-block-27">{new Date(post.created_at).toLocaleString()}</div>
+                              </div>
+                            </div>
+                            <div className="created-post-hr"></div>
+                            <div className="created-post-info-div">
+                              <div id="created-post-desc" className="created-post-info">
+                                {post.content}
+                              </div>
                             </div>
                           </div>
                         </div>
+                        <div className="approval-dissapproval-block">
+                          <a
+                            href="#"
+                            id="created-post-accept"
+                            className="link-block-3 approve-linkblock w-inline-block"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleApprovePost(post.id);
+                            }}
+                          >
+                            <div>Approve</div>
+                            <img
+                              src="/assets/Icons/success-GREEN.svg"
+                              alt="Approve"
+                              className="image-23"
+                            />
+                          </a>
+                          <a
+                            href="#"
+                            id="created-post-reject"
+                            className="link-block-3 dissapproval-linkblock w-inline-block"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleRejectPost(post.id);
+                            }}
+                          >
+                            <div>Reject</div>
+                            <img
+                              src="\assets\Icons\reject-request-RED.svg"
+                              alt="Reject"
+                              className="image-25"
+                            />
+                          </a>
+                        </div>
                       </div>
-                      <div className="approval-dissapproval-block">
-                        <a
-                          href="#"
-                          id="created-post-accept"
-                          className="link-block approve-linkblock w-inline-block"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleApprovePost(post.id);
-                          }}
-                        >
-                          <div>Approve</div>
-                          <img
-                            src="/assets/Icons/success-GREEN.svg"
-                            alt="Approve"
-                            className="image-8"
-                          />
-                        </a>
-                        <a
-                          href="#"
-                          id="created-post-reject"
-                          className="link-block dissapproval-linkblock w-inline-block"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleRejectPost(post.id);
-                          }}
-                        >
-                          <div>Reject</div>
-                          <img
-                            src="\assets\Icons\reject-request-RED.svg"
-                            alt="Reject"
-                            className="image-9"
-                          />
-                        </a>
-                      </div>
-                    </div>
-                  ))
-                ) : (<div>No pending posts</div>)}
+                    ))
+                  ) : (<div>No pending posts</div>)}
+                </div>
               </div>
-
             </div>
           </section>
-          <div className="body-hr">
-            <div className="w-layout-blockcontainer container body-hr-container w-container"></div>
-          </div>
+
+          <div className="body-hr container"></div>
+
           <section id='admin-section-blocked-users' className="admin-section-blocked-users">
             <div className="w-layout-blockcontainer container blocked-users-container w-container">
-              <div className="blocked-users-header">
-                <h2 className="heading">Blocked users</h2>
-              </div>
-              <div className="blocked-blocked-users-list">
-                {blockedUsers.length > 0 ? (
-                  blockedUsers.map((user) => (
-                    <div className="blocked-user-block" key={user.id}>
-                      <div className="blocked-user-info">
-                        <div className="blocked-user-image">
-                          <img
-                            src=
-                            {
-                              user.profileImage === "defaultProfilePicture.svg"
-                                ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
-                                : `${backendUrl}/api/posts/uploads/${user.profileImage}` // Putanja ka serveru
-                            }
-                            alt="Profile"
-                            className="image-10"
-                          />
+              <div className='blocked-users-wrapper'>
+                <div className="blocked-users-header">
+                  <h2 className="heading">Blocked users</h2>
+                </div>
+                <div className="blocked-blocked-users-list">
+                  {blockedUsers.length > 0 ? (
+                    blockedUsers.map((user) => (
+                      <div className="blocked-user-block" key={user.id}>
+                        <div className="blocked-user-info">
+                          <div className="blocked-user-image">
+                            <img
+                              src=
+                              {
+                                user.profileImage === "defaultProfilePicture.svg"
+                                  ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
+                                  : `${backendUrl}/api/posts/uploads/${user.profileImage}` // Putanja ka serveru
+                              }
+                              alt="Profile"
+                              className="image-27"
+                            />
+                          </div>
+                          <div className="blocked-user-info-block">
+                            <div className="info-upper-text">Username</div>
+                            <div className="info-bottom-text">@{user.username}</div>
+                          </div>
+                          <div className="blocked-user-info-block">
+                            <div className="info-upper-text">First Name</div>
+                            <div className="info-bottom-text">{user.firstName}</div>
+                          </div>
+                          <div className="blocked-user-info-block">
+                            <div className="info-upper-text">Last Name</div>
+                            <div className="info-bottom-text">{user.lastName}</div>
+                          </div>
+                          <div className="blocked-user-info-block">
+                            <div className="info-upper-text">City</div>
+                            <div className="info-bottom-text">{user.city}</div>
+                          </div>
+                          <div className="blocked-user-info-block">
+                            <div className="info-upper-text">Country</div>
+                            <div className="info-bottom-text">{user.country}</div>
+                          </div>
+                          <div className="blocked-user-info-block">
+                            <div className="info-upper-text">Phone number</div>
+                            <div className="info-bottom-text">{user.phone}</div>
+                          </div>
+                          <div className="blocked-user-info-block">
+                            <div className="info-upper-text">Email</div>
+                            <div className="info-bottom-text">{user.email}</div>
+                          </div>
+                          <a
+                            href="#"
+                            className="link-block-4 w-inline-block"
+                            onClick={() => handleUnblock(user.id)}
+                          >
+                            <div className="text-block-28">Unblock user</div>
+                          </a>
                         </div>
-                        <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Username</div>
-                          <div className="info-bottom-text">@{user.username}</div>
-                        </div>
-                        <div className="blocked-user-info-block">
-                          <div className="info-upper-text">First Name</div>
-                          <div className="info-bottom-text">{user.firstName}</div>
-                        </div>
-                        <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Last Name</div>
-                          <div className="info-bottom-text">{user.lastName}</div>
-                        </div>
-                        <div className="blocked-user-info-block">
-                          <div className="info-upper-text">City</div>
-                          <div className="info-bottom-text">{user.city}</div>
-                        </div>
-                        <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Country</div>
-                          <div className="info-bottom-text">{user.country}</div>
-                        </div>
-                        <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Phone number</div>
-                          <div className="info-bottom-text">{user.phone}</div>
-                        </div>
-                        <div className="blocked-user-info-block">
-                          <div className="info-upper-text">Email</div>
-                          <div className="info-bottom-text">{user.email}</div>
-                        </div>
-                        <a
-                          href="#"
-                          className="link-block-3 w-inline-block"
-                          onClick={() => handleUnblock(user.id)}
-                        >
-                          <div className="text-block-7">Unblock user</div>
-                        </a>
+                        <div className="blocked-user-hr"></div>
                       </div>
-                      <div className="blocked-user-hr"></div>
-                    </div>
-                  ))
-                ) : (
-                  <div>No blocked users</div>
-                )}
+                    ))
+                  ) : (
+                    <div>No blocked users</div>
+                  )}
+                </div>
               </div>
             </div>
           </section>

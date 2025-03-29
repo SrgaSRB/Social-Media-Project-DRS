@@ -35,8 +35,6 @@ const Login: React.FC = () => {
   useEffect(() => {
     setIsLoading(true);
 
-    loadCSS('/styles/login.css');
-
     if (hasCheckedSession.current) return; // Skip if already checked
     hasCheckedSession.current = true;
 
@@ -59,6 +57,8 @@ const Login: React.FC = () => {
       })
       .catch(() => console.log('No active session'))
       .finally(() => setIsLoading(false));
+      setIsLoading(false);
+
   }, []);
 
   const handleLogout = async () => {
@@ -104,30 +104,27 @@ const Login: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="preloader">
-        <div className="spinner"></div>
-        <span> Loading...</span>
-      </div>
+      <Loader></Loader>
     );
   }
 
   return (
     <div className="body">
-      <section className="hero-section">
-        <div className="w-layout-blockcontainer container hero-container w-container">
+      <section className="login-section">
+        <div className="w-layout-blockcontainer container w-container">
           <div className="content-wapper">
-            <div className="image-div">
+            <div className="image-div-3">
               <img
                 src="\assets\Icons\login-background.svg"
                 loading="lazy"
                 alt="Login Illustration"
-                className="image-2"
+                className="image-30"
               />
             </div>
             <div className="login-form-div">
-              <div className="form-block w-form">
-                <form onSubmit={handleSubmit} className="form">
-                  <label htmlFor="username">Username</label>
+              <div className="login-form-block w-form">
+                <form onSubmit={handleSubmit} className="login-form">
+                  <label htmlFor="username" className='Field Label 2'>Username</label>
                   <input
                     className="text-field w-input"
                     maxLength={256}
@@ -139,7 +136,7 @@ const Login: React.FC = () => {
                     onChange={(e) => setUsername(e.target.value)}
                     required
                   />
-                  <label htmlFor="password">Password</label>
+                  <label className='Field Label 2' htmlFor="password">Password</label>
                   <input
                     className="text-field w-input"
                     maxLength={256}
@@ -153,7 +150,7 @@ const Login: React.FC = () => {
                   />
                   <input
                     type="submit"
-                    className="submit-button w-button"
+                    className="submit-button-3 w-button"
                     value="Login"
                   />
                   <a

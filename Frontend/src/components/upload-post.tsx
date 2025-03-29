@@ -34,13 +34,6 @@ const UploadPost: React.FC = () => {
   useEffect(() => {
     setIsLoading(true);
 
-    loadCSS([
-      '/styles/upload-post.css',
-      '/styles/notification.css',
-      '/styles/navbar.css',
-      '/styles/extern.css'
-    ]);
-
     const checkSession = async () => {
       try {
         const response = await fetch(`${backendUrl}/api/auth/session`, {
@@ -65,7 +58,7 @@ const UploadPost: React.FC = () => {
   if (isLoading) {
     return <Loader />;
   }
-  
+
 
   // Handle post text change
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -105,16 +98,16 @@ const UploadPost: React.FC = () => {
       });
 
       if (response.ok) {
-        showNotification("success" ,'The post was created successfully!');
+        showNotification("success", 'The post was created successfully!');
         setPostText('');
         setImage(null);
         setPreview(null);
       } else {
         const errorData = await response.json();
-        showNotification("error" ,`An error occurred: ${errorData.error || 'Please try again.'}`);
+        showNotification("error", `An error occurred: ${errorData.error || 'Please try again.'}`);
       }
     } catch (error) {
-      showNotification("error" ,'An error occurred. Please try again.');
+      showNotification("error", 'An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -122,66 +115,68 @@ const UploadPost: React.FC = () => {
 
   return (
     <div className="body">
-      <section className="hero-section">
+      <section className="upload-post-section">
         <div className="w-layout-blockcontainer container w-container">
-          <div className="upload-div-block">
-            <div className="image-div-block">
-              <div className="text-block">
-                Upload an image <span className="text-span">(optional)</span>
-              </div>
-              <div className="image-div">
-                {preview ? (
-                  <>
-                    <a href="#" className="link-block w-inline-block" onClick={removeImage}>
-                      <div>X</div>
-                    </a>
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="image-4"
-                      id="post-image"
-                      style={{ display: 'block' }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    {/*
+          <div className="upload-post-wrapper">
+            <div className="upload-div-block">
+              <div className="image-div-block">
+                <div className="Text Block 14">
+                  Upload an image <span className="text-span">(optional)</span>
+                </div>
+                <div className="image-div">
+                  {preview ? (
+                    <>
+                      <a href="#" className="upload-post-remove-photo w-inline-block" onClick={removeImage}>
+                        <div>X</div>
+                      </a>
+                      <img
+                        src={preview}
+                        alt="Preview"
+                        className="image-13"
+                        id="post-image"
+                        style={{ display: 'block' }}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {/*
                     <div>Drag and Drop to upload file</div>
                     <div>or</div>
                     */}
-                    <input
-                      type="file"
-                      className="inputFile"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                  </>
-                )}
+                      <input
+                        type="file"
+                        className="inputFile"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="text-div">
-              <div className="form-block w-form">
-                <form onSubmit={handleSubmit} className="form">
-                  <label htmlFor="post-text" className="field-label">
-                    Post text
-                  </label>
-                  <textarea
-                    required
-                    placeholder="Enter text"
-                    maxLength={5000}
-                    id="post-text"
-                    name="field"
-                    className="textarea w-input"
-                    value={postText}
-                    onChange={handleTextChange}
-                  />
-                  <input
-                    type="submit"
-                    className="submit-button w-button"
-                    value={isSubmitting ? 'Submitting...' : 'Submit'}
-                    disabled={isSubmitting}
-                  />
-                </form>
+              <div className="text-div">
+                <div className="upload-post-form-block w-form">
+                  <form onSubmit={handleSubmit} className="upload-post-form">
+                    <label htmlFor="post-text" className="field-label">
+                      Post text
+                    </label>
+                    <textarea
+                      required
+                      placeholder="Enter text"
+                      maxLength={5000}
+                      id="post-text"
+                      name="field"
+                      className="textarea w-input"
+                      value={postText}
+                      onChange={handleTextChange}
+                    />
+                    <input
+                      type="submit"
+                      className="submit-button w-button"
+                      value={isSubmitting ? 'Submitting...' : 'Submit'}
+                      disabled={isSubmitting}
+                    />
+                  </form>
+                </div>
               </div>
             </div>
           </div>
