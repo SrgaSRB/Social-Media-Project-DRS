@@ -139,11 +139,12 @@ const UploadPost: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      {/*
+                      
                     <div>Drag and Drop to upload file</div>
                     <div>or</div>
-                    */}
+                    
                       <input
+                        style={{ fontSize : '1rem', width: '210px'}}
                         type="file"
                         className="inputFile"
                         accept="image/*"

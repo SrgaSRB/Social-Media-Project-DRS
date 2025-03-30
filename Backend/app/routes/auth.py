@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from sqlalchemy.orm import Session
-from app.models import User, SessionLocal
+from app.models import User, SessionLocal, Friendship
 from werkzeug.security import check_password_hash
 from app.routes.emails import send_email_in_thread
 
@@ -55,6 +55,20 @@ def register():
 
     db.add(new_user)
     db.commit()
+    db.refresh(new_user)
+
+    admin = db.query(User).filter_by(role='admin').first()
+
+    if admin:
+        new_friendship = Friendship(
+            user1_id = new_user.id,
+            user2_id = admin.id,
+            status = 'accepted',
+            request_sent_by = admin.id
+        )
+        db.add(new_friendship)
+        db.commit()
+
     message_text = f"Kreiran korisnik! Korisnicko ime: {new_user.username} Lozinka: {new_user.password}"
     send_email_in_thread(
         "luka.zbucnovic@gmail.com", "jndx ishq rgsd ehnb",
