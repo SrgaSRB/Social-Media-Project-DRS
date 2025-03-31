@@ -168,8 +168,8 @@ def friends_posts():
         Post.status == 'approved'
     ).order_by(Post.created_at.desc()).all()
 
-    like_count = db.query(PostLike).filter_by(PostLike.post_id == Post.id).count()
-    is_liked = db.query(PostLike).filter_by(user_id=user_id, post_id=Post.id).first()
+    like_count = db.query(PostLike).filter(PostLike.post_id == post.id).count()
+    is_liked = db.query(PostLike).filter(PostLike.user_id == user_id, PostLike.post_id == post.id).first()
 
     result = []
     for post in posts:
