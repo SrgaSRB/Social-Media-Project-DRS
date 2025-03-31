@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, jsonify, session, send_from_directory
 from werkzeug.utils import secure_filename
-from app.models import Post, User, Friendship, SessionLocal
+from app.models import Post, User, Friendship, SessionLocal, PostLike
 from app import socketio
 import uuid
 import datetime
@@ -168,6 +168,9 @@ def friends_posts():
         Post.status == 'approved'
     ).order_by(Post.created_at.desc()).all()
 
+    like_count = db.query(PostLike).filter_by(PostLike.post_id == Post.id).count()
+    is_liked = db.query(PostLike).filter_by(user_id=user_id, post_id=Post.id).first()
+
     result = []
     for post in posts:
         image_path = f"{post.image_url}" if post.image_url else None
@@ -179,6 +182,8 @@ def friends_posts():
                 'postImage': image_path,  
                 'postText': post.content,
                 'timeAgo': post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'likeCount': like_count,
+                'isLiked': is_liked is not None,
             })
         else:
             result.append({
@@ -188,6 +193,8 @@ def friends_posts():
                 'postImage': None,  
                 'postText': post.content,
                 'timeAgo': post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'likeCount': like_count,
+                'isLiked': is_liked is not None,
             })
 
     return jsonify(result), 200
@@ -426,3 +433,41 @@ def get_pending_posts():
         })
 
     return jsonify(result), 200
+
+@posts_bp.route('/like/<int:post_id>', methods=['POST'])
+def like_post(post_id):
+    """
+    POST: Lajkuje post.
+    """
+    db = next(get_db())
+    user_session = session.get('user')
+
+    if not user_session:
+        return jsonify({'error': 'User not logged in'}), 401
+
+    user_id = user_session['id']
+    post = db.query(Post).filter_by(id=post_id).first()
+
+    if not post:
+        return jsonify({'error': 'Post not found'}), 404
+
+    existing_like = db.query(PostLike).filter_by(user_id=user_id, post_id=post_id).first()
+
+    if existing_like:
+        db.delete(existing_like)
+        db.commit()
+        return jsonify({
+            'message': 'Post liked successfully',
+            'liked': False,
+            'like_count': db.query(PostLike).filter_by(post_id=post_id).count()
+        }), 201
+
+    else:
+        new_like = PostLike(user_id=user_id, post_id=post_id)
+        db.add(new_like)
+        db.commit()
+        return jsonify({
+            'message': 'Post unliked successfully',
+            'liked': True,
+            'like_count': db.query(PostLike).filter_by(post_id=post_id).count()
+        }), 200

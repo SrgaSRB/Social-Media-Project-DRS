@@ -2088,6 +2088,7 @@ textarea.w-input, textarea.w-select {
 .hero-section {
   background-color: #f2f2f2;
   height: auto;
+  min-height: 100vh;
   display: block;
 }
 
@@ -4189,6 +4190,44 @@ textarea.w-input, textarea.w-select {
   text-decoration: underline;
 }
 
+.user-post-likes-and-comments-div {
+  grid-column-gap: 30px;
+  grid-row-gap: 30px;
+  margin-left: 8px;
+  display: flex;
+}
+
+.user-post-likes-and-comments {
+  grid-column-gap: 4px;
+  grid-row-gap: 4px;
+  color: #000;
+  cursor: pointer;
+  border: 1px solid gray;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 8px;
+  transition: all .3s;
+  display: flex;
+}
+
+.user-post-likes-and-comments:hover {
+  background-color: #f2f2f2;
+}
+
+.image-32 {
+  cursor: pointer;
+  height: 28px;
+}
+
+.user-post-comments {
+  display: flex;
+}
+
+.image-33 {
+  height: 28px;
+}
+
 @media screen and (max-width: 991px) {
   .container.hero-container {
     max-width: 700px;
@@ -4430,6 +4469,15 @@ textarea.w-input, textarea.w-select {
   .container-10.hero-container {
     max-width: 700px;
   }
+
+  .image-32 {
+    height: 24px;
+  }
+
+  .image-33 {
+    width: auto;
+    height: 24px;
+  }
 }
 
 @media screen and (max-width: 767px) {
@@ -4463,11 +4511,24 @@ textarea.w-input, textarea.w-select {
   .user-post-image {
     object-fit: contain;
     object-position: 50% 50%;
-    display: flex;
+    flex: 0 auto;
+    justify-content: center;
+    min-width: auto;
+    display: block;
+  }
+
+  .user-post-user-info {
+    flex: 1;
+    min-width: 40%;
   }
 
   .user-post-user-info-name {
     font-size: 1.1rem;
+  }
+
+  .user-post-user-info-date {
+    flex: 0 auto;
+    align-self: flex-start;
   }
 
   .image-4 {
@@ -4696,6 +4757,11 @@ textarea.w-input, textarea.w-select {
   .container-10.hero-container {
     max-width: 520px;
   }
+
+  .user-post-likes-and-comments-div {
+    align-self: center;
+    margin-left: 0;
+  }
 }
 
 @media screen and (max-width: 479px) {
@@ -4777,6 +4843,8 @@ textarea.w-input, textarea.w-select {
   }
 
   .user-post-user-info {
+    grid-column-gap: 4px;
+    grid-row-gap: 4px;
     border-style: none;
     order: -1;
     width: 100%;
@@ -5426,6 +5494,19 @@ textarea.w-input, textarea.w-select {
 
   .user-info-input-2 {
     height: 35px;
+  }
+
+  .user-post-likes-and-comments-div {
+    grid-column-gap: 16px;
+    grid-row-gap: 16px;
+    align-self: flex-start;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 8px;
+  }
+
+  .image-32, .image-33 {
+    height: 20px;
   }
 }
 

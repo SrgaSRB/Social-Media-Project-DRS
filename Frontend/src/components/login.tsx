@@ -95,6 +95,7 @@ const Login: React.FC = () => {
     } catch (error) {
       console.error('Fetch error:', error);
       showNotification('warning', 'Failed to connect to the server. Please try again later.');
+      console.log(backendUrl);
     }
   };
 

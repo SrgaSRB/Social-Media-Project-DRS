@@ -33,6 +33,7 @@ class Post(Base):
     # Reations
     user = relationship("User", back_populates="posts", foreign_keys=[user_id]) # User who created the post
     admin = relationship("User", foreign_keys=[approved_by_admin]) # Admin who approved the post
+    likes = relationship("PostLike", back_populates="post", cascade="all, delete-orphan")
 
 
 class User(Base):
@@ -59,7 +60,7 @@ class User(Base):
     approved_posts = relationship("Post", foreign_keys="[Post.approved_by_admin]") # Posts approved by the admin
     sent_requests = relationship("Friendship", foreign_keys="[Friendship.user1_id]", back_populates="sender") # Friend requests sent by the user
     received_requests = relationship("Friendship", foreign_keys="[Friendship.user2_id]", back_populates="receiver") # Friend requests received by the user
-
+    liked_posts = relationship("PostLike", back_populates="user", cascade="all, delete-orphan")
 
 class Friendship(Base):
     __tablename__ = 'friendships' 
@@ -72,6 +73,18 @@ class Friendship(Base):
 
     sender = relationship("User", foreign_keys=[user1_id], back_populates="sent_requests") 
     receiver = relationship("User", foreign_keys=[user2_id], back_populates="received_requests") 
+
+class PostLike(Base):
+    __tablename__ = 'post_likes'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    post_id = Column(Integer, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+
+    user = relationship("User", back_populates="liked_posts")
+    post = relationship("Post", back_populates="likes")
+
 
 
 DATABASE_URL_RENDER = "postgresql://drs_postgres:63CgcJb2GwEPOdU4UD1Hn7eBgGLMzEKA@dpg-ctol4al2ng1s73bjnla0-a.oregon-postgres.render.com:5432/drs_db_ewbp"

@@ -26,6 +26,8 @@ interface Post {
   postImage: string;
   postText: string;
   timeAgo: string;
+  isLiked: boolean;
+  likeCount: number;
 }
 
 const Index: React.FC = () => {
@@ -120,6 +122,41 @@ const Index: React.FC = () => {
     return <Loader />;
   }
 
+  const handleLikeToggle = async (postId: number) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/posts/like/${postId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+  
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("Server nije vratio validan JSON:", text);
+        return;
+      }
+        
+      if (response.ok) {
+        // Ažuriraj lokalno stanje posta
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  }
+              : post
+          )
+        );
+      } else {
+        console.error("Greška:", data.error || data.message);
+      }
+    } catch (err) {
+      console.error("Greška pri lajkovanju posta:", err);
+    }
+  };
+  
 
   if (error) {
     return (
@@ -173,6 +210,9 @@ const Index: React.FC = () => {
                   timeAgo={post.timeAgo}
                   backendUrl={backendUrl!}
                   onImageClick={handleImageClick}
+                  isLiked={post.isLiked}
+                  likeCount={post.likeCount}
+                  onLikeToggle={handleLikeToggle}
                 />
               ))}
             </div>
