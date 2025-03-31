@@ -168,11 +168,11 @@ def friends_posts():
         Post.status == 'approved'
     ).order_by(Post.created_at.desc()).all()
 
-    like_count = db.query(PostLike).filter(PostLike.post_id == post.id).count()
-    is_liked = db.query(PostLike).filter(PostLike.user_id == user_id, PostLike.post_id == post.id).first()
-
     result = []
     for post in posts:
+        like_count = db.query(PostLike).filter(PostLike.post_id == post.id).count()
+        is_liked = db.query(PostLike).filter(PostLike.user_id == user_id, PostLike.post_id == post.id).first()
+
         image_path = f"{post.image_url}" if post.image_url else None
         if image_path:
             result.append({
