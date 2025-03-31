@@ -26,29 +26,10 @@ const Post: React.FC<PostProps> = ({
   timeAgo,
   backendUrl,
   onImageClick,
-  isLiked: initialIsLiked,
-  likeCount: initialLikeCount,
+  isLiked,
+  likeCount,
   onLikeToggle,
 }) => {
-
-  const [isLiked, setIsLiked] = useState(initialIsLiked);
-  const [likeCount, setLikeCount] = useState(initialLikeCount);
-
-  const toggleLike = async () => {
-    try {
-      if (isLiked) {
-        await axios.delete(`${backendUrl}/api/posts/like/${id}`, { withCredentials: true });
-        setIsLiked(false);
-        setLikeCount((prev) => prev - 1);
-      } else {
-        await axios.put(`${backendUrl}/api/posts/like/${id}`, {}, { withCredentials: true });
-        setIsLiked(true);
-        setLikeCount((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.error('Error toggling like:', error);
-    }
-  };
 
   return (
     <div key={id} className="user-post">

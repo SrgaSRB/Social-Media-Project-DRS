@@ -129,23 +129,19 @@ const Index: React.FC = () => {
         credentials: "include",
       });
   
-      const text = await response.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        console.error("Server nije vratio validan JSON:", text);
-        return;
-      }
-        
+      const data = await response.json();
+  
       if (response.ok) {
+        console.log("Post liked/unliked successfully:", data);
         // Ažuriraj lokalno stanje posta
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
             post.id === postId
               ? {
                   ...post,
-                  }
+                  isLiked: data.liked,
+                  likeCount: data.like_count,
+                }
               : post
           )
         );
