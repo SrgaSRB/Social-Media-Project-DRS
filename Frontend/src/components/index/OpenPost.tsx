@@ -57,7 +57,7 @@ const OpenPost: React.FC<OpenPostProps> = ({
                 setComments(data);
             } catch (error) {
                 console.error("Greška prilikom dohvatanja komentara:", error);
-            }finally {
+            } finally {
                 setLoading(false);
             }
         };
@@ -78,8 +78,8 @@ const OpenPost: React.FC<OpenPostProps> = ({
 
         if (res.ok) {
             const newComment = await res.json();
-            setComments(prev => [newComment, ...prev]);
             setCommentText("");
+            setComments(prev => [...prev, newComment]);
         }
     };
 
@@ -136,24 +136,24 @@ const OpenPost: React.FC<OpenPostProps> = ({
                             </div>
                             <div className="user-post-comments-div-block">
                                 <div className="user-post-comments-div-group">
-                                        {loading ? (
-                                            <Loader />
-                                        ) : comments.length === 0 ? (
-                                            <div className="no-comments">No comments yet</div>
-                                        ) : (
-                                            comments.map((comment) => (
-                                                <div className="user-post-comments-div" key={comment.id}>
-                                                    <div className="user-post-comments-image-div">
-                                                        <img src={comment.profileImage} alt={comment.username} />
-                                                    </div>
-                                                    <div className="user-post-comment">
-                                                        <div className="user-post-comment-user-username">@{comment.username}</div>
-                                                        <div className="user-post-comment-text"><span className="text-span-5">@{comment.username}</span>{comment.content}</div>
-                                                        <div className="text-block-30">{comment.created_at}</div>
-                                                    </div>
+                                    {loading ? (
+                                        <Loader />
+                                    ) : comments.length === 0 ? (
+                                        <div className="no-comments">No comments yet</div>
+                                    ) : (
+                                        comments.map((comment) => (
+                                            <div className="user-post-comments-div" key={comment.id}>
+                                                <div className="user-post-comments-image-div">
+                                                    <img src={comment.profileImage} alt={comment.username} />
                                                 </div>
-                                            ))
-                                        )}
+                                                <div className="user-post-comment">
+                                                    <div className="user-post-comment-user-username">@{comment.username}</div>
+                                                    <div className="user-post-comment-text"><span className="text-span-5">@{comment.username}</span>{comment.content}</div>
+                                                    <div className="text-block-30">{comment.created_at}</div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
 
                                 </div>
                                 <div className="user-post-comment-div-block w-form">
@@ -170,6 +170,9 @@ const OpenPost: React.FC<OpenPostProps> = ({
                                     </form>
                                 </div>
                             </div>
+                        <div className="user-post-close" onClick={onClose}>
+                            <img src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/67ec58796dcd3d58c13533b5_x-02%20(1).svg" loading="lazy" alt="" height="Auto" className="image-35" />
+                        </div>
                         </div>
                     </div>
                 </div>

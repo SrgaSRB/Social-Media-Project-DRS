@@ -174,9 +174,6 @@ const Index: React.FC = () => {
   const handleOpenPost = (postId: number) => {
     setSelectedPostId(postId);
     setIsOpenPost(true);
-    console.log(postId);
-    console.log(isOpenPost);
-    console.log(selectedPostId);
   };
 
   const handleClosePost = () => {
@@ -200,7 +197,6 @@ const Index: React.FC = () => {
       {isOpenPost && selectedPostId !== null ? (
         (() => {
           const selectedPost = posts.find((post) => post.id === selectedPostId);
-          console.log("Selected post ID:", selectedPostId, selectedPost);
           if (!selectedPost) return null;
 
           return (

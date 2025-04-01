@@ -2278,6 +2278,7 @@ textarea.w-input, textarea.w-select {
   grid-row-gap: 0px;
   justify-content: space-between;
   align-items: stretch;
+  position: relative;
 }
 
 .user-post-user-info-profile-image {
@@ -4412,6 +4413,25 @@ textarea.w-input, textarea.w-select {
   font-weight: 700;
 }
 
+.user-post-close {
+  cursor: pointer;
+  border-radius: 50%;
+  margin-top: 4px;
+  margin-right: 4px;
+  transition: all .4s;
+  position: absolute;
+  inset: 0% 0% auto auto;
+}
+
+.user-post-close:hover {
+  background-color: #ebebeb;
+  border-radius: 50%;
+}
+
+.image-35 {
+  width: 40px;
+}
+
 @media screen and (max-width: 991px) {
   .container {
     width: 750px;
@@ -5747,6 +5767,10 @@ textarea.w-input, textarea.w-select {
   .text-span-5 {
     margin-right: 2px;
     font-size: 1rem;
+  }
+
+  .image-35 {
+    width: 32px;
   }
 }
 

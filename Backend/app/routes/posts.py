@@ -7,6 +7,7 @@ import uuid
 import datetime
 from flask_socketio import emit
 from app.routes.emails import send_email_in_thread
+from sqlalchemy.orm import joinedload
 
 
 def generate_unique_filename(filename):
@@ -510,5 +511,14 @@ def add_comment(post_id):
     db.add(new_comment)
     db.commit()
 
-    return jsonify({"message": "Comment added successfully"}), 201
+    created_comment = db.query(Comment)\
+        .options(joinedload(Comment.user))\
+        .filter_by(id=new_comment.id).first()
 
+    return jsonify({
+        "id": created_comment.id,
+        "username": created_comment.user.username,
+        "profileImage": created_comment.user.profile_image,
+        "content": created_comment.content,
+        "created_at": created_comment.created_at.strftime("%Y-%m-%d %H:%M:%S")
+    }), 201
