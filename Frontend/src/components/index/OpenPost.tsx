@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProfilePicture from '../universal/ProfilePicture';
+import Loader from "../universal/Loader";
 
 interface CommentType {
     id: number;
@@ -24,7 +25,6 @@ interface OpenPostProps {
     onClose: () => void;
 }
 
-
 const OpenPost: React.FC<OpenPostProps> = ({
     postId,
     username,
@@ -41,8 +41,11 @@ const OpenPost: React.FC<OpenPostProps> = ({
 
     const [commentText, setCommentText] = useState("");
     const [comments, setComments] = useState<CommentType[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        setLoading(true);
+
         if (!postId) return;
 
         const fetchComments = async () => {
@@ -54,6 +57,8 @@ const OpenPost: React.FC<OpenPostProps> = ({
                 setComments(data);
             } catch (error) {
                 console.error("Greška prilikom dohvatanja komentara:", error);
+            }finally {
+                setLoading(false);
             }
         };
 
@@ -131,17 +136,25 @@ const OpenPost: React.FC<OpenPostProps> = ({
                             </div>
                             <div className="user-post-comments-div-block">
                                 <div className="user-post-comments-div-group">
-                                    {comments.map((comment) => (
-                                        <div className="user-post-comments-div" key={comment.id}>
-                                            <div className="user-post-comments-image-div">
-                                                <img src={comment.profileImage} alt={comment.username} />
-                                            </div>
-                                            <div className="user-post-comment">
-                                                <div className="user-post-comment-user-username">@{comment.username}</div>
-                                                <div className="user-post-comment-text">{comment.content}</div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        {loading ? (
+                                            <Loader />
+                                        ) : comments.length === 0 ? (
+                                            <div className="no-comments">No comments yet</div>
+                                        ) : (
+                                            comments.map((comment) => (
+                                                <div className="user-post-comments-div" key={comment.id}>
+                                                    <div className="user-post-comments-image-div">
+                                                        <img src={comment.profileImage} alt={comment.username} />
+                                                    </div>
+                                                    <div className="user-post-comment">
+                                                        <div className="user-post-comment-user-username">@{comment.username}</div>
+                                                        <div className="user-post-comment-text"><span className="text-span-5">@{comment.username}</span>{comment.content}</div>
+                                                        <div className="text-block-30">{comment.created_at}</div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+
                                 </div>
                                 <div className="user-post-comment-div-block w-form">
                                     <form className="user-post-comment-div" onSubmit={handleCommentSubmit}>

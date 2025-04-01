@@ -4379,6 +4379,7 @@ textarea.w-input, textarea.w-select {
 .user-post-comment-user-username {
   font-size: 1rem;
   font-weight: 700;
+  display: none;
 }
 
 .user-post-comments-div-group {
@@ -4401,8 +4402,14 @@ textarea.w-input, textarea.w-select {
 .text-block-30 {
   color: gray;
   text-align: left;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   font-size: .7rem;
+}
+
+.text-span-5 {
+  margin-right: 4px;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 @media screen and (max-width: 991px) {
@@ -5735,6 +5742,11 @@ textarea.w-input, textarea.w-select {
   .open-post-info {
     border-radius: 12px;
     max-height: 100%;
+  }
+
+  .text-span-5 {
+    margin-right: 2px;
+    font-size: 1rem;
   }
 }
 
