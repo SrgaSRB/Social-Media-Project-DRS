@@ -518,7 +518,7 @@ def add_comment(post_id):
     return jsonify({
         "id": created_comment.id,
         "username": created_comment.user.username,
-        "profileImage": created_comment.user.profile_image,
+        "profileImage": created_comment.user.profile_picture_url,
         "content": created_comment.content,
         "created_at": created_comment.created_at.strftime("%Y-%m-%d %H:%M:%S")
     }), 201
