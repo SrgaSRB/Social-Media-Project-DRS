@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
-import Loader from "../components/Loader";
-import ProfilePicture from "../components/ProfilePicture";
+import Loader from "../universal/Loader";
+import ProfilePicture from "../universal/ProfilePicture";
 
 
 interface Friend {

@@ -34,6 +34,7 @@ class Post(Base):
     user = relationship("User", back_populates="posts", foreign_keys=[user_id]) # User who created the post
     admin = relationship("User", foreign_keys=[approved_by_admin]) # Admin who approved the post
     likes = relationship("PostLike", back_populates="post", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
 
 
 class User(Base):
@@ -85,6 +86,17 @@ class PostLike(Base):
     user = relationship("User", back_populates="liked_posts")
     post = relationship("Post", back_populates="likes")
 
+class Comment(Base):
+    __tablename__ = 'comments'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    post_id = Column(Integer, ForeignKey('posts.id', ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+
+    user = relationship("User")
+    post = relationship("Post", back_populates="comments")
 
 
 DATABASE_URL_RENDER = "postgresql://drs_postgres:63CgcJb2GwEPOdU4UD1Hn7eBgGLMzEKA@dpg-ctol4al2ng1s73bjnla0-a.oregon-postgres.render.com:5432/drs_db_ewbp"

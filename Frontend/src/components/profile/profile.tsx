@@ -2,10 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useNotification } from '../notification/NotificationContext';
-import Loader from "../components/Loader";
+import Loader from "../universal/Loader";
 import Cropper from "react-easy-crop";
 import { Area } from "react-easy-crop"; // Importuj tipove za croppedArea i croppedAreaPixels
-import ProfilePicture from "../components/ProfilePicture";
+import ProfilePicture from "../universal/ProfilePicture";
 
 
 const loadCSS = (hrefs: string[]) => {

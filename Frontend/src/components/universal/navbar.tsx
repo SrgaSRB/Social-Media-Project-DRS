@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
-import ProfilePicture from "../components/ProfilePicture";
+import ProfilePicture from "../universal/ProfilePicture";
 
 
 const Navbar: React.FC = () => {

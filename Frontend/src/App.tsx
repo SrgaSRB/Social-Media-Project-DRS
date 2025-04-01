@@ -1,14 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import Register from './components/register';
-import Login from './components/login';
-import Navbar from './components/navbar';
-import Index from './components/index';
-import UploadPost from './components/upload-post';
-import UserProfile from './components/profile';
-import UserSearch from './components/search';
-import FriendsRequest from './components/friends-request';
-import Messages from './components/messages'
+import Register from './components/login-register/register';
+import Login from './components/login-register/login';
+import Navbar from './components/universal/navbar';
+import Index from './components/index/index';
+import UploadPost from './components/upload-post/upload-post';
+import UserProfile from './components/profile/profile';
+import UserSearch from './components/index/search';
+import FriendsRequest from './components/friends-request/friends-request';
+import Messages from './components/messages/messages';
 import './styles/index.css'
 import './styles/notification.css'
 import './App.css'; // Import your CSS file

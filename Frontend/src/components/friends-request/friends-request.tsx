@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
-import Loader from "../components/Loader";
-import ProfilePicture from "../components/ProfilePicture";
+import Loader from "../universal/Loader";
+import ProfilePicture from "../universal/ProfilePicture";
 
 
 const loadCSS = (hrefs: string[]) => {

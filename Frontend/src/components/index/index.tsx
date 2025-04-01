@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 import ModalImage from './ModalImage';
-import Loader from "../components/Loader";
-import Post from "../components/Post";
+import Loader from "../universal/Loader";
+import Post from "./Post";
+import OpenPost from './OpenPost';
 
 const loadCSS = (hrefs: string[]) => {
   // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
@@ -44,9 +45,13 @@ const Index: React.FC = () => {
   const [modalImageUrl, setModalImageUrl] = useState('');
   const [modalAltText, setModalAltText] = useState('');
 
+  const [isOpenPost, setIsOpenPost] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+
+
   useEffect(() => {
     setIsLoading(true);
-    
+
     const checkSession = async () => {
       try {
         const response = await fetch(`${backendUrl}/api/auth/session`, {
@@ -123,36 +128,62 @@ const Index: React.FC = () => {
   }
 
   const handleLikeToggle = async (postId: number) => {
+    // 1. Pronađi post
+    const postIndex = posts.findIndex((post) => post.id === postId);
+    const originalPost = posts[postIndex];
+
+    // 2. Optimistički update
+    const updatedPost = {
+      ...originalPost,
+      isLiked: !originalPost.isLiked,
+      likeCount: originalPost.likeCount + (originalPost.isLiked ? -1 : 1),
+    };
+
+    const newPosts = [...posts];
+    newPosts[postIndex] = updatedPost;
+    setPosts(newPosts);
+
     try {
       const response = await fetch(`${backendUrl}/api/posts/like/${postId}`, {
         method: "POST",
         credentials: "include",
       });
-  
+
       const data = await response.json();
-  
-      if (response.ok) {
-        console.log("Post liked/unliked successfully:", data);
-        // Ažuriraj lokalno stanje posta
-        setPosts((prevPosts) =>
-          prevPosts.map((post) =>
-            post.id === postId
-              ? {
-                  ...post,
-                  isLiked: data.liked,
-                  likeCount: data.like_count,
-                }
-              : post
-          )
-        );
-      } else {
+
+      if (!response.ok) {
+        // Ako server javi grešku, vrati staro stanje
+        setPosts((prev) => {
+          const rollback = [...prev];
+          rollback[postIndex] = originalPost;
+          return rollback;
+        });
         console.error("Greška:", data.error || data.message);
       }
     } catch (err) {
+      // Ako request padne, takođe vrati staro stanje
+      setPosts((prev) => {
+        const rollback = [...prev];
+        rollback[postIndex] = originalPost;
+        return rollback;
+      });
       console.error("Greška pri lajkovanju posta:", err);
     }
   };
-  
+
+  const handleOpenPost = (postId: number) => {
+    setSelectedPostId(postId);
+    setIsOpenPost(true);
+    console.log(postId);
+    console.log(isOpenPost);
+    console.log(selectedPostId);
+  };
+
+  const handleClosePost = () => {
+    setIsOpenPost(false);
+    setSelectedPostId(null);
+  };
+
 
   if (error) {
     return (
@@ -166,6 +197,31 @@ const Index: React.FC = () => {
 
   return (
     <>
+      {isOpenPost && selectedPostId !== null ? (
+        (() => {
+          const selectedPost = posts.find((post) => post.id === selectedPostId);
+          console.log("Selected post ID:", selectedPostId, selectedPost);
+          if (!selectedPost) return null;
+
+          return (
+            <OpenPost
+              postId={selectedPostId}
+              backendUrl={backendUrl!}
+              onClose={handleClosePost}
+              username={selectedPost.username}
+              profileImage={selectedPost.profileImage}
+              postImage={selectedPost.postImage}
+              postText={selectedPost.postText}
+              timeAgo={selectedPost.timeAgo}
+              isLiked={selectedPost.isLiked}
+              likeCount={selectedPost.likeCount}
+              onLikeToggle={handleLikeToggle}
+            />
+          );
+        })()
+      ) : null}
+
+
       <div className="body">
         <section className="hero-section">
           <div className="w-layout-blockcontainer container hero-container w-container">
@@ -209,6 +265,7 @@ const Index: React.FC = () => {
                   isLiked={post.isLiked}
                   likeCount={post.likeCount}
                   onLikeToggle={handleLikeToggle}
+                  handleOpenPost={handleOpenPost}
                 />
               ))}
             </div>

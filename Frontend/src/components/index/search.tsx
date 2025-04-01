@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useLocation } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
-import Loader from "../components/Loader";
+import Loader from "../universal/Loader";
 import { useNavigate } from 'react-router-dom';
-import ProfilePicture from "../components/ProfilePicture";
+import ProfilePicture from "../universal/ProfilePicture";
 
 const loadCSS = (hrefs: string[]) => {
   // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>

@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { NotificationProvider } from './notification/NotificationContext';
-import { NotificationList } from './notification/NotificationList';
+import { NotificationProvider } from './components/notification/NotificationContext';
+import { NotificationList } from './components/notification/NotificationList';
 import { Analytics } from "@vercel/analytics/react"
 
 

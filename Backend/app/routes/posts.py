@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, jsonify, session, send_from_directory
 from werkzeug.utils import secure_filename
-from app.models import Post, User, Friendship, SessionLocal, PostLike
+from app.models import Post, User, Friendship, SessionLocal, PostLike, Comment
 from app import socketio
 import uuid
 import datetime
@@ -471,3 +471,44 @@ def like_post(post_id):
             'liked': True,
             'like_count': db.query(PostLike).filter_by(post_id=post_id).count()
         }), 200
+
+@posts_bp.route('/<int:post_id>/comments', methods=['GET'])
+def get_comments(post_id):
+    db = next(get_db())
+    comments = db.query(Comment).filter_by(post_id=post_id).order_by(Comment.created_at.desc()).all()
+
+    return jsonify([
+        {
+            "id": comment.id,
+            "username": comment.user.username,
+            "profileImage": comment.user.profile_picture_url,
+            "content": comment.content,
+            "created_at": comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        for comment in comments
+    ]), 200
+
+@posts_bp.route('/<int:post_id>/comments', methods=['POST'])
+def add_comment(post_id):
+    db = next(get_db())
+    user_session = session.get('user')
+
+    if not user_session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json()
+    content = data.get("content")
+
+    if not content:
+        return jsonify({"error": "Content required"}), 400
+
+    new_comment = Comment(
+        post_id=post_id,
+        user_id=user_session['id'],
+        content=content
+    )
+    db.add(new_comment)
+    db.commit()
+
+    return jsonify({"message": "Comment added successfully"}), 201
+

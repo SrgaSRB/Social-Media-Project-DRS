@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ProfilePicture from "../components/ProfilePicture";
+import ProfilePicture from "../universal/ProfilePicture";
 import axios from 'axios';
 
 
@@ -15,7 +15,8 @@ interface PostProps {
   isLiked: boolean;
   likeCount: number;
   onLikeToggle: (postId: number) => void;
-}
+  handleOpenPost: (postId: number) => void;
+  }
 
 const Post: React.FC<PostProps> = ({
   id,
@@ -29,6 +30,7 @@ const Post: React.FC<PostProps> = ({
   isLiked,
   likeCount,
   onLikeToggle,
+  handleOpenPost,
 }) => {
 
   return (
@@ -77,9 +79,10 @@ const Post: React.FC<PostProps> = ({
             <div>{likeCount}</div>
           </div>
 
-          <div className="user-post-likes-and-comments">
-            <img src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/67e9c2c6114b7db95b3cc6a1_chat%20(1).png" loading="lazy" alt="" className="image-33" />
-            <div>16</div>
+          <div className="user-post-likes-and-comments" onClick={() => handleOpenPost(id)}>
+          <img src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/67e9c2c6114b7db95b3cc6a1_chat%20(1).png" loading="lazy" alt="" className="image-33" />
+            {//<div>{commentCount}</div>
+            }
           </div>
         </div>
 
