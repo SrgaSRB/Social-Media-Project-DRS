@@ -63,8 +63,11 @@ Use the following credentials to log in and test the application:
 Admins can:
 
 -View all pending posts
+
 -Approve or reject posts with feedback
+
 -Receive email notifications on moderation
+
 -Auto-block users with too many rejected posts
 
 ---
@@ -72,6 +75,7 @@ Admins can:
 ## Deployment Links
 
 Frontend (Vercel): https://social-media-project-drs.vercel.app
+
 Backend (Render): https://social-media-project-drs-3.onrender.com
 
 ---
@@ -79,4 +83,5 @@ Backend (Render): https://social-media-project-drs-3.onrender.com
 ## Contact
 
 For questions or collaboration inquiries, feel free to reach out:
+
 📧 Email: delicdevelopment@gmail.com
