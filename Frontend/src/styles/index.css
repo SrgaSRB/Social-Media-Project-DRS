@@ -2974,6 +2974,7 @@ textarea.w-input, textarea.w-select {
 
 .text-block-17 {
   color: #000;
+  border-bottom: 1px solid #0000;
   justify-content: center;
   align-items: center;
   height: 64px;
@@ -2990,7 +2991,9 @@ textarea.w-input, textarea.w-select {
 }
 
 .chat-box-messages-user-message-text {
+  overflow-wrap: anywhere;
   justify-content: flex-end;
+  align-self: flex-end;
   align-items: center;
   display: flex;
 }
@@ -3081,10 +3084,19 @@ textarea.w-input, textarea.w-select {
 }
 
 .chat-box-messages-friend-message-block {
+  grid-column-gap: 4px;
+  grid-row-gap: 4px;
+  background-color: #ccc;
+  border-radius: 8px 8px 8px 0;
+  flex-flow: column;
   justify-content: flex-start;
-  align-items: center;
+  align-self: flex-start;
+  align-items: stretch;
+  min-width: 60px;
   max-width: 70%;
+  padding: 9px 15px 20px 9px;
   display: flex;
+  position: relative;
 }
 
 .container-4 {
@@ -3095,15 +3107,20 @@ textarea.w-input, textarea.w-select {
 }
 
 .chat-box-messages-user-message-block {
+  grid-column-gap: 4px;
+  grid-row-gap: 4px;
   color: #fff;
   background-color: #4ca2ff;
-  border-radius: 12px;
+  border-radius: 8px 8px 0;
+  flex-flow: column;
   justify-content: flex-end;
   align-self: flex-end;
-  align-items: center;
+  align-items: stretch;
+  min-width: 60px;
   max-width: 70%;
-  padding: 9px 15px;
+  padding: 9px 9px 20px 15px;
   display: flex;
+  position: relative;
 }
 
 .chat-boc-user-photo {
@@ -3122,7 +3139,7 @@ textarea.w-input, textarea.w-select {
   border-left: 1px solid #ccc;
   flex-flow: column;
   flex: 1;
-  padding: 4px 0;
+  padding: 0 0 4px;
   display: flex;
 }
 
@@ -3164,18 +3181,19 @@ textarea.w-input, textarea.w-select {
   justify-content: flex-start;
   align-items: stretch;
   margin-bottom: 16px;
-  padding: 8px;
+  padding: 8px 14px;
   display: flex;
   overflow: auto;
 }
 
 .chat-box-messages-friend-message-text {
   color: #000;
+  overflow-wrap: anywhere;
   background-color: #ccc;
-  border-radius: 12px;
+  border-radius: 8px 8px 8px 0;
   justify-content: flex-start;
+  align-self: flex-start;
   align-items: center;
-  padding: 9px 15px;
   display: flex;
 }
 
@@ -4294,7 +4312,7 @@ textarea.w-input, textarea.w-select {
 .div-block-7 {
   padding-top: 160px;
   padding-bottom: 160px;
-  display: block;
+  display: none;
 }
 
 .image-34 {
@@ -4430,6 +4448,55 @@ textarea.w-input, textarea.w-select {
 
 .image-35 {
   width: 40px;
+}
+
+.div-block-8 {
+  background-color: var(--color-2);
+  width: 24px;
+  height: 24px;
+  margin-right: -24px;
+  position: absolute;
+  inset: auto 0% 0% auto;
+}
+
+.div-block-9 {
+  background-color: #fff;
+  border-bottom-left-radius: 50%;
+  position: absolute;
+  inset: 0%;
+}
+
+.div-block-10 {
+  background-color: #ccc;
+  width: 24px;
+  height: 24px;
+  margin-left: -24px;
+  position: absolute;
+  inset: auto auto 0% 0%;
+}
+
+.div-block-11 {
+  background-color: #fff;
+  border-bottom-right-radius: 50%;
+  position: absolute;
+  inset: 0%;
+}
+
+.chat-box-messages-friend-message-time {
+  margin-bottom: 4px;
+  margin-right: 8px;
+  font-size: .65rem;
+  position: absolute;
+  inset: auto 0% 0% auto;
+}
+
+.chat-box-messages-user-message-time {
+  color: #ccc;
+  margin-bottom: 4px;
+  margin-left: 8px;
+  font-size: .65rem;
+  position: absolute;
+  inset: auto auto 0% 0%;
 }
 
 @media screen and (max-width: 991px) {
@@ -5403,6 +5470,12 @@ textarea.w-input, textarea.w-select {
     font-size: 1.5rem;
   }
 
+  .chat-box-messages-friend-message-block {
+    padding-top: 4px;
+    padding-left: 4px;
+    padding-right: 10px;
+  }
+
   .side-chat-image-div {
     width: 48px;
     height: 48px;
@@ -5412,7 +5485,7 @@ textarea.w-input, textarea.w-select {
     z-index: 10000;
     background-color: #fff;
     margin-bottom: 50px;
-    display: none;
+    display: flex;
     position: fixed;
     inset: 0%;
   }
