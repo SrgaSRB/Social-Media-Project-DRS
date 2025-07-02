@@ -3,25 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext';
 import Loader from "../universal/Loader";
 
-const loadCSS = (href: string) => {
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    if (link.getAttribute('href') !== href) {
-      link.remove();
-    }
-  });
-
-  const existingLink = document.querySelector(`link[href="${href}"]`);
-  if (!existingLink) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  }
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = "/styles/notification.css";
-  document.head.appendChild(link);
-};
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');

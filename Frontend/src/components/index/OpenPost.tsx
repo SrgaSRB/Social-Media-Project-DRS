@@ -44,27 +44,29 @@ const OpenPost: React.FC<OpenPostProps> = ({
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(true);
 
         if (!postId) return;
 
-        const fetchComments = async () => {
-            try {
-                const res = await fetch(`${backendUrl}/api/posts/${postId}/comments`, {
-                    credentials: "include",
-                });
-                const data = await res.json();
-                setComments(data);
-            } catch (error) {
-                console.error("Greška prilikom dohvatanja komentara:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchComments();
+
     }, [postId, backendUrl]);
 
+    const fetchComments = async () => {
+        
+        setLoading(true);
+
+        try {
+            const res = await fetch(`${backendUrl}/api/posts/${postId}/comments`, {
+                credentials: "include",
+            });
+            const data = await res.json();
+            setComments(data);
+        } catch (error) {
+            console.error("Greška prilikom dohvatanja komentara:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -88,16 +90,15 @@ const OpenPost: React.FC<OpenPostProps> = ({
 
     return (
         <section className="open-post-section" onClick={onClose}>
-            <div
-                className="w-layout-blockcontainer container w-container"
-                onClick={(e) => e.stopPropagation()} // <--- OVO SPREČAVA ZATVARANJE KAD KLIKNEŠ UNUTRA
-            >
-                <div className="open-post-wrapper">
+            <div className="w-layout-blockcontainer container w-container">
+
+                <div className="open-post-wrapper" onClick={(e) => e.stopPropagation()}>
                     {postImage && (
                         <div className="open-post-image-div">
                             <img src={`${backendUrl}/api/posts/uploads/${postImage}`} loading="lazy" alt="" className="image-34" />
                         </div>
                     )}
+
                     <div className="open-post-info">
                         <div className="user-post-user-info temp-class">
                             <div className="user-post-info-part">
@@ -170,9 +171,9 @@ const OpenPost: React.FC<OpenPostProps> = ({
                                     </form>
                                 </div>
                             </div>
-                        <div className="user-post-close" onClick={onClose}>
-                            <img src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/67ec58796dcd3d58c13533b5_x-02%20(1).svg" loading="lazy" alt="" height="Auto" className="image-35" />
-                        </div>
+                            <div className="user-post-close" onClick={onClose}>
+                                <img src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/67ec58796dcd3d58c13533b5_x-02%20(1).svg" loading="lazy" alt="" height="Auto" className="image-35" />
+                            </div>
                         </div>
                     </div>
                 </div>

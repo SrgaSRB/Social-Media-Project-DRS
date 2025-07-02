@@ -5,26 +5,6 @@ import { useNotification } from "../notification/NotificationContext";
 import Loader from "../universal/Loader";
 
 
-const loadCSS = (href: string) => {
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    if (link.getAttribute('href') !== href) {
-      link.remove();
-    }
-  });
-
-  const existingLink = document.querySelector(`link[href="${href}"]`);
-  if (!existingLink) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  }
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = "/styles/notification.css";
-  document.head.appendChild(link);
-};
-
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -47,7 +27,7 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
 
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordError, setPasswordError] = useState(""); 
+  const [passwordError, setPasswordError] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -77,7 +57,7 @@ const Register: React.FC = () => {
         setEmailAvailable(false);
       }
     } catch (error) {
-      showNotification("error","Error checking email: " + error);
+      showNotification("error", "Error checking email: " + error);
       setEmailAvailable(false);
     }
   };
@@ -99,7 +79,7 @@ const Register: React.FC = () => {
         setUsernameAvailable(false);
       }
     } catch (error) {
-      showNotification("error","Error checking username: " + error);
+      showNotification("error", "Error checking username: " + error);
       setUsernameAvailable(false);
     }
   };
@@ -123,14 +103,14 @@ const Register: React.FC = () => {
 
       console.log("Backend response:", response);
       if (response.ok) {
-        showNotification("success","Registration successful!");
+        showNotification("success", "Registration successful!");
         navigate("/login"); // Redirect to login page after successful registration
       } else {
         const errorData = await response.json();
-        showNotification("error" ,`Error: ${errorData.message || "An error occurred"}`);
+        showNotification("error", `Error: ${errorData.message || "An error occurred"}`);
       }
     } catch (error) {
-      showNotification( "error","An error occurred. Please try again.");
+      showNotification("error", "An error occurred. Please try again.");
     }
   };
 
@@ -147,7 +127,7 @@ const Register: React.FC = () => {
       setPasswordError("");
     }
   };
-  
+
   return (
     <section>
       <Helmet>

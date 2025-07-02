@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from typing import List
 import threading
 
-def send_email(sender_email: str, sender_password: str, recipients: str, subject: str, message: str, smtp_server: str, smtp_port: int):
+def send_email(sender_email: str, sender_password: str, recipient: str, subject: str, message: str, smtp_server: str, smtp_port: int):
     """
     Function to send an email.
 
@@ -20,7 +20,7 @@ def send_email(sender_email: str, sender_password: str, recipients: str, subject
         # Create a MIME multipart message
         msg = MIMEMultipart()
         msg['From'] = sender_email
-        msg['To'] = ', '.join(recipients)
+        msg['To'] = recipient
         msg['Subject'] = subject
 
         # Attach the message body
@@ -30,9 +30,9 @@ def send_email(sender_email: str, sender_password: str, recipients: str, subject
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()  # Secure the connection
             server.login(sender_email, sender_password)  # Log in to the server
-            server.sendmail(sender_email, recipients, msg.as_string())  # Send the email
+            server.sendmail(sender_email, recipient, msg.as_string())  # Send the email
 
-        print(f"Email sent successfully to {', '.join(recipients)}.")
+        print(f"Email sent successfully to recipient.")
 
     except Exception as e:
         print(f"Failed to send email: {e}")

@@ -4,24 +4,10 @@ import { io } from 'socket.io-client';
 import { useNotification } from '../notification/NotificationContext';
 import Loader from "../universal/Loader";
 import Cropper from "react-easy-crop";
-import { Area } from "react-easy-crop"; // Importuj tipove za croppedArea i croppedAreaPixels
+import { Area } from "react-easy-crop";
 import ProfilePicture from "../universal/ProfilePicture";
-
-
-const loadCSS = (hrefs: string[]) => {
-  // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    link.remove();
-  });
-
-  // Dodajemo nove CSS fajlove
-  hrefs.forEach(href => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  });
-};
+import EditPostView from './EditPostView';
+import RejectPostView from './RejectPostView';
 
 interface BlockedUser {
   id: number;
@@ -50,18 +36,18 @@ interface User {
 
 interface Post {
   id: number;
-  username: string;
   content: string;
-  image_url?: string; // Optional property
-  profileImage?: string; // Optional property
+  image_url?: string;
+  profileImage?: string;
   created_at: string;
+  status: string;
 }
 
 
 const UserProfile: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userType, setUserType] = useState<'admin' | 'user'>('user'); // Default user type
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [userData, setUserData] = useState<User | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -208,6 +194,7 @@ const UserProfile: React.FC = () => {
 
         const data = await response.json();
         setPosts(data);
+        console.log('User posts fetched:', data);
       } catch (error) {
         console.error('Error fetching user posts:', error);
       }
@@ -310,35 +297,6 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleSaveChanges = async (updatedPost: any) => {
-    const formData = new FormData();
-    formData.append('content', updatedPost.content);
-    if (updatedPost.newImage) {
-      formData.append('image', updatedPost.newImage);
-    }
-
-    try {
-      const response = await fetch(`${backendUrl}/api/posts/${updatedPost.id}`, {
-        method: 'PUT',
-        body: formData,
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update post');
-      }
-
-      const updatedData = await response.json();
-      setPosts((prevPosts) =>
-        prevPosts.map((post) => (post.id === updatedData.id ? updatedData : post))
-      );
-      handleCloseModal();
-      showNotification('success', 'The post was successfully updated and sent for approval.');
-    } catch (error) {
-      console.error('Error updating post:', error);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -388,38 +346,6 @@ const UserProfile: React.FC = () => {
     setCurrentPostId(postId);
     setIsRejectModalOpen(true);
   };
-
-  const handleRejectPostWithReason = async () => {
-    if (!currentPostId) return;
-
-    try {
-      const response = await fetch(`${backendUrl}/api/posts/${currentPostId}/reject`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ reason: rejectionReason }),
-      });
-
-      if (response.ok) {
-        setPendingPosts((prevPosts) =>
-          prevPosts.filter((post) => post.id !== currentPostId)
-        );
-        showNotification('success', 'The post was rejected.');
-      } else {
-        showNotification('error', 'An error occurred while rejecting.');
-      }
-    } catch (error) {
-      showNotification('error', 'Error connecting to the server.');
-      console.error('Error rejecting post:', error);
-    } finally {
-      setIsRejectModalOpen(false);
-      setRejectionReason('');
-      setCurrentPostId(null);
-    }
-  };
-
 
   const handleLogout = async () => {
     try {
@@ -583,142 +509,43 @@ const UserProfile: React.FC = () => {
   return (
     <div className="body">
 
-      {isEditModalOpen && (
-        <section className="edit-post-section">
-          <div className="w-layout-blockcontainer container edit-post-container w-container">
-            <div className="edit-post-block">
-              <div className="edit-post-image-and-text-block">
-                <div className="edit-post-image-block">
-                  <div className="text-block-8">
-                    Image <span className="text-span-3">(Optional)</span>
-                  </div>
-                  <div className="edit-post-image">
-                    {currentPost?.image_url || currentPost?.newImage ? (
-                      <>
-                        <img
-                          id="post-photo"
-                          src={
-                            currentPost?.newImage
-                              ? URL.createObjectURL(currentPost.newImage)
-                              : `${backendUrl}/api/posts/uploads/${currentPost.image_url}`
-                          }
-                          alt="Post"
-                          className="image-11"
-                        />
-                        <a
-                          href="#"
-                          id="remove-picture"
-                          className="link-block-4 w-inline-block"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentPost({ ...currentPost, image_url: null, newImage: null });
-                          }}
-                        >
-                          <div>X</div>
-                        </a>
-                      </>
-                    ) : (
-                      <input
-                        type="file"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setCurrentPost({ ...currentPost, newImage: file });
-                          }
-                        }}
-                      />
-                    )}
-                  </div>
-
-                </div>
-                <div className="edit-post-text">
-                  <div className="text-block-9">Post Text:</div>
-                  <textarea
-                    id="post-text"
-                    value={currentPost?.content || ''}
-                    onChange={(e) =>
-                      setCurrentPost({ ...currentPost, content: e.target.value })
-                    }
-                    style={{ maxWidth: '100%' }}
-                  />
-                </div>
-              </div>
-              <div className="edit-post-buttons">
-                <a
-                  href="#"
-                  id="cancel"
-                  className="link-block-5 w-inline-block"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleCloseModal();
-                  }}
-                >
-                  <div>Cancel</div>
-                </a>
-                <a
-                  href="#"
-                  id="edit"
-                  className="link-block-5 w-inline-block"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleSaveChanges(currentPost);
-                  }}
-                >
-                  <div>Save</div>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+      {isEditModalOpen && currentPost && (
+        <EditPostView
+          post={currentPost}
+          backendUrl={backendUrl!}
+          onClose={handleCloseModal}
+          onUpdated={(p) => {
+            setPosts((prev) =>
+              prev.map((post) =>
+                post.id === p.id
+                  ? {
+                    ...post,
+                    ...p,
+                  }
+                  : post
+              ),
+            );
+          }}
+        />
       )}
 
-      {isRejectModalOpen && (
-        <section className="reject-description-section">
-          <div className="w-layout-blockcontainer container container-reject-description w-container">
-            <div className="form-block w-form">
-              <form
-                id="reject-form"
-                name="reject-form"
-                className="form-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleRejectPostWithReason();
-                }}
-              >
-                <label htmlFor="rejectionReason" className="field-label">
-                  Reason for post rejection
-                </label>
-                <textarea
-                  placeholder="Unesite razlog odbijanja objave"
-                  maxLength={5000}
-                  id="rejectionReason"
-                  name="rejectionReason"
-                  className="textarea w-input"
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  required
-                ></textarea>
-                <div className="reject-description-buttons-div">
-                  <button
-                    type="button"
-                    className="reject-button give-up w-button"
-                    onClick={() => {
-                      setIsRejectModalOpen(false);
-                      setRejectionReason('');
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="reject-button w-button">
-                    Send
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
+      {isRejectModalOpen && currentPostId && (
+        <RejectPostView
+          postId={currentPostId}
+          backendUrl={backendUrl}
+          onClose={() => {
+            setIsRejectModalOpen(false);
+            setRejectionReason('');
+            setCurrentPostId(null);
+          }}
+          onRejected={(id) => {
+            setPendingPosts((prev) => prev.filter((p) => p.id !== id));
+          }}
+          showNotification={showNotification}
+        />
       )}
 
+      
       {/* Modal za izmenu slike */}
       {isPhotoSettingsOpen && (
         <div className="profile-photo-settings-background">
@@ -908,7 +735,7 @@ const UserProfile: React.FC = () => {
                         {post.image_url ? (
                           <img
                             src={`${backendUrl}/api/posts/uploads/${post.image_url}`}
-                            alt={post.postImage}
+                            alt={post.image_url}
                             className="image-20"
                           />
                         ) : (

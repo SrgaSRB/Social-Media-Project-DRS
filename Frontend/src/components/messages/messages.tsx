@@ -20,22 +20,6 @@ interface ChatMessage {
   status: string;
 }
 
-const loadCSS = (hrefs: string[]) => {
-  // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    link.remove();
-  });
-
-  // Dodajemo nove CSS fajlove
-  hrefs.forEach(href => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  });
-};
-
-
 const Messages: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);

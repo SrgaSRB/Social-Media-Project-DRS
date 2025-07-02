@@ -1,6 +1,5 @@
 import React from "react";
 
-
 interface ModalImageProps {
     imageUrl: string;
     altText: string;
@@ -11,7 +10,7 @@ const ModalImage : React.FC<ModalImageProps> = ({imageUrl, altText, onClose}) =>
   
     return (
         <div className="modal-overlay" onClick={onClose}>
-          <div className="modal-content">
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <img src={imageUrl} alt={altText} className="modal-image" />
             <button className="modal-close-button" onClick={onClose}>
               &times;

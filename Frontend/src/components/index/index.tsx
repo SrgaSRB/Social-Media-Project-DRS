@@ -50,62 +50,72 @@ const Index: React.FC = () => {
 
 
   useEffect(() => {
-    setIsLoading(true);
-
-    const checkSession = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/auth/session`, {
-          method: 'GET',
-          credentials: 'include', // Include cookies for authentication
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const data = await response.json();
-
-        if (!data.user) {
-          // Redirect the user to login if not logged in
-          navigate('/login');
-        } else {
-          fetchPosts();
-        }
-      } catch (error) {
-        console.error('Error while checking session:', error);
-        navigate('/login'); // Redirect to login in case of error
-      }
-    };
-
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/posts/friends-posts`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch posts. Please try again.');
-        }
-
-        const data: Post[] = await response.json();
-        setPosts(data);
-      } catch (err: any) {
-        setError(err.message || 'An unexpected error occurred.');
-      } finally {
-        if (!hasNotification && location.state?.message) {
-          const { message, type } = location.state;
-          showNotification(type, message);
-          setHasNotification(true);
-        }
-        setIsLoading(false);
-      }
-    };
 
     checkSession();
+    fetchPosts();
+
   }, [navigate, hasNotification, location.state]);
+
+  const checkSession = async () => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/auth/session`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies for authentication
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!data.user) {
+        // Redirect the user to login if not logged in
+        navigate('/login');
+      }
+    }
+    catch (error) {
+      console.error('Error while checking session:', error);
+      navigate('/login'); // Redirect to login in case of error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchPosts = async () => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/posts/friends-posts`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch posts. Please try again.');
+      }
+
+      const data: Post[] = await response.json();
+      setPosts(data);
+    }
+    catch (err: any) {
+      setError(err.message || 'An unexpected error occurred.');
+    }
+    finally {
+      if (!hasNotification && location.state?.message) {
+        const { message, type } = location.state;
+        showNotification(type, message);
+        setHasNotification(true);
+      }
+      setIsLoading(false);
+    }
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -4,3 +4,9 @@ profile.tsx
 
 navbar
 	1000
+
+edit-post-section
+	1000
+
+reject-post-section
+	1000

@@ -273,6 +273,13 @@ def update_post(post_id):
 
             post.image_url = filename
 
+    elif request.form.get('remove_image') == 'true':
+        if post.image_url:
+            old_image_path = os.path.join(UPLOAD_FOLDER, post.image_url)
+            if os.path.exists(old_image_path):
+                os.remove(old_image_path)
+            post.image_url = None
+
     post.status = 'pending'
 
     db.commit()
@@ -409,8 +416,19 @@ def reject_post(post_id):
 
     post.status = 'rejected'
     post.rejection_reason = reason
-    db.commit()
 
+    user = db.query(User).filter_by(id=post.user_id).first()
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    user.rejected_posts_count += 1
+
+    if user.rejected_posts_count >= 3:
+        user.is_blocked = True
+        db.commit()
+        send_post_rejection_email(post_id)
+    
     return jsonify({'message': 'Post rejected successfully'}), 200
 
 

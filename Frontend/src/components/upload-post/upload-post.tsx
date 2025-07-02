@@ -5,21 +5,6 @@ import { useNotification } from '../notification/NotificationContext';
 import Loader from "../universal/Loader";
 
 
-const loadCSS = (hrefs: string[]) => {
-  // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    link.remove();
-  });
-
-  // Dodajemo nove CSS fajlove
-  hrefs.forEach(href => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  });
-};
-
 const UploadPost: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [postText, setPostText] = useState('');
@@ -32,28 +17,31 @@ const UploadPost: React.FC = () => {
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    setIsLoading(true);
-
-    const checkSession = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/auth/session`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-        const data = await response.json();
-
-        if (!data.user) {
-          navigate('/login'); // Redirect to login page if not logged in
-        }
-      } catch (error) {
-        navigate('/login'); // Redirect to login page in case of error
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
     checkSession();
+
   }, []);
+
+  const checkSession = async () => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/auth/session`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+
+      if (!data.user) {
+        navigate('/login'); // Redirect to login page if not logged in
+      }
+    } catch (error) {
+      navigate('/login'); // Redirect to login page in case of error
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -139,12 +127,12 @@ const UploadPost: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      
-                    <div>Drag and Drop to upload file</div>
-                    <div>or</div>
-                    
+
+                      <div>Drag and Drop to upload file</div>
+                      <div>or</div>
+
                       <input
-                        style={{ fontSize : '1rem', width: '210px'}}
+                        style={{ fontSize: '1rem', width: '210px' }}
                         type="file"
                         className="inputFile"
                         accept="image/*"

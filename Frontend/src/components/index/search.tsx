@@ -6,21 +6,6 @@ import Loader from "../universal/Loader";
 import { useNavigate } from 'react-router-dom';
 import ProfilePicture from "../universal/ProfilePicture";
 
-const loadCSS = (hrefs: string[]) => {
-  // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    link.remove();
-  });
-
-  // Dodajemo nove CSS fajlove
-  hrefs.forEach(href => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  });
-};
-
 interface User {
   id: number;
   name: string;
