@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import ProfilePicture from "../universal/ProfilePicture";
-import axios from 'axios';
-
 
 interface PostProps {
   id: number;
@@ -16,7 +14,7 @@ interface PostProps {
   likeCount: number;
   onLikeToggle: (postId: number) => void;
   handleOpenPost: (postId: number) => void;
-  }
+}
 
 const Post: React.FC<PostProps> = ({
   id,
@@ -61,11 +59,10 @@ const Post: React.FC<PostProps> = ({
             <div className="user-post-user-info-date">{timeAgo}</div>
           </div>
         </div>
-        <div className="post-hr" />
 
         <div className="user-post-likes-and-comments-div">
 
-        <div className="user-post-likes-and-comments" onClick={() => onLikeToggle(id)}>
+          <div className="user-post-likes-and-comments" onClick={() => onLikeToggle(id)}>
 
             <img
               src={
@@ -80,13 +77,12 @@ const Post: React.FC<PostProps> = ({
           </div>
 
           <div className="user-post-likes-and-comments" onClick={() => handleOpenPost(id)}>
-          <img src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/67e9c2c6114b7db95b3cc6a1_chat%20(1).png" loading="lazy" alt="" className="image-33" />
+            <img src="https://cdn.prod.website-files.com/67334b62cd4d25faa4b76e02/67e9c2c6114b7db95b3cc6a1_chat%20(1).png" loading="lazy" alt="" className="image-33" />
             {//<div>{commentCount}</div>
             }
           </div>
         </div>
 
-        <div className="post-hr" />
         <div className="user-post-text">
           <div className="text-block-2">{postText}</div>
         </div>

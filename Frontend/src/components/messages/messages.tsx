@@ -20,22 +20,6 @@ interface ChatMessage {
   status: string;
 }
 
-const loadCSS = (hrefs: string[]) => {
-  // Brišemo sve postojeće <link rel="stylesheet"> elemente iz <head>
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-    link.remove();
-  });
-
-  // Dodajemo nove CSS fajlove
-  hrefs.forEach(href => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  });
-};
-
-
 const Messages: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
@@ -72,7 +56,7 @@ const Messages: React.FC = () => {
         const sessionData = await sessionResponse.json();
 
         if (!sessionData.user) {
-          navigate("/login"); // Ako nije ulogovan, preusmerava ga na login
+          navigate("/login");
           return;
         }
 
@@ -181,10 +165,9 @@ const Messages: React.FC = () => {
         // Ako backend vraća novu poruku u polju 'msg', ona će biti dodata;
         // u suprotnom, live listener će je dodati kad stigne preko socket-a.
         if (data && data.msg) {
-          setMessages(prev => [...prev, data.msg]);
           setNewMessage('');
         } else {
-          console.error("Backend nije vratio poruku:", data);
+          console.error("Error:", data);
         }
       })
       .catch(err => console.error(err));
@@ -269,10 +252,14 @@ const Messages: React.FC = () => {
                       msg.sender_id === currentUserId ? (
                         <div key={msg.id} className="chat-box-messages-user-message-block">
                           <div className="chat-box-messages-user-message-text">{msg.content}</div>
+                          <div className='div-block-8'><div className='div-block-9'></div></div>
+                          <div className="chat-box-messages-user-message-time">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                         </div>
                       ) : (
                         <div key={msg.id} className="chat-box-messages-friend-message-block">
                           <div className="chat-box-messages-friend-message-text">{msg.content}</div>
+                          <div className='div-block-10'><div className='div-block-11'></div></div>
+                          <div className="chat-box-messages-friend-message-time">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                         </div>
                       )
                     )
