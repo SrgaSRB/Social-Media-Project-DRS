@@ -32,7 +32,7 @@ class Post(Base):
 
     # Reations
     user = relationship("User", back_populates="posts", foreign_keys=[user_id]) # User who created the post
-    admin = relationship("User", foreign_keys=[approved_by_admin]) # Admin who approved the post
+    admin = relationship("User", foreign_keys=[approved_by_admin], back_populates="approved_posts") # Admin who approved the post
     likes = relationship("PostLike", back_populates="post", cascade="all, delete-orphan")
     comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
 
@@ -58,7 +58,7 @@ class User(Base):
 
     # Relations
     posts = relationship("Post", back_populates="user", foreign_keys="[Post.user_id]", cascade="all, delete-orphan") # Posts created by the user
-    approved_posts = relationship("Post", foreign_keys="[Post.approved_by_admin]") # Posts approved by the admin
+    approved_posts = relationship("Post", foreign_keys="[Post.approved_by_admin]", back_populates="admin", overlaps="admin") # Posts approved by the admin
     sent_requests = relationship("Friendship", foreign_keys="[Friendship.user1_id]", back_populates="sender") # Friend requests sent by the user
     received_requests = relationship("Friendship", foreign_keys="[Friendship.user2_id]", back_populates="receiver") # Friend requests received by the user
     liked_posts = relationship("PostLike", back_populates="user", cascade="all, delete-orphan")

@@ -9,6 +9,9 @@ from flask_socketio import emit
 from app.routes.emails import send_email_in_thread
 from sqlalchemy.orm import joinedload
 
+import logging
+log = logging.getLogger(__name__)
+
 
 def generate_unique_filename(filename):
     """
@@ -398,37 +401,40 @@ def approve_post(post_id):
 
 @posts_bp.route('/<int:post_id>/reject', methods=['POST'])
 def reject_post(post_id):
-    """
-    POST: Odbija post postavljanjem statusa na 'rejected' i dodaje razlog odbijanja.
-    """
-    db = next(get_db())
-    user_session = session.get('user')
+    log.info(">>> /%s/reject triggered", post_id)
 
-    if not user_session or user_session.get('role') != 'admin':
-        return jsonify({'error': 'Unauthorized'}), 403
+    db = next(get_db())
+    
+    print("Pozvan endpoint /reject", flush=True)
 
     post = db.query(Post).filter_by(id=post_id).first()
     if not post:
+        print("Post not found", flush=True)
         return jsonify({'error': 'Post not found'}), 404
 
     data = request.get_json()
     reason = data.get('reason', '')
 
+    print(f"Reason: {reason}", flush=True)
+
     post.status = 'rejected'
     post.rejection_reason = reason
 
     user = db.query(User).filter_by(id=post.user_id).first()
-
     if not user:
+        print("User not found", flush=True)
         return jsonify({'error': 'User not found'}), 404
     
     user.rejected_posts_count += 1
+    print(f"{user.username} rejected count: {user.rejected_posts_count}", flush=True)
 
     if user.rejected_posts_count >= 3:
         user.is_blocked = True
-        db.commit()
-        send_post_rejection_email(post_id)
-    
+        print(f"{user.username} blocked", flush=True)
+
+    db.add(user)
+    db.commit()
+
     return jsonify({'message': 'Post rejected successfully'}), 200
 
 

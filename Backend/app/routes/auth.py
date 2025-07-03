@@ -94,6 +94,12 @@ def login():
     db = next(get_db())
     user = db.query(User).filter_by(username=username).first()
 
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    if user.is_blocked:
+        return jsonify({'error': 'User is blocked'}), 403
+
     if user and user.password == password:
         session['user'] = {
             'id': user.id,
@@ -167,7 +173,7 @@ def get_session():
     if user:
         return jsonify({'user': user}), 200
 
-    return jsonify({'user': None}), 200
+    return jsonify({'error': 'No active session'}), 401
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():

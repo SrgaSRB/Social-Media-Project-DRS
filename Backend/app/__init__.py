@@ -5,6 +5,9 @@ import cloudinary
 import cloudinary.uploader
 from config import Config
 
+from app.models import engine 
+from app.models import Base
+
 socketio = SocketIO(cors_allowed_origins="*")
 
 def create_app():
@@ -33,5 +36,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(messages_bp)
+
+    Base.metadata.create_all(bind=engine)
 
     return app

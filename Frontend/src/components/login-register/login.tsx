@@ -63,6 +63,17 @@ const Login: React.FC = () => {
         let errorMsg = 'Login failed';
         try {
           const errorData = await response.json();
+          // Check for blocked user
+          if (response.status === 403 && errorData.error === 'User is blocked') {
+            showNotification("error", "Your account has been blocked. Please contact support.");
+            return;
+          }else if (response.status === 401) {
+            showNotification("warning", "Invalid password. Please try again.");
+            return;
+          }else if (response.status === 404) {
+            showNotification("warning", "User not found. Please check your username.");
+            return;
+          }
           errorMsg = errorData.error || response.statusText;
         } catch (jsonError) {
           console.error('Invalid JSON response:', jsonError);

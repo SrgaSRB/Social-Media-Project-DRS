@@ -136,7 +136,6 @@ const UserProfile: React.FC = () => {
   */
 
   useEffect(() => {
-    setIsLoading(true);
 
     // Testiranje prijema događaja
     socket.on('new_pending_post', (data) => {
@@ -144,90 +143,125 @@ const UserProfile: React.FC = () => {
       console.log('Received new pending post:', data);
     });
 
-    //Blocked users list
-    const fetchBlockedUsers = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/users/blocked`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch blocked users');
-        }
-
-        const data = await response.json();
-        setBlockedUsers(data);
-      } catch (error) {
-        showNotification("error", 'Error fetching blocked users:' + error);
-      }
-    };
-
-    //check is session empty
-    const checkSession = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/auth/session`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-        const data = await response.json();
-
-        if (!data.user) {
-          navigate('/login');
-        }
-      } catch (error) {
-        console.error('Error fetching session:', error);
-        navigate('/login');
-      }
-    };
-
-    const fetchUserPosts = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/posts/user-posts`, {
-          method: 'GET',
-          credentials: 'include', // Neophodno za sesiju
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user posts');
-        }
-
-        const data = await response.json();
-        setPosts(data);
-        console.log('User posts fetched:', data);
-      } catch (error) {
-        console.error('Error fetching user posts:', error);
-      }
-    };
-
-    fetch(`${backendUrl}/api/auth/session`, {
-      credentials: 'include',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const { user } = data;
-        setUserType(user?.role || 'user');
-        setUserData(user);
-      })
-      .catch((error) => {
-        console.error('Error fetching session:', error);
-        setUserType('user');
-      })
-      .finally(() => setIsLoading(false));
-
-    fetchUserPosts();
     checkSession();
-    if (userType === 'admin') {
-      fetchPendingPosts();
-      fetchBlockedUsers();
-    }
-
+    fetchUserPosts();
+    fetchPendingPosts();
+    fetchBlockedUsers();
 
     return () => {
       socket.disconnect();
     };
   }, [userType]);
 
+
+  const fetchBlockedUsers = async () => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/users/blocked`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch blocked users');
+      }
+
+      const data = await response.json();
+      setBlockedUsers(data);
+    } catch (error) {
+      showNotification("error", 'Error fetching blocked users:' + error);
+    } finally {
+      setIsLoading(false);
+    }
+
+  };
+
+  const checkSession = async () => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/auth/session`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+
+      if (!data.user) {
+        navigate('/login');
+      }
+      setUserData(data.user);
+
+      if (data.user.role === 'admin') {
+        setUserType('admin');
+      }
+    } catch (error) {
+      console.error('Error fetching session:', error);
+      navigate('/login');
+    } finally {
+      setIsLoading(false);
+    }
+
+  };
+
+  const fetchUserPosts = async () => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/posts/user-posts`, {
+        method: 'GET',
+        credentials: 'include', // Neophodno za sesiju
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user posts');
+      }
+
+      const data = await response.json();
+      setPosts(data);
+      console.log('User posts fetched:', data);
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+
+  };
+
+  const fetchPendingPosts = async () => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/posts/pending-posts`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+      });
+
+      if (!response.ok) {
+      throw new Error('Failed to fetch pending posts');
+      }
+
+      const data = await response.json();
+      setPendingPosts(data);
+      console.log('Pending posts fetched:', data);
+    } catch (error) {
+      console.error('Error fetching pending posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+
+
+    socket.on('new_pending_post', (post) => {
+      setPendingPosts((prevPosts) => [...prevPosts, post]);
+    });
+  };
 
   const handleEditPost = (post: any) => {
     setCurrentPost(post);
@@ -247,31 +281,6 @@ const UserProfile: React.FC = () => {
     }
   };
 
-
-  const fetchPendingPosts = async () => {
-    fetch(`${backendUrl}/api/posts/pending-posts`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json', // Recite serveru da očekujete JSON odgovor
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch pending posts');
-        }
-        return response.json();
-      })
-      .then((data) => setPendingPosts(data))
-      .catch((error) => console.error('Error fetching pending posts:', error));
-
-
-
-    // Listen for new pending posts via WebSocket
-    socket.on('new_pending_post', (post) => {
-      setPendingPosts((prevPosts) => [...prevPosts, post]);
-    });
-  };
 
   const handleDeletePost = async (postId: number) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this post?');
@@ -333,6 +342,7 @@ const UserProfile: React.FC = () => {
       if (response.ok) {
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
         showNotification('success', 'The post was approved.');
+        setPendingPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
       } else {
         showNotification('error', 'An error occurred while approving.');
       }
@@ -545,7 +555,7 @@ const UserProfile: React.FC = () => {
         />
       )}
 
-      
+
       {/* Modal za izmenu slike */}
       {isPhotoSettingsOpen && (
         <div className="profile-photo-settings-background">
@@ -819,16 +829,7 @@ const UserProfile: React.FC = () => {
                           <div className="created-post-user-info">
                             <div className="created-post-user-info-block">
                               <div className="div-block-2">
-                                <img
-                                  src=
-                                  {
-                                    post.profileImage === "defaultProfilePicture.svg"
-                                      ? "/assets/Icons/defaultProfilePicture.svg"
-                                      : `${backendUrl}/api/posts/uploads/${post.profileImage}`
-                                  }
-                                  alt="User Profile"
-                                  className="image-26"
-                                />
+                                <ProfilePicture profileImage={post.profileImage} />
                               </div>
                               <div>
                                 <div className="text-block-26">
@@ -901,16 +902,7 @@ const UserProfile: React.FC = () => {
                       <div className="blocked-user-block" key={user.id}>
                         <div className="blocked-user-info">
                           <div className="blocked-user-image">
-                            <img
-                              src=
-                              {
-                                user.profileImage === "defaultProfilePicture.svg"
-                                  ? "/assets/Icons/defaultProfilePicture.svg" // Putanja do lokalnog fajla
-                                  : `${backendUrl}/api/posts/uploads/${user.profileImage}` // Putanja ka serveru
-                              }
-                              alt="Profile"
-                              className="image-27"
-                            />
+                            <ProfilePicture profileImage={user?.profileImage}/>
                           </div>
                           <div className="blocked-user-info-block">
                             <div className="info-upper-text">Username</div>
