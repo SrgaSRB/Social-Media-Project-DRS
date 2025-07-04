@@ -51,6 +51,7 @@ const Index: React.FC = () => {
 
   useEffect(() => {
 
+    console.log("Backend URL:", backendUrl);
     checkSession();
     fetchPosts();
 

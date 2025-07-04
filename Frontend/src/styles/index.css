@@ -4340,7 +4340,7 @@ textarea.w-input, textarea.w-select {
 .div-block-7 {
   padding-top: 160px;
   padding-bottom: 160px;
-  display: none;
+  display: block;
 }
 
 .image-34 {
@@ -5435,6 +5435,7 @@ textarea.w-input, textarea.w-select {
     width: 100%;
     min-width: auto;
     max-width: 100%;
+    margin: 0;
   }
 
   .image-5 {
@@ -5711,6 +5712,10 @@ textarea.w-input, textarea.w-select {
     width: 32px;
   }
 
+  .chat-section {
+    display: none;
+  }
+
   .chat-box-user {
     position: relative;
   }
@@ -5922,6 +5927,10 @@ textarea.w-input, textarea.w-select {
     min-height: 100dvh;
   }
 
+  .blocked-users-header {
+    z-index: 200;
+  }
+
   .blocked-user-info {
     grid-column-gap: 4px;
     grid-row-gap: 4px;
@@ -5977,7 +5986,6 @@ textarea.w-input, textarea.w-select {
   }
 
   .navbar {
-    z-index: 100;
     width: 100%;
     height: 50px;
   }
@@ -6117,10 +6125,11 @@ textarea.w-input, textarea.w-select {
   .user-post-likes-and-comments-div {
     grid-column-gap: 8px;
     grid-row-gap: 8px;
-    align-self: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
     margin-top: 2px;
     margin-bottom: 2px;
-    margin-left: 8px;
+    margin-left: 0;
   }
 
   .image-32, .image-33 {
@@ -6134,6 +6143,10 @@ textarea.w-input, textarea.w-select {
   .open-post-info {
     border-radius: 12px;
     max-height: 100%;
+  }
+
+  .div-block-7 {
+    display: none;
   }
 
   .text-span-5 {

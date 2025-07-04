@@ -10,3 +10,15 @@ edit-post-section
 
 reject-post-section
 	1000
+
+open-post-section
+	1000
+
+reject/padding post bg
+	100
+
+reject/padding post text
+	101
+
+padding/blocked section header text
+	200

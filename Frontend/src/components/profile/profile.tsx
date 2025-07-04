@@ -41,6 +41,7 @@ interface Post {
   profileImage?: string;
   created_at: string;
   status: string;
+  rejection_reason?: string; 
 }
 
 
@@ -311,12 +312,25 @@ const UserProfile: React.FC = () => {
     setError(null);
     setIsSaving(true);
 
+    const mappedUserData = {
+      username: userData?.username,
+      first_name: userData?.firstName,
+      last_name: userData?.lastName,
+      address: userData?.address,
+      city: userData?.city,
+      country: userData?.country,
+      phone_number: userData?.phone,
+      email: userData?.email,
+      password: userData?.password,
+      // profile_picture_url: userData?.profileImage, // Uncomment if backend expects this
+    };
+
     try {
       const response = await fetch(`${backendUrl}/api/auth/update-profile`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-        credentials: 'include', // Omogućava slanje kolačića sa sesijom
+        body: JSON.stringify(mappedUserData),
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -737,7 +751,7 @@ const UserProfile: React.FC = () => {
                           <div className="user-postreject-div"></div>
                           <div className="user-post-padding-image-div">
                             <img src="\assets\Icons\alert-triangle-RED.svg" loading="lazy" alt="" className="image-12" />
-                            <div className="text-block-20">Post is rejected!</div>
+                            <div className="text-block-20">Post is rejected! <br></br> Reason: {post.rejection_reason}</div>
                           </div>
                         </>
                       )}

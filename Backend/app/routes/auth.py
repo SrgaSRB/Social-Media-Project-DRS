@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session
 from app.models import User, SessionLocal, Friendship
 from werkzeug.security import check_password_hash
 from app.routes.emails import send_email_in_thread
+from contextlib import contextmanager
 
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
+@contextmanager
 def get_db():
     """
     Creates and manages a database session.
@@ -35,46 +37,47 @@ def register():
     if ' ' in data['username']:
         return jsonify({"error": "Username cannot contain whitespace"}), 400
 
-    db = next(get_db())
-    existing_user = db.query(User).filter((User.username == data['username']) | (User.email == data['email'])).first()
-    if existing_user:
-        return jsonify({"error": "Username or email already exists"}), 400
+    with get_db() as db:
 
-    new_user = User(
-        username=data['username'],
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        address=data['address'],
-        city=data['city'],
-        country=data['country'],
-        phone_number=data['phone_number'],
-        email=data['email'],
-        password=data['password'],  
-        role='user'  
-    )
+        existing_user = db.query(User).filter((User.username == data['username']) | (User.email == data['email'])).first()
+        if existing_user:
+            return jsonify({"error": "Username or email already exists"}), 400
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    admin = db.query(User).filter_by(role='admin').first()
-
-    if admin:
-        new_friendship = Friendship(
-            user1_id = new_user.id,
-            user2_id = admin.id,
-            status = 'accepted',
-            request_sent_by = admin.id
+        new_user = User(
+            username=data['username'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            address=data['address'],
+            city=data['city'],
+            country=data['country'],
+            phone_number=data['phone_number'],
+            email=data['email'],
+            password=data['password'],  
+            role='user'  
         )
-        db.add(new_friendship)
-        db.commit()
 
-    message_text = f"Kreiran korisnik! Korisnicko ime: {new_user.username} Lozinka: {new_user.password}"
-    send_email_in_thread(
-        "luka.zbucnovic@gmail.com", "jndx ishq rgsd ehnb",
-        [f"{new_user.email}"], "Korisnik uspesno kreiran", message_text,
-        "smtp.gmail.com", 587
-    )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        admin = db.query(User).filter_by(role='admin').first()
+
+        if admin:
+            new_friendship = Friendship(
+                user1_id = new_user.id,
+                user2_id = admin.id,
+                status = 'accepted',
+                request_sent_by = admin.id
+            )
+            db.add(new_friendship)
+            db.commit()
+
+        message_text = f"Kreiran korisnik! Korisnicko ime: {new_user.username} Lozinka: {new_user.password}"
+        send_email_in_thread(
+            "luka.zbucnovic@gmail.com", "jndx ishq rgsd ehnb",
+            [f"{new_user.email}"], "Korisnik uspesno kreiran", message_text,
+            "smtp.gmail.com", 587
+        )
 
     return jsonify({"message": "Registration successful"}), 201
 
@@ -90,35 +93,34 @@ def login():
     if not username or not password:
         return jsonify({'error': 'Username and password are required'}), 400
 
-    # Get the user from the database
-    db = next(get_db())
-    user = db.query(User).filter_by(username=username).first()
+    with get_db() as db:
+        user = db.query(User).filter_by(username=username).first()
 
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
 
-    if user.is_blocked:
-        return jsonify({'error': 'User is blocked'}), 403
+        if user.is_blocked:
+            return jsonify({'error': 'User is blocked'}), 403
 
-    if user and user.password == password:
-        session['user'] = {
-            'id': user.id,
-            'username': user.username,
-            'firstName': user.first_name,
-            'lastName': user.last_name,
-            'address': user.address,
-            'city': user.city,
-            'country': user.country,
-            'phone': user.phone_number,
-            'email': user.email,
-            'password': user.password,  # Plain-text password (to be removed in the future)
-            'role': user.role,
-            'isBlocked': user.is_blocked,
-            'rejectedPostsCount': user.rejected_posts_count,
-            'createdAt': user.created_at.isoformat() if user.created_at else None,
-            'profileImage': user.profile_picture_url
-        }
-        return jsonify({'message': 'Login successful', 'user': session['user']}), 200
+        if user and user.password == password:
+            session['user'] = {
+                'id': user.id,
+                'username': user.username,
+                'firstName': user.first_name,
+                'lastName': user.last_name,
+                'address': user.address,
+                'city': user.city,
+                'country': user.country,
+                'phone': user.phone_number,
+                'email': user.email,
+                'password': user.password,  # Plain-text password (to be removed in the future)
+                'role': user.role,
+                'isBlocked': user.is_blocked,
+                'rejectedPostsCount': user.rejected_posts_count,
+                'createdAt': user.created_at.isoformat() if user.created_at else None,
+                'profileImage': user.profile_picture_url
+            }
+            return jsonify({'message': 'Login successful', 'user': session['user']}), 200
 
     return jsonify({'error': 'Invalid username or password'}), 401
 
@@ -134,20 +136,21 @@ def update_profile():
     if not session_username:
         return jsonify({'error': 'You are not logged in'}), 401
 
-    db = next(get_db())
-    user = db.query(User).filter_by(username=session_username).first()
+    with get_db() as db:
+        user = db.query(User).filter_by(username=session_username).first()
 
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
 
-    for key, value in data.items():
-        if key != 'username':  
-            setattr(user, key, value)
+        for key, value in data.items():
+            if key != 'username':  
+                setattr(user, key, value)
 
-    db.commit()
+        db.commit()
 
-    session['user'] = {**session['user'], **data}
-    return jsonify({'message': 'Profile updated successfully', 'user': session['user']}), 200
+        session['user'] = {**session['user'], **data}
+
+        return jsonify({'message': 'Profile updated successfully', 'user': session['user']}), 200
 
 @auth_bp.route('/check-username', methods=['POST'])
 def check_username():
@@ -157,9 +160,8 @@ def check_username():
     if not username:
         return jsonify({"error": "Username is required"}), 400
 
-    db = SessionLocal()
-    user = db.query(User).filter_by(username=username).first()
-    db.close()
+    with get_db() as db:
+        user = db.query(User).filter_by(username=username).first()
 
     return jsonify({"available": user is None}), 200
 
@@ -191,8 +193,8 @@ def check_email():
     if not email:
         return jsonify({'error': 'Email is required'}), 400
 
-    db = next(get_db())
-    user = db.query(User).filter_by(email=email).first()
+    with get_db() as db:
+        user = db.query(User).filter_by(email=email).first()
 
     if user:
         return jsonify({'available': False}), 200
