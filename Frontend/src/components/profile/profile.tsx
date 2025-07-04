@@ -146,8 +146,6 @@ const UserProfile: React.FC = () => {
 
     checkSession();
     fetchUserPosts();
-    fetchPendingPosts();
-    fetchBlockedUsers();
 
     return () => {
       socket.disconnect();
@@ -197,6 +195,8 @@ const UserProfile: React.FC = () => {
 
       if (data.user.role === 'admin') {
         setUserType('admin');
+        fetchPendingPosts(); 
+        fetchBlockedUsers(); 
       }
     } catch (error) {
       console.error('Error fetching session:', error);

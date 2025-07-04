@@ -38,6 +38,7 @@ def get_db():
 
 users_bp = Blueprint('users', __name__, url_prefix='/api/users')
 
+#Proveri za sta je ova ruta
 @users_bp.route('/accept-friend', methods=['POST'])
 def accept_friend():
     """
@@ -52,14 +53,21 @@ def accept_friend():
 
     with get_db() as db:
 
-        friend_request = db.query(Friendship).filter_by(
-            user1_id=sender_id, user2_id=receiver_id, status='pending'
-        ).first()
+        friend_request = (
+            db.query(Friendship)
+            .filter(
+                Friendship.status == 'pending',
+                ((Friendship.user1_id == sender_id) & (Friendship.user2_id == receiver_id)) |
+                ((Friendship.user1_id == receiver_id) & (Friendship.user2_id == sender_id))
+            )
+            .first()
+        )
 
         if not friend_request:
             return jsonify({"error": "Friend request not found"}), 404
 
         friend_request.status = 'accepted'
+        db.add(friend_request)
         db.commit()
         
         return jsonify({"message": "Friend request accepted"}), 200
@@ -195,11 +203,11 @@ def accept_friend_request():
                 status='pending'
             ).first()
 
-    if not friend_request:
-        return jsonify({'error': 'Friend request not found or already accepted'}), 404
+        if not friend_request:
+            return jsonify({'error': 'Friend request not found or already accepted'}), 404
 
-    friend_request.status = 'accepted'
-    db.commit()
+        friend_request.status = 'accepted'
+        db.commit()
 
     return jsonify({'message': 'Friend request accepted successfully'}), 200
 
