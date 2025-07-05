@@ -112,38 +112,49 @@ def send_post_rejection_email(post_id: int):
         except Exception:
             return jsonify({"error": "Došlo je do greške pri slanju email-a."}), 500
     
-def block_user_if_rejected_posts_exceed_limit(user_id):
-    
+def block_user_and_notify(user_id):
     with get_db() as db:
-
         try:
-            # Prebrojavanje odbijenih objava korisnika
-            rejected_posts_count = db.query(Post).filter_by(user_id=user_id, status='rejected').count()
+            user = db.query(User).filter_by(id=user_id).first()
 
-            # Ažuriranje korisnika ako ima više od 3 odbijene objave
-            if rejected_posts_count > 3:
+            if user and not user.is_blocked:
+                user.is_blocked = True
+                db.commit()
 
-                user = db.query(User).filter_by(id=user_id).first()
+                # Slanje obaveštenja
+                subject = "Obaveštenje o privremenoj suspenziji naloga"
+                message = (
+                    "Poštovani,\n\n"
+                    "Obaveštavamo Vas da je Vaš nalog privremeno suspendovan zbog učestalog objavljivanja sadržaja "
+                    "koji nije odobren od strane administratora. Broj odbijenih objava premašio je dozvoljeni prag(3).\n\n"
+                    "Molimo Vas da ubuduće pažljivo proučite pravila korišćenja platforme. "
+                    "Vaš nalog može biti reaktiviran nakon dodatne provere od strane administratora.\n\n"
+                    "Hvala na razumevanju.\n\n"
+                    "Srdačno,\n"
+                    "Administracija platforme"
+                )
 
-                if user:
 
-                    user.is_blocked = True
-                    db.commit()
+                # Email parametri
+                sender_email = "luka.zbucnovic@gmail.com"
+                sender_password = "jndx ishq rgsd ehnb"
+                smtp_server = "smtp.gmail.com"
+                smtp_port = 587
 
-                    # Detalji email-a
-                    subject = "Blokirani ste"
-                    message = "Nažalost, zbog kršenja pravila naše zajednice (prekomeran broj odbijenih objava, preko 3) bili smo prinudjeni da Vam suspendujemo nalog na neko vreme (dok Vas admin ne nagradi za dobro vladanje)."
+                send_email_in_thread(
+                    sender_email,
+                    sender_password,
+                    user.email,
+                    subject,
+                    message,
+                    smtp_server,
+                    smtp_port
+                )
 
-                    # Parametri za slanje email-a
-                    sender_email = "luka.zbucnovic@gmail.com"  # Ovdje je fiksiran email administratora
-                    sender_password = "jndx ishq rgsd ehnb"  # Koristi aplikacijsku lozinku ako koristiš Gmail
-                    smtp_server = "smtp.gmail.com"
-                    smtp_port = 587
-
-                    send_email_in_thread(sender_email,sender_password,user.email,subject,message,smtp_server,smtp_port)
-
-        except Exception:
+        except Exception as e:
             db.rollback()
+            print(f"Greška prilikom blokiranja korisnika: {e}")
+
 
 
 @posts_bp.route('/friends-posts', methods=['GET'])
