@@ -3385,7 +3385,7 @@ textarea.w-input, textarea.w-select {
 }
 
 .user-post-remove:hover {
-  box-shadow: 2px 2px 5px red;
+  box-shadow: 1px 1px 5px #ff000080;
 }
 
 .container-hr {
@@ -3478,7 +3478,7 @@ textarea.w-input, textarea.w-select {
 }
 
 .user-post-edit:hover {
-  box-shadow: 2px 2px 5px #0f0;
+  box-shadow: 1px 1px 5px #00ff0080;
 }
 
 .user-info-image-settings-icon {
@@ -4054,7 +4054,9 @@ textarea.w-input, textarea.w-select {
 }
 
 .navibar-icon.selected-icon {
+  background-color: #0003;
   border-bottom: 6px solid #000;
+  border-radius: 16px;
   flex: 1;
 }
 
@@ -6003,6 +6005,12 @@ textarea.w-input, textarea.w-select {
     width: auto;
     max-width: none;
     height: auto;
+  }
+
+  .navibar-icon.selected-icon {
+    background-color: #0000004d;
+    border: 1px solid #0000;
+    border-radius: 8px;
   }
 
   .image-29 {

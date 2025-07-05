@@ -105,8 +105,6 @@ def send_post_rejection_email(post_id: int):
 
             send_email_in_thread(sender_email,sender_password,user.email,subject,message,smtp_server,smtp_port)
 
-            block_user_if_rejected_posts_exceed_limit(user.id)
-
             return jsonify({"message": "Email o odbijanju poslat korisniku."}), 200
 
         except Exception:
@@ -450,7 +448,7 @@ def reject_post(post_id):
 
         if user.rejected_posts_count >= 3:
             user.is_blocked = True
-            block_user_if_rejected_posts_exceed_limit(user.id)
+            block_user_and_notify(user.id)
 
 
         db.add(user)
