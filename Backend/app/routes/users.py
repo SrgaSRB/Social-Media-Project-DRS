@@ -303,7 +303,7 @@ def get_blocked_users():
             'profileImage': user.profile_picture_url
         })
 
-        return jsonify(result), 200
+    return jsonify(result), 200
 
 @users_bp.route('/unblock/<int:user_id>', methods=['POST'])
 def unblock_user(user_id):
