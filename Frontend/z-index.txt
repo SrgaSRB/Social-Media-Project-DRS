@@ -20,5 +20,8 @@ reject/padding post bg
 reject/padding post text
 	101
 
+user-post-remove-and-edit-div
+	103
+
 padding/blocked section header text
 	200

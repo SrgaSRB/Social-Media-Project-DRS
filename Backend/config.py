@@ -8,7 +8,6 @@ class Config:
     UPLOAD_FOLDER = "./uploads"
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-    # Cloudinary podaci (nemoj direktno u kod u realnim aplikacijama)
     CLOUDINARY_CLOUD_NAME = "dloemc8rb"
     CLOUDINARY_API_KEY = "473783831832757"
     CLOUDINARY_API_SECRET = "qqhfhL8l2FEjkkG4lBJGhbov63o"

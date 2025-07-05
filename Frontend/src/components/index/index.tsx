@@ -103,6 +103,7 @@ const Index: React.FC = () => {
       }
 
       const data: Post[] = await response.json();
+      console.log("Fetched posts:", data);
       setPosts(data);
     }
     catch (err: any) {

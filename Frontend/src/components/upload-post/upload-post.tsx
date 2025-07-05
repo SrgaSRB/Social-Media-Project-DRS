@@ -85,6 +85,8 @@ const UploadPost: React.FC = () => {
         body: formData,
       });
 
+      console.log("Response status:", response.status);
+
       if (response.status === 201) {
         showNotification("success", 'The post was created successfully!');
         setPostText('');

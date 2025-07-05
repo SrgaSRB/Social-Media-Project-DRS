@@ -41,7 +41,7 @@ interface Post {
   profileImage?: string;
   created_at: string;
   status: string;
-  rejection_reason?: string; 
+  rejection_reason?: string;
 }
 
 
@@ -195,8 +195,8 @@ const UserProfile: React.FC = () => {
 
       if (data.user.role === 'admin') {
         setUserType('admin');
-        fetchPendingPosts(); 
-        fetchBlockedUsers(); 
+        fetchPendingPosts();
+        fetchBlockedUsers();
       }
     } catch (error) {
       console.error('Error fetching session:', error);
@@ -238,15 +238,15 @@ const UserProfile: React.FC = () => {
 
     try {
       const response = await fetch(`${backendUrl}/api/posts/pending-posts`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      },
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        },
       });
 
       if (!response.ok) {
-      throw new Error('Failed to fetch pending posts');
+        throw new Error('Failed to fetch pending posts');
       }
 
       const data = await response.json();
@@ -784,20 +784,27 @@ const UserProfile: React.FC = () => {
                         <div>{post.content}</div>
                       </div>
                       <div className="user-post-remove-and-edit-div">
-                        <div className="user-post-edit" onClick={() => handleEditPost(post)}>
-                          <img
-                            src="\assets\Icons\edit.svg"
-                            alt="Edit"
-                          />
-                          <div>Edit</div>
-                        </div>
-                        <div className="user-post-remove" onClick={() => handleDeletePost(post.id)}>
-                          <img
-                            src="/assets/Icons/trash.svg"
-                            alt="Delete"
-                          />
-                          <div>Delete</div>
-                        </div>
+
+                        {post.status !== 'pending' && (
+                          <div className="user-post-edit" onClick={() => handleEditPost(post)}>
+                            <img
+                              src="\assets\Icons\edit.svg"
+                              alt="Edit"
+                            />
+                            <div>Edit</div>
+                          </div>
+                        )}
+
+                        {post.status !== 'rejected' && (
+                          <div className="user-post-remove" onClick={() => handleDeletePost(post.id)}>
+                            <img
+                              src="/assets/Icons/trash.svg"
+                              alt="Delete"
+                            />
+                            <div>Delete</div>
+                          </div>
+                        )}
+
                       </div>
                     </div>
                   ))
@@ -916,7 +923,7 @@ const UserProfile: React.FC = () => {
                       <div className="blocked-user-block" key={user.id}>
                         <div className="blocked-user-info">
                           <div className="blocked-user-image">
-                            <ProfilePicture profileImage={user?.profileImage}/>
+                            <ProfilePicture profileImage={user?.profileImage} />
                           </div>
                           <div className="blocked-user-info-block">
                             <div className="info-upper-text">Username</div>

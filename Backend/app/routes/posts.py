@@ -152,15 +152,13 @@ def friends_posts():
     GET: Returns posts from friends with image file paths.
     """
 
+    user_session = session.get('user')
+    if not user_session:
+        return jsonify({'error': 'User not logged in'}), 401
+    
+    user_id = user_session['id']
+
     with get_db() as db:
-
-        user_session = session.get('user')
-
-        if not user_session:
-            return jsonify({'error': 'User not logged in'}), 401
-
-        user_id = user_session['id']
-
         friends = db.query(Friendship).filter(
             (Friendship.user1_id == user_id) | (Friendship.user2_id == user_id),
             Friendship.status == 'accepted'
@@ -207,7 +205,7 @@ def friends_posts():
                     'isLiked': is_liked is not None,
                 })
 
-            return jsonify(result), 200
+        return jsonify(result), 200
 
 @posts_bp.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -368,8 +366,10 @@ def upload_post():
 
         with get_db() as db:
 
-            db.add(new_post)
-            db.commit()
+                db.add(new_post)
+                db.flush()  
+                db.commit()
+                db.refresh(new_post)
 
         socketio.emit('new_pending_post', {
             'id': new_post.id,
@@ -389,6 +389,7 @@ def upload_post():
                 'created_at': new_post.created_at.strftime('%Y-%m-%d %H:%M:%S')
             }
         }), 201
+    
     except Exception as e:
         print(f"Error creating post: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
@@ -438,9 +439,13 @@ def reject_post(post_id):
 
         if user.rejected_posts_count >= 3:
             user.is_blocked = True
+            block_user_if_rejected_posts_exceed_limit(user.id)
+
 
         db.add(user)
         db.commit()
+    
+    send_post_rejection_email(post_id)
 
     return jsonify({'message': 'Post rejected successfully'}), 200
 
