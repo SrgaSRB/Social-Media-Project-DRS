@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../notification/NotificationContext";
@@ -28,6 +28,37 @@ const Register: React.FC = () => {
 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+
+  useEffect(() => {
+    checkSession();
+  }, []);
+
+
+  const checkSession = async () => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/auth/session`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+
+      if (data.user.role !== "admin") {
+        showNotification("error", "You do not have permission to access this page.");
+        navigate('/login');
+      }
+
+    } catch (error) {
+      console.error('Error fetching session:', error);
+      navigate('/login');
+    } finally {
+      setIsLoading(false);
+    }
+
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -101,10 +132,9 @@ const Register: React.FC = () => {
         body: JSON.stringify(formData),
       });
 
-      console.log("Backend response:", response);
       if (response.ok) {
         showNotification("success", "Registration successful!");
-        navigate("/login"); // Redirect to login page after successful registration
+        //navigate("/login"); // Redirect to login page after successful registration
       } else {
         const errorData = await response.json();
         showNotification("error", `Error: ${errorData.message || "An error occurred"}`);
@@ -161,7 +191,8 @@ const Register: React.FC = () => {
                     required
                   />
                   {usernameAvailable === false && (
-                    <span className="error-message">
+                    <span className="error-message"
+                      style={{ color: "red" }}>
                       Username is not available.
                     </span>
                   )}
@@ -279,7 +310,9 @@ const Register: React.FC = () => {
                     required
                   />
                   {emailAvailable === false && (
-                    <span className="error-message">
+                    <span className="error-message"
+                      style={{ color: "red" }}
+                    >
                       Email address is not available.
                     </span>
                   )}
@@ -314,7 +347,7 @@ const Register: React.FC = () => {
                     onChange={handleConfirmPasswordChange}
                     required
                   />
-                  {passwordError && <span className="error-message">{passwordError}</span>}
+                  {passwordError && <span className="error-message" style={{ color: "red" }}>{passwordError}</span>}
 
 
                   <input
@@ -324,6 +357,8 @@ const Register: React.FC = () => {
                   />
                 </form>
               </div>
+
+              {/*
               <a
                 href="#"
                 className="link"
@@ -334,6 +369,7 @@ const Register: React.FC = () => {
               >
                 Already have an account?
               </a>
+                  */}
             </div>
             <div className="image-register-div">
               <img

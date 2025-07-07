@@ -53,7 +53,8 @@ def register():
             phone_number=data['phone_number'],
             email=data['email'],
             password=data['password'],  
-            role='user'  
+            role='user',
+            is_first_login=True
         )
 
         db.add(new_user)
@@ -72,10 +73,20 @@ def register():
             db.add(new_friendship)
             db.commit()
 
-        message_text = f"Kreiran korisnik! Korisnicko ime: {new_user.username} Lozinka: {new_user.password}"
+        message_text = (
+            f"Poštovani {new_user.first_name} {new_user.last_name},\n\n"
+            f"Vaš korisnički nalog je uspešno kreiran.\n"
+            f"Molimo Vas da se prijavite koristeći sledeće pristupne podatke:\n\n"
+            f"Korisničko ime: {new_user.username}\n"
+            f"Lozinka: {new_user.password}\n\n"
+            f"Nakon prijave moći ćete da pristupite svim funkcionalnostima sistema.\n\n"
+            f"S poštovanjem,\n"
+            f"Administratorski tim"
+        )
         send_email_in_thread(
             "luka.zbucnovic@gmail.com", "jndx ishq rgsd ehnb",
-            [f"{new_user.email}"], "Korisnik uspesno kreiran", message_text,
+            new_user.email,
+            "Korisnik uspesno kreiran", message_text,
             "smtp.gmail.com", 587
         )
 
@@ -103,6 +114,25 @@ def login():
             return jsonify({'error': 'User is blocked'}), 403
 
         if user and user.password == password:
+
+            if user.is_first_login:
+                admin = db.query(User).filter_by(role='admin').first()
+                if admin:
+                    subject = f"Korisnik {user.username} se prvi put prijavio"
+                    message = (
+                        f"Korisnik {user.first_name} {user.last_name} "
+                        f"({user.username}, {user.email}) se upravo prvi put prijavio na sistem."
+                    )
+
+                    send_email_in_thread(
+                        "luka.zbucnovic@gmail.com", "jndx ishq rgsd ehnb",
+                        [admin.email], subject, message,
+                        "smtp.gmail.com", 587
+                    )
+
+                user.is_first_login = False
+                db.commit()
+
             session['user'] = {
                 'id': user.id,
                 'username': user.username,

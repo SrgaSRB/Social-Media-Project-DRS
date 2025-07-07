@@ -7,6 +7,16 @@
   --notification-warning: #fbf3d5;
 }
 
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .notification-div {
   grid-column-gap: 16px;
   grid-row-gap: 16px;
@@ -25,8 +35,7 @@
   padding: 20px 30px;
   font-size: 1.5rem;
   display: flex;
-  position: fixed;
-  inset: 0% 0% auto auto;
+  position: relative;;
   z-index: 9999;
 }
 

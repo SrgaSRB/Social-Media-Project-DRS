@@ -16,6 +16,9 @@ def send_email(sender_email: str, sender_password: str, recipient: str, subject:
     :param smtp_server: SMTP server address.
     :param smtp_port: SMTP server port.
     """
+
+    print(f"Šaljem email na adresu: {recipient} sa temom: {subject}")
+
     try:
         # Create a MIME multipart message
         msg = MIMEMultipart()

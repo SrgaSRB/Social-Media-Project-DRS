@@ -38,7 +38,7 @@ const Login: React.FC = () => {
       })
       .catch(() => console.log('No active session'))
       .finally(() => setIsLoading(false));
-      setIsLoading(false);
+    setIsLoading(false);
 
   }, []);
 
@@ -67,10 +67,10 @@ const Login: React.FC = () => {
           if (response.status === 403 && errorData.error === 'User is blocked') {
             showNotification("error", "Your account has been blocked. Please contact support.");
             return;
-          }else if (response.status === 401) {
+          } else if (response.status === 401) {
             showNotification("warning", "Invalid password. Please try again.");
             return;
-          }else if (response.status === 404) {
+          } else if (response.status === 404) {
             showNotification("warning", "User not found. Please check your username.");
             return;
           }
@@ -146,6 +146,8 @@ const Login: React.FC = () => {
                     className="submit-button-3 w-button"
                     value="Login"
                   />
+                  {
+                    /*
                   <a
                     href="#"
                     className="link-2"
@@ -156,6 +158,8 @@ const Login: React.FC = () => {
                   >
                     Don't have an account?
                   </a>
+                    */
+                  }
                 </form>
               </div>
             </div>

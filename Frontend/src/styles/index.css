@@ -3842,7 +3842,11 @@ textarea.w-input, textarea.w-select {
 }
 
 .blocked-blocked-users-list {
+  background-color: #f6f6f6;
+  border-radius: 20px;
   flex-flow: column;
+  flex: 1;
+  padding: 20px;
   display: flex;
   overflow: auto;
 }
@@ -3878,10 +3882,6 @@ textarea.w-input, textarea.w-select {
   padding-right: 32px;
   font-size: 3rem;
   line-height: 1.4;
-}
-
-.admin-section-blocked-users {
-  height: 100vh;
 }
 
 .blocked-user-image {
@@ -3935,6 +3935,7 @@ textarea.w-input, textarea.w-select {
 
 .blocked-users-wrapper {
   flex-flow: column;
+  height: 100dvh;
   display: flex;
 }
 
@@ -4752,6 +4753,34 @@ textarea.w-input, textarea.w-select {
   background-color: gray;
   border-radius: 8px;
   padding: 10px 30px;
+}
+
+.text-block-36 {
+  font-size: 3rem;
+}
+
+.add-user-wrapper {
+  justify-content: center;
+  align-items: center;
+  height: 50dvh;
+  padding-bottom: 70px;
+  display: flex;
+}
+
+.text-block-37 {
+  font-size: 3rem;
+}
+
+.button-7 {
+  border-radius: 100px;
+  padding: 20px 80px;
+  font-size: 2.5rem;
+  transition: all .4s;
+}
+
+.button-7:hover {
+  background-color: #2f80c7;
+  box-shadow: 2px 2px 20px 2px #0003;
 }
 
 @media screen and (max-width: 991px) {
@@ -6225,6 +6254,11 @@ textarea.w-input, textarea.w-select {
 
   .div-block-17 {
     font-size: 1rem;
+  }
+
+  .button-7 {
+    padding: 10px 40px;
+    font-size: 1.25rem;
   }
 }
 

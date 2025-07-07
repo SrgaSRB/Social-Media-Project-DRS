@@ -971,6 +971,17 @@ const UserProfile: React.FC = () => {
               </div>
             </div>
           </section>
+
+
+          <section className="add-user-section">
+            <div className="w-layout-blockcontainer container w-container">
+              <div className="add-user-wrapper">
+                <a href="/register" className="button-7 w-button">Add New User</a>
+              </div>
+            </div>
+          </section>
+
+
           {/*
           <div className="admin-navbar">
           <a
